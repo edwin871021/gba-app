@@ -2,15 +2,14 @@
 <html lang="zh-TW" class="h-full bg-brand-900">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
     <title>大灣區自駕特種兵</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b2545">
     
-    <!-- 強制刷新快取 -->
-    <link rel="apple-touch-icon" href="icon.jpg?v=6">
+    <link rel="apple-touch-icon" href="icon.jpg?v=7">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -86,7 +85,7 @@
         <p class="text-xs font-bold" id="toast-message-text">提示訊息</p>
     </div>
 
-    <main class="flex-1 overflow-y-auto p-4 pb-32 no-scrollbar bg-slate-50" id="main-content">
+    <main class="flex-1 overflow-y-auto p-4 pb-24 no-scrollbar bg-slate-50" id="main-content">
         
         <section id="tab-dashboard" class="space-y-4">
             <div class="bg-gradient-to-br from-brand-900 to-brand-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
@@ -560,6 +559,27 @@
         function setActiveDay(dayNum) { activeDay = dayNum; renderItineraryPage(); }
         function showToast(m, w=false) { const t = document.getElementById('custom-toast'); document.getElementById('toast-message-text').innerText = m; t.classList.remove('hidden'); setTimeout(() => { t.style.opacity = '1'; t.style.transform = 'translateY(0)'; }, 50); setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.classList.add('hidden'), 300); }, 2000); }
 
+        // ==========================================
+        // 核心重置按鈕：修復丟失的功能
+        // ==========================================
+        function resetToCloudTemplate() {
+            if(confirm("確定重置雲端資料庫嗎？\n(這會將行程、攻略與打包清單恢復成您最原始完整的預設版本，包含記帳本也會一併清空)")) {
+                const resetTrip = JSON.parse(JSON.stringify(defaultTripDays));
+                const resetGuide = JSON.parse(JSON.stringify(defaultGuides));
+                const resetPack = JSON.parse(JSON.stringify(defaultPackingItems));
+                const resetWarn = JSON.parse(JSON.stringify(defaultTripWarning));
+                
+                db.collection("gba_trip").doc("main_trip").set({ 
+                    tripDays: resetTrip, guideData: resetGuide, packingItems: resetPack, tripWarning: resetWarn 
+                }).then(() => {
+                    db.collection("gba_budget").doc("main_budget").set({ expenses: [] }).then(() => {
+                        showToast("重置成功，正在重新整理...");
+                        setTimeout(() => location.reload(), 1000);
+                    });
+                });
+            }
+        }
+
         const defaultTripWarning = { title: "深圳限行與自駕防坑必看！", desc: "您租用的車輛為廣州牌（粵A）。深圳在工作日高峰期（07:00-09:00、17:30-19:30）嚴格限制外地車牌進入全市道路。規劃於 Day 6 (7/2 週四) 13:00~15:00 之間在深圳南山區據點還車，這個時段是絕對安全的離峰窗口！" };
         const defaultTripDays = {
             1: { date: "6/27", title: "Day 1 (6/27 週六) - 廣州直達 & 搶辦門號", city: "廣州", hotel: "廣州天河區酒店", events: [
@@ -609,7 +629,7 @@
             ]},
             7: { date: "7/03", title: "Day 7 (7/3 五) - 冰雪體驗、科技購物與雙夜市連衝", city: "深圳", hotel: "深圳南山區酒店", events: [
                 { time: "09:30 - 12:30", icon: "ski", title: "世界之窗：阿爾卑斯冰雪世界室內滑雪", desc: "單獨購買滑雪票，不需進入世界之窗主景區。在大型室內雪場享受夏日滑雪、溜冰的暢快快感！" },
-                { time: "13:00 - 16:30", icon: "shopping", title: "深圳萬象天地朝盛", desc: "前往大沖站，在經典的巨型「抱抱象」裝置前合照，漫步時尚旗艦街區並享用精緻午餐。" },
+                { time: "13:00 - 16:30", icon: "shopping", title: "深圳萬象天地朝聖", desc: "前往大沖站，在經典的巨型「抱抱象」裝置前合照，漫步時尚旗艦街區並享用精緻午餐。" },
                 { time: "17:00 - 19:30", icon: "sim", title: "華強北電子聖地 & 星河COCO Park", desc: "一窺華強北震撼的電子零件世界，隨後前往福田區核心的 COCO Park 商場散步。" },
                 { time: "20:00 之後", icon: "night", title: "【特種兵雙夜市連衝】東門老街 + 水圍夜市", desc: "先到老牌熱鬧的東門老街品嚐經典街頭小吃，再殺去充滿港式煙火氣的水圍夜市，大啖烤串、特色糖水宵夜。" },
                 { time: "22:30", icon: "hotel", title: "🏠 返回深圳南山區酒店休息", desc: "結束雙夜市的美食特種兵大餐後，搭乘地鐵快速返回位於【深圳南山區】的酒店整理行李、洗澡睡覺。" }
@@ -636,7 +656,6 @@
             { name: "衛生紙、濕巾", checked: false, group: "hygiene" }, { name: "酒精", checked: false, group: "hygiene" }, { name: "刮鬍刀", checked: false, group: "hygiene" }, { name: "藥品組 (感冒、防暈、常備藥)", checked: false, group: "hygiene" }, { name: "耳塞", checked: false, group: "hygiene" }, { name: "眼罩", checked: false, group: "hygiene" }, { name: "頸枕", checked: false, group: "hygiene" }
         ];
 
-        // 這裡就是最重要的啟動鑰匙！
         window.addEventListener('DOMContentLoaded', loadCloudData);
 
         if ('serviceWorker' in navigator) {
