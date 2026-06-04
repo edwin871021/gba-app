@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b2545">
     
-    <link rel="apple-touch-icon" href="icon.jpg?v=7">
+    <link rel="apple-touch-icon" href="icon.jpg?v=8">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -43,7 +43,8 @@
         .glow-gold { animation: pulse-gold 2s infinite; }
     </style>
 </head>
-<body class="text-slate-800 font-sans h-full flex flex-col overflow-hidden select-none">
+<!-- 絕對鎖死外殼：fixed inset-0 w-full h-full -->
+<body class="text-slate-800 font-sans fixed inset-0 w-full h-full flex flex-col overflow-hidden select-none">
 
     <div class="fixed top-0 left-0 right-0 h-[env(safe-area-inset-top)] bg-brand-900 z-50"></div>
 
@@ -85,7 +86,8 @@
         <p class="text-xs font-bold" id="toast-message-text">提示訊息</p>
     </div>
 
-    <main class="flex-1 overflow-y-auto p-4 pb-24 no-scrollbar bg-slate-50" id="main-content">
+    <!-- 精準計算底部留白：calc(80px+env(safe-area-inset-bottom)) -->
+    <main class="flex-1 overflow-y-auto p-4 pb-[calc(80px+env(safe-area-inset-bottom))] no-scrollbar bg-slate-50 relative" id="main-content">
         
         <section id="tab-dashboard" class="space-y-4">
             <div class="bg-gradient-to-br from-brand-900 to-brand-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
@@ -273,7 +275,8 @@
 
     </main>
 
-    <nav class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-50 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)]">
+    <!-- 加入 id="bottom-nav" 以便 JS 可以隱藏它 -->
+    <nav id="bottom-nav" class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-50 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)] transition-transform duration-300 ease-in-out">
         <div class="flex h-[60px] justify-around items-center">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 py-1.5 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[10px] mt-1 font-bold">總覽</span></button>
             <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 py-1.5 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-lg"></i><span class="text-[10px] mt-1">行程</span></button>
@@ -284,6 +287,9 @@
     </nav>
 
     <script>
+        // ==========================================
+        // 核心安全規則與原生 App 質感優化
+        // ==========================================
         document.addEventListener('touchstart', function (event) { if (event.touches.length > 1) event.preventDefault(); }, { passive: false });
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function (event) {
@@ -293,6 +299,24 @@
         }, { passive: false });
         document.addEventListener('gesturestart', function (event) { event.preventDefault(); });
 
+        // 原生質感優化：鍵盤彈出時自動隱藏底部導航欄
+        document.addEventListener('focusin', function(e) {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                document.getElementById('bottom-nav').classList.add('translate-y-full'); // 將導航欄往下推移隱藏
+            }
+        });
+        document.addEventListener('focusout', function(e) {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                setTimeout(() => {
+                    document.getElementById('bottom-nav').classList.remove('translate-y-full'); // 恢復導航欄
+                    window.scrollTo(0, 0); // 修復 iOS 鍵盤收起後的畫面位移空白 Bug
+                }, 10);
+            }
+        });
+
+        // ==========================================
+        // Firebase 憑證配置區
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyBIFGsVxsisfseqQMtrE3BJQMW9EE6D65o",
             authDomain: "gba-road-sync.firebaseapp.com",
@@ -559,9 +583,6 @@
         function setActiveDay(dayNum) { activeDay = dayNum; renderItineraryPage(); }
         function showToast(m, w=false) { const t = document.getElementById('custom-toast'); document.getElementById('toast-message-text').innerText = m; t.classList.remove('hidden'); setTimeout(() => { t.style.opacity = '1'; t.style.transform = 'translateY(0)'; }, 50); setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.classList.add('hidden'), 300); }, 2000); }
 
-        // ==========================================
-        // 核心重置按鈕：修復丟失的功能
-        // ==========================================
         function resetToCloudTemplate() {
             if(confirm("確定重置雲端資料庫嗎？\n(這會將行程、攻略與打包清單恢復成您最原始完整的預設版本，包含記帳本也會一併清空)")) {
                 const resetTrip = JSON.parse(JSON.stringify(defaultTripDays));
