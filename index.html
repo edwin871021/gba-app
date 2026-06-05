@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b2545">
     
-    <link rel="apple-touch-icon" href="icon.jpg?v=12">
+    <link rel="apple-touch-icon" href="icon.jpg?v=13">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -32,10 +32,17 @@
     <style>
         html { 
             -webkit-text-size-adjust: 100%; 
-            font: -apple-system-body;
+            font: -apple-system-body; /* 允許主內容響應系統字體大小 */
             touch-action: manipulation; 
         }
         body { background-color: #0b2545; }
+        
+        /* 鎖定 UI 字體大小，免疫 iOS 動態字體縮放 */
+        .lock-text-size {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            -webkit-text-size-adjust: none !important;
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .admin-only { display: none; }
@@ -47,28 +54,28 @@
 
     <div class="fixed top-0 left-0 right-0 h-[env(safe-area-inset-top)] bg-brand-900 z-50"></div>
 
-    <header class="bg-brand-900 text-white shrink-0 shadow-md pt-[env(safe-area-inset-top)] relative z-50">
+    <header class="lock-text-size bg-brand-900 text-white shrink-0 shadow-md pt-[env(safe-area-inset-top)] relative z-50">
         <div class="px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-2">
                 <div class="bg-brand-500 text-white p-1.5 rounded-lg flex items-center justify-center">
-                    <i class="fa-solid fa-fire text-sm animate-bounce text-amber-400"></i>
+                    <i class="fa-solid fa-fire text-[14px] animate-bounce text-amber-400"></i>
                 </div>
                 <div>
-                    <h1 class="text-base font-bold tracking-tight">大灣區自駕助手</h1>
-                    <p class="text-xs text-brand-100 opacity-80" id="sync-status">Firebase 數據同步中...</p>
+                    <h1 class="text-[16px] font-bold tracking-tight leading-tight">大灣區自駕助手</h1>
+                    <p class="text-[11px] text-brand-100 opacity-80 mt-0.5" id="sync-status">Firebase 數據同步中...</p>
                 </div>
             </div>
             <div class="text-right flex items-center space-x-2">
-                <button onclick="toggleAdminAuth()" id="btn-auth" class="text-[10px] bg-slate-700 hover:bg-slate-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
+                <button onclick="toggleAdminAuth()" id="btn-auth" class="text-[11px] bg-slate-700 hover:bg-slate-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
                     <i class="fa-solid fa-lock mr-1"></i>解鎖編輯
                 </button>
-                <button onclick="resetToCloudTemplate()" class="admin-only text-[10px] bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
+                <button onclick="resetToCloudTemplate()" class="admin-only text-[11px] bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
                     重置範本
                 </button>
             </div>
         </div>
         
-        <div class="bg-brand-800/50 px-4 py-2 border-t border-brand-800 flex justify-between items-center text-xs text-slate-300">
+        <div class="bg-brand-800/50 px-4 py-2 border-t border-brand-800 flex justify-between items-center text-[11px] text-slate-300">
             <div class="flex items-center space-x-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span id="current-city-indicator">當前城市：讀取中...</span>
@@ -82,10 +89,10 @@
 
     <div id="custom-toast" class="hidden fixed top-[env(safe-area-inset-top,1rem)] left-4 right-4 bg-slate-900 text-white p-3.5 rounded-xl shadow-2xl z-50 transition-all duration-300 transform translate-y-[-20px] opacity-0 flex items-center space-x-3 border border-white/10 mt-4">
         <div class="text-amber-500" id="toast-icon-box"><i class="fa-solid fa-circle-info"></i></div>
-        <p class="text-xs font-bold" id="toast-message-text">提示訊息</p>
+        <p class="text-[12px] font-bold" id="toast-message-text">提示訊息</p>
     </div>
 
-    <main class="flex-1 overflow-y-auto p-4 pb-[calc(80px+env(safe-area-inset-bottom))] no-scrollbar bg-slate-50 relative" id="main-content">
+    <main class="flex-1 overflow-y-auto p-4 pb-[calc(60px+env(safe-area-inset-bottom))] no-scrollbar bg-slate-50 relative" id="main-content">
         
         <section id="tab-dashboard" class="space-y-4">
             <div class="bg-gradient-to-br from-brand-900 to-brand-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
@@ -213,7 +220,10 @@
             </div>
 
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
-                <h3 class="text-xs font-extrabold text-slate-800"><i class="fa-solid fa-plus mr-1"></i>增加個人私人物品</h3>
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-extrabold text-slate-800"><i class="fa-solid fa-plus mr-1"></i>增加個人私人物品</h3>
+                    <button onclick="resetPersonalPackingList()" class="text-[11px] text-red-500 font-bold transition active:scale-90 px-2 py-1 bg-red-50 rounded-lg"><i class="fa-solid fa-rotate-right mr-1"></i>重置清單</button>
+                </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div class="col-span-2"><input type="text" id="input-pack-name" placeholder="例如：個人藥品、隱形眼鏡" class="w-full px-3 py-1.5 text-xs border rounded-lg"></div>
                     <div>
@@ -276,13 +286,13 @@
 
     </main>
 
-    <nav id="bottom-nav" class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-50 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)] transition-transform duration-300 ease-in-out">
-        <div class="flex h-[60px] justify-around items-center">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 py-1.5 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[10px] mt-1 font-bold">總覽</span></button>
-            <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 py-1.5 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-lg"></i><span class="text-[10px] mt-1">行程</span></button>
-            <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 py-1.5 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-lg"></i><span class="text-[10px] mt-1">攻略</span></button>
-            <button onclick="switchTab('packing')" id="nav-packing" class="flex flex-col items-center justify-center flex-1 py-1.5 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-suitcase text-lg"></i><span class="text-[10px] mt-1">打包</span></button>
-            <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center justify-center flex-1 py-1.5 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-wallet text-lg"></i><span class="text-[10px] mt-1">記帳</span></button>
+    <nav id="bottom-nav" class="lock-text-size bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-50 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-transform duration-300 ease-in-out" style="padding-bottom: env(safe-area-inset-bottom);">
+        <div class="flex justify-around items-center pt-2 pb-1">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[20px]"></i><span class="text-[10px] mt-1 font-bold">總覽</span></button>
+            <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[20px]"></i><span class="text-[10px] mt-1 font-bold">行程</span></button>
+            <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[20px]"></i><span class="text-[10px] mt-1 font-bold">攻略</span></button>
+            <button onclick="switchTab('packing')" id="nav-packing" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-suitcase text-[20px]"></i><span class="text-[10px] mt-1 font-bold">打包</span></button>
+            <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-wallet text-[20px]"></i><span class="text-[10px] mt-1 font-bold">記帳</span></button>
         </div>
     </nav>
 
@@ -331,13 +341,13 @@
                 if (pass === ADMIN_PASSWORD) {
                     isAdmin = true;
                     document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i>已鎖定編輯';
-                    document.getElementById('btn-auth').className = "text-[10px] bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
+                    document.getElementById('btn-auth').className = "text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
                     showToast("身分認證成功！已解鎖權限。"); applyAdminUI(true);
                 } else if (pass !== null) { showToast("密碼錯誤，拒絕存取編輯權限。", true); }
             } else {
                 isAdmin = false;
                 document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock mr-1"></i>解鎖編輯';
-                document.getElementById('btn-auth').className = "text-[10px] bg-slate-700 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
+                document.getElementById('btn-auth').className = "text-[11px] bg-slate-700 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
                 showToast("已退出管理模式。"); applyAdminUI(false);
             }
         }
@@ -361,6 +371,16 @@
 
         function saveLocalPackingList() {
             localStorage.setItem('gba_personal_packing', JSON.stringify(packingItems));
+        }
+
+        // 專屬本機打包清單重置功能
+        function resetPersonalPackingList() {
+            if(confirm("確定要將本機的打包清單恢復成預設狀態嗎？\n(這會清除您自行新增的私人物品，並還原所有打勾狀態)")) {
+                packingItems = JSON.parse(JSON.stringify(defaultPackingItems));
+                saveLocalPackingList();
+                renderPackingChecklist();
+                showToast("個人打包清單已重置！");
+            }
         }
 
         function loadCloudData() {
@@ -424,8 +444,8 @@
                 document.getElementById(`tab-${tab}`).classList.toggle('hidden', tab !== tabId);
                 const navBtn = document.getElementById(`nav-${tab}`);
                 if(navBtn) navBtn.className = (tab === tabId) 
-                    ? "flex flex-col items-center justify-center flex-1 py-1.5 text-brand-500 transition-all active:scale-90 active:opacity-75" 
-                    : "flex flex-col items-center justify-center flex-1 py-1.5 text-slate-400 transition-all active:scale-90 active:opacity-75";
+                    ? "flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75" 
+                    : "flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75";
             });
             document.getElementById('main-content').scrollTop = 0;
         }
@@ -500,9 +520,6 @@
             container.innerHTML = htmlContent + `</div>`;
         }
 
-        // ==========================================
-        // 行程編輯與排序系統
-        // ==========================================
         function editTripEvent(idx) {
             if(!isAdmin) return;
             const evt = tripDays[activeDay].events[idx];
@@ -682,7 +699,7 @@
 
         function setActiveDay(dayNum) { 
             activeDay = dayNum; 
-            cancelEditTripEvent(); // 切換天數時取消編輯模式
+            cancelEditTripEvent(); 
             renderItineraryPage(); 
         }
         function showToast(m, w=false) { const t = document.getElementById('custom-toast'); document.getElementById('toast-message-text').innerText = m; t.classList.remove('hidden'); setTimeout(() => { t.style.opacity = '1'; t.style.transform = 'translateY(0)'; }, 50); setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.classList.add('hidden'), 300); }, 2000); }
