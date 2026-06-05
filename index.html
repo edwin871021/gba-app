@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>大灣區自駕特種兵</title>
+    <title>大灣區旅遊助手</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b2545">
     
-    <link rel="apple-touch-icon" href="icon.jpg?v=15">
+    <link rel="apple-touch-icon" href="icon.jpg?v=16">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,17 +30,18 @@
         }
     </script>
     <style>
-        /* 核心修復 1：徹底鎖死基礎字體大小，免疫 iOS 系統「輔助使用」巨大字體縮放，確保精緻版面不崩潰 */
         html { 
             font-size: 16px !important;
             -webkit-text-size-adjust: 100% !important;
             touch-action: manipulation; 
         }
-        
-        /* 核心修復 2：外殼背景強制設為白色，徹底消滅底部任何可能的藍色縫隙 */
         body { background-color: #ffffff; }
 
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .lock-text-size {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            -webkit-text-size-adjust: none !important;
+        }
+
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .admin-only { display: none; }
@@ -49,19 +50,18 @@
         .glow-gold { animation: pulse-gold 2s infinite; }
     </style>
 </head>
-
-<body class="text-slate-800 font-sans fixed inset-0 w-full h-full flex flex-col overflow-hidden select-none bg-white">
+<body class="text-slate-800 font-sans fixed inset-0 w-full h-full flex flex-col overflow-hidden select-none bg-slate-50">
 
     <div class="shrink-0 w-full bg-brand-900 z-50" style="height: env(safe-area-inset-top);"></div>
 
-    <header class="bg-brand-900 text-white shrink-0 shadow-md relative z-50">
+    <header class="lock-text-size bg-brand-900 text-white shrink-0 shadow-md relative z-50">
         <div class="px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-2">
                 <div class="bg-brand-500 text-white p-1.5 rounded-lg flex items-center justify-center">
                     <i class="fa-solid fa-fire text-[14px] animate-bounce text-amber-400"></i>
                 </div>
                 <div>
-                    <h1 class="text-[16px] font-bold tracking-tight leading-tight">大灣區自駕助手</h1>
+                    <h1 class="text-[16px] font-bold tracking-tight leading-tight">大灣區旅遊助手</h1>
                     <p class="text-[11px] text-brand-100 opacity-80 mt-0.5" id="sync-status">Firebase 數據同步中...</p>
                 </div>
             </div>
@@ -92,10 +92,10 @@
         <p class="text-[12px] font-bold" id="toast-message-text">提示訊息</p>
     </div>
 
-    <main class="flex-1 overflow-y-auto p-4 no-scrollbar bg-slate-50 relative w-full" id="main-content">
+    <main class="flex-1 overflow-y-auto p-4 pb-[85px] no-scrollbar bg-slate-50 relative w-full" id="main-content">
         
-        <section id="tab-dashboard" class="space-y-4 pb-6">
-            <div class="bg-gradient-to-br from-brand-900 to-brand-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
+        <section id="tab-dashboard" class="space-y-4">
+            <div class="lock-text-size bg-gradient-to-br from-brand-900 to-brand-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
                 <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4">
                     <i class="fa-solid fa-route text-9xl"></i>
                 </div>
@@ -104,107 +104,107 @@
                     <h2 class="text-[24px] font-bold mt-1 leading-tight" id="dashboard-hero-title">讀取中...</h2>
                     <p class="text-[14px] text-slate-300 mt-2 leading-relaxed" id="dashboard-hero-desc">讀取中...</p>
                     <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10 text-center">
-                        <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">總里程</p><p class="text-[16px] font-bold text-amber-400 mt-0.5">~350 km</p></div>
-                        <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">計畫跨城</p><p class="text-[16px] font-bold text-emerald-400 mt-0.5">4 城</p></div>
-                        <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">交通工具</p><p class="text-[16px] font-bold text-sky-400 mt-0.5">自駕/高鐵</p></div>
+                        <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">總里程 (預估)</p><p class="text-[18px] font-bold text-amber-400 mt-0.5">~350 km</p></div>
+                        <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">計畫跨城</p><p class="text-[18px] font-bold text-emerald-400 mt-0.5">4 城</p></div>
+                        <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">交通工具</p><p class="text-[18px] font-bold text-sky-400 mt-0.5">自駕/高鐵</p></div>
                     </div>
                 </div>
             </div>
 
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                <h3 class="text-[14px] font-bold text-slate-800 mb-3 flex items-center">
+                <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center">
                     <i class="fa-solid fa-hotel mr-2 text-brand-500"></i>每晚落腳點一覽表
                 </h3>
-                <div class="grid grid-cols-1 gap-2 text-[12px]" id="dashboard-hotel-list"></div>
+                <div class="grid grid-cols-1 gap-2 text-xs" id="dashboard-hotel-list"></div>
             </div>
 
             <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-start space-x-3 shadow-sm">
-                <div class="text-amber-500 shrink-0 mt-0.5"><i class="fa-solid fa-triangle-exclamation text-[16px]"></i></div>
+                <div class="text-amber-500 shrink-0 mt-0.5"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
                 <div>
-                    <h4 class="text-[12px] font-bold text-amber-800" id="dashboard-warning-title">讀取中...</h4>
-                    <p class="text-[12px] text-amber-700 mt-1 leading-relaxed" id="dashboard-warning-desc">讀取中...</p>
+                    <h4 class="text-xs font-bold text-amber-800" id="dashboard-warning-title">讀取中...</h4>
+                    <p class="text-xs text-amber-700 mt-1 leading-relaxed" id="dashboard-warning-desc">讀取中...</p>
                 </div>
             </div>
 
             <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 mt-4">
-                <h3 class="text-[12px] font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-pen-to-square mr-1.5 text-brand-500"></i>編輯首頁標題與簡介</h3>
-                <input type="text" id="input-dash-title" class="w-full px-3 py-1.5 text-[12px] border rounded-lg bg-slate-50 focus:bg-white" placeholder="大標題">
-                <textarea id="input-dash-desc" rows="3" class="w-full px-3 py-1.5 text-[12px] border rounded-lg bg-slate-50 focus:bg-white" placeholder="簡介內容..."></textarea>
-                <button onclick="updateDashboardInfo()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-[12px] transition active:scale-95 shadow-sm">發布更新標題簡介</button>
+                <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-pen-to-square mr-1.5 text-brand-500"></i>編輯首頁標題與簡介</h3>
+                <input type="text" id="input-dash-title" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="大標題">
+                <textarea id="input-dash-desc" rows="3" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="簡介內容..."></textarea>
+                <button onclick="updateDashboardInfo()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">發布更新標題簡介</button>
             </div>
 
             <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 mt-4">
-                <h3 class="text-[12px] font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-pen-to-square mr-1.5 text-brand-500"></i>編輯底部注意事項</h3>
-                <input type="text" id="input-warn-title" class="w-full px-3 py-1.5 text-[12px] border rounded-lg bg-slate-50 focus:bg-white" placeholder="標題">
-                <textarea id="input-warn-desc" rows="3" class="w-full px-3 py-1.5 text-[12px] border rounded-lg bg-slate-50 focus:bg-white" placeholder="內容..."></textarea>
-                <button onclick="updateWarning()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-[12px] transition active:scale-95 shadow-sm">發布更新注意事項</button>
+                <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-pen-to-square mr-1.5 text-brand-500"></i>編輯底部注意事項</h3>
+                <input type="text" id="input-warn-title" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="標題">
+                <textarea id="input-warn-desc" rows="3" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="內容..."></textarea>
+                <button onclick="updateWarning()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">發布更新注意事項</button>
             </div>
         </section>
 
-        <section id="tab-itinerary" class="hidden space-y-4 pb-6">
+        <section id="tab-itinerary" class="hidden space-y-4">
             <div id="day-nav-bar" class="flex space-x-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth"></div>
 
             <div class="admin-only bg-white p-3 rounded-xl shadow-sm border border-slate-100 space-y-2">
-                <div class="flex items-center space-x-2 text-[12px] font-bold text-brand-900 shrink-0">
+                <div class="flex items-center space-x-2 text-xs font-bold text-brand-900 shrink-0">
                     <i class="fa-solid fa-map-location-dot text-brand-500"></i><span>今日基本資訊 (編輯模式)</span>
                 </div>
                 <div class="flex space-x-2">
-                    <input type="text" id="input-day-city" class="w-20 shrink-0 px-2 py-1.5 text-[12px] border rounded-lg bg-slate-50 focus:bg-white" placeholder="城市">
-                    <input type="text" id="input-day-hotel" class="flex-1 min-w-0 px-2 py-1.5 text-[12px] border rounded-lg bg-slate-50 focus:bg-white" placeholder="住宿酒店">
-                    <button onclick="updateDayInfo()" class="shrink-0 bg-brand-500 hover:bg-brand-600 text-white font-bold px-3 py-1.5 rounded-lg text-[12px] transition active:scale-90">同步修改</button>
+                    <input type="text" id="input-day-city" class="w-20 shrink-0 px-2 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="城市">
+                    <input type="text" id="input-day-hotel" class="flex-1 min-w-0 px-2 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="住宿酒店">
+                    <button onclick="updateDayInfo()" class="shrink-0 bg-brand-500 hover:bg-brand-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition active:scale-90">同步修改</button>
                 </div>
             </div>
 
             <div id="day-details-container" class="space-y-4"></div>
 
             <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
-                <h3 class="text-[12px] font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-calendar-plus mr-1.5 text-brand-500"></i><span id="label-add-edit">在當前天數新增行程</span></h3>
+                <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-calendar-plus mr-1.5 text-brand-500"></i><span id="label-add-edit">在當前天數新增行程</span></h3>
                 <div class="grid grid-cols-3 gap-2">
-                    <div><input type="text" id="input-evt-time" placeholder="時間區間" class="w-full px-2 py-1.5 text-[12px] border rounded-lg"></div>
-                    <div class="col-span-2"><input type="text" id="input-evt-title" placeholder="行程主標題" class="w-full px-2 py-1.5 text-[12px] border rounded-lg"></div>
+                    <div><input type="text" id="input-evt-time" placeholder="時間區間" class="w-full px-2 py-1.5 text-xs border rounded-lg"></div>
+                    <div class="col-span-2"><input type="text" id="input-evt-title" placeholder="行程主標題" class="w-full px-2 py-1.5 text-xs border rounded-lg"></div>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
                     <div>
-                        <select id="input-evt-icon" class="w-full px-1 py-1.5 text-[12px] border rounded-lg bg-white">
+                        <select id="input-evt-icon" class="w-full px-1 py-1.5 text-xs border rounded-lg bg-white">
                             <option value="car">🚗 自駕車</option><option value="landmark">📍 景點門點</option><option value="food">🍱 美食餐飲</option><option value="hotel">🏠 飯店住宿</option><option value="night">🌙 夜市晚景</option><option value="camera">📷 拍照攝影</option><option value="sim">📱 通訊電話</option><option value="bank">🏦 銀行開戶</option><option value="license">🪪 辦駕駛證</option><option value="ship">🚢 碼頭渡輪</option><option value="train">🚄 高鐵火車</option><option value="plane">✈️ 機場航空</option><option value="kart">🏎️ 卡丁車速</option><option value="ski">⛷️ 室內滑雪</option><option value="shopping">🛍️ 購物商圈</option>
                         </select>
                     </div>
                     <div class="col-span-2">
-                        <select id="input-evt-task" class="w-full px-1 py-1.5 text-[12px] border rounded-lg bg-white font-bold text-slate-700">
+                        <select id="input-evt-task" class="w-full px-1 py-1.5 text-xs border rounded-lg bg-white font-bold text-slate-700">
                             <option value="false">普通遊玩行程</option><option value="true" class="text-amber-600">★ 核心任務（高亮）</option>
                         </select>
                     </div>
                 </div>
-                <div><textarea id="input-evt-desc" rows="2" placeholder="詳細說明與防坑備忘..." class="w-full px-2 py-1.5 text-[12px] border rounded-lg"></textarea></div>
+                <div><textarea id="input-evt-desc" rows="2" placeholder="詳細說明與防坑備忘..." class="w-full px-2 py-1.5 text-xs border rounded-lg"></textarea></div>
                 <div class="flex space-x-2">
-                    <button id="btn-submit-evt" onclick="addTripEvent()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-[12px] transition active:scale-95 shadow-sm">加入今日計畫</button>
-                    <button id="btn-cancel-evt" onclick="cancelEditTripEvent()" class="hidden shrink-0 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold px-3 py-2 rounded-lg text-[12px] transition active:scale-95 shadow-sm">取消</button>
+                    <button id="btn-submit-evt" onclick="addTripEvent()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">加入今日計畫</button>
+                    <button id="btn-cancel-evt" onclick="cancelEditTripEvent()" class="hidden shrink-0 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold px-3 py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">取消</button>
                 </div>
             </div>
         </section>
 
-        <section id="tab-guides" class="hidden space-y-4 pb-6">
+        <section id="tab-guides" class="hidden space-y-4">
             <div class="flex bg-slate-200 p-1 rounded-xl shrink-0 overflow-x-auto no-scrollbar" id="guide-tabs-bar"></div>
             <div id="guide-contents-container"></div>
             <hr class="border-slate-200">
             
             <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
-                <h3 class="text-[12px] font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-folder-plus mr-1.5 text-brand-500"></i>建立全新辦事攻略分類</h3>
-                <div><input type="text" id="input-guide-title" placeholder="分類名稱 (自動編號，例如：保險辦理)" class="w-full px-3 py-1.5 text-[12px] border rounded-lg bg-slate-50 focus:bg-white"></div>
-                <div><input type="text" id="input-guide-desc" placeholder="前言摘要說明..." class="w-full px-3 py-1.5 text-[12px] border rounded-lg bg-slate-50 focus:bg-white"></div>
+                <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-folder-plus mr-1.5 text-brand-500"></i>建立全新辦事攻略分類</h3>
+                <div><input type="text" id="input-guide-title" placeholder="分類名稱 (自動編號，例如：保險辦理)" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white"></div>
+                <div><input type="text" id="input-guide-desc" placeholder="前言摘要說明..." class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white"></div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div><textarea id="input-guide-s1" rows="2" placeholder="重點步驟一內容..." class="w-full px-2 py-1 text-[12px] border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
-                    <div><textarea id="input-guide-s2" rows="2" placeholder="重點步驟二內容..." class="w-full px-2 py-1 text-[12px] border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
+                    <div><textarea id="input-guide-s1" rows="2" placeholder="重點步驟一內容..." class="w-full px-2 py-1 text-xs border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
+                    <div><textarea id="input-guide-s2" rows="2" placeholder="重點步驟二內容..." class="w-full px-2 py-1 text-xs border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
                 </div>
                 <div class="flex space-x-2">
-                    <button onclick="addUserGuide()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-[12px] transition active:scale-95 shadow-sm">確認新增</button>
-                    <button onclick="deleteCurrentGuide()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-lg text-[12px] transition active:scale-95 shadow-sm">刪除此攻略</button>
+                    <button onclick="addUserGuide()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">確認新增</button>
+                    <button onclick="deleteCurrentGuide()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-lg text-xs transition active:scale-95 shadow-sm">刪除此攻略</button>
                 </div>
             </div>
         </section>
 
-        <section id="tab-packing" class="hidden space-y-4 pb-6">
-            <div class="bg-gradient-to-br from-indigo-900 to-brand-900 text-white p-5 rounded-2xl shadow-md relative overflow-hidden">
+        <section id="tab-packing" class="hidden space-y-4">
+            <div class="lock-text-size bg-gradient-to-br from-indigo-900 to-brand-900 text-white p-5 rounded-2xl shadow-md relative overflow-hidden">
                 <div class="relative z-10">
                     <span class="text-[12px] uppercase tracking-widest text-amber-500 font-bold">Personal Packing List</span>
                     <div class="flex justify-between items-baseline mt-1">
@@ -219,32 +219,32 @@
             </div>
             
             <div class="space-y-4">
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-[12px] font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-passport mr-2 text-red-500"></i>1. 必備核心證件包</h3><div class="grid grid-cols-1 gap-2" id="packing-group-docs"></div></div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-[12px] font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-laptop-code mr-2 text-blue-500"></i>2. 電子通訊與充電組</h3><div class="grid grid-cols-1 gap-2" id="packing-group-tech"></div></div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-[12px] font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-umbrella mr-2 text-amber-500"></i>3. 日常隨身攜帶組</h3><div class="grid grid-cols-1 gap-2" id="packing-group-daily"></div></div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-[12px] font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-shirt mr-2 text-green-500"></i>4. 衣物穿戴與防護</h3><div class="grid grid-cols-1 gap-2" id="packing-group-clothes"></div></div>
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-[12px] font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-soap mr-2 text-purple-500"></i>5. 衛生清潔與個人舒適</h3><div class="grid grid-cols-1 gap-2" id="packing-group-hygiene"></div></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-passport mr-2 text-red-500"></i>1. 必備核心證件包</h3><div class="grid grid-cols-1 gap-2" id="packing-group-docs"></div></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-laptop-code mr-2 text-blue-500"></i>2. 電子通訊與充電組</h3><div class="grid grid-cols-1 gap-2" id="packing-group-tech"></div></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-umbrella mr-2 text-amber-500"></i>3. 日常隨身攜帶組</h3><div class="grid grid-cols-1 gap-2" id="packing-group-daily"></div></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-shirt mr-2 text-green-500"></i>4. 衣物穿戴與防護</h3><div class="grid grid-cols-1 gap-2" id="packing-group-clothes"></div></div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-soap mr-2 text-purple-500"></i>5. 衛生清潔與個人舒適</h3><div class="grid grid-cols-1 gap-2" id="packing-group-hygiene"></div></div>
             </div>
 
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-[12px] font-extrabold text-slate-800"><i class="fa-solid fa-plus mr-1"></i>增加個人私人物品</h3>
+                    <h3 class="text-xs font-extrabold text-slate-800"><i class="fa-solid fa-plus mr-1"></i>增加個人私人物品</h3>
                     <button onclick="resetPersonalPackingList()" class="text-[11px] text-red-500 font-bold transition active:scale-90 px-2 py-1 bg-red-50 rounded-lg"><i class="fa-solid fa-rotate-right mr-1"></i>重置清單</button>
                 </div>
                 <div class="grid grid-cols-3 gap-2">
-                    <div class="col-span-2"><input type="text" id="input-pack-name" placeholder="例如：個人藥品、隱形眼鏡" class="w-full px-3 py-1.5 text-[12px] border rounded-lg"></div>
+                    <div class="col-span-2"><input type="text" id="input-pack-name" placeholder="例如：個人藥品、隱形眼鏡" class="w-full px-3 py-1.5 text-xs border rounded-lg"></div>
                     <div>
-                        <select id="input-pack-group" class="w-full px-1 py-1.5 text-[12px] border rounded-lg bg-white">
+                        <select id="input-pack-group" class="w-full px-1 py-1.5 text-xs border rounded-lg bg-white">
                             <option value="docs">核心證件</option><option value="tech">電子通訊</option><option value="daily">日常隨身</option><option value="clothes">衣物穿戴</option><option value="hygiene">衛生舒適</option>
                         </select>
                     </div>
                 </div>
-                <button onclick="addUserPackingItem()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg text-[12px] transition shadow-sm active:scale-95">新增到我的本機清單</button>
+                <button onclick="addUserPackingItem()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg text-xs transition shadow-sm active:scale-95">新增到我的本機清單</button>
             </div>
         </section>
 
-        <section id="tab-budget" class="hidden space-y-4 pb-6">
-            <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 text-white p-5 rounded-2xl shadow-md">
+        <section id="tab-budget" class="hidden space-y-4">
+            <div class="lock-text-size bg-gradient-to-br from-emerald-800 to-emerald-950 text-white p-5 rounded-2xl shadow-md">
                 <span class="text-[12px] uppercase tracking-widest text-emerald-300 font-bold">Firebase 即時同步帳本（全員可編輯）</span>
                 <div class="grid grid-cols-2 gap-4 mt-3">
                     <div><p class="text-[12px] text-emerald-300">已付總額</p><h2 class="text-[24px] font-extrabold text-emerald-300 leading-tight" id="budget-paid-total">NT$ 0</h2></div>
@@ -260,31 +260,31 @@
             </div>
 
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
-                <h3 class="text-[12px] font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-plus mr-1.5 text-brand-500"></i>新增記帳項目</h3>
+                <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-plus mr-1.5 text-brand-500"></i>新增記帳項目</h3>
                 <div class="grid grid-cols-2 gap-2">
-                    <div><input type="text" id="input-exp-name" placeholder="項目名稱" class="w-full px-3 py-1.5 text-[12px] border rounded-lg"></div>
-                    <div><input type="number" id="input-exp-cost" placeholder="金額 (NTD)" class="w-full px-3 py-1.5 text-[12px] border rounded-lg"></div>
+                    <div><input type="text" id="input-exp-name" placeholder="項目名稱" class="w-full px-3 py-1.5 text-xs border rounded-lg"></div>
+                    <div><input type="number" id="input-exp-cost" placeholder="金額 (NTD)" class="w-full px-3 py-1.5 text-xs border rounded-lg"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <select id="input-exp-category" class="w-full px-2.5 py-1.5 text-[12px] border rounded-lg bg-white">
+                        <select id="input-exp-category" class="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-white">
                             <option value="交通">交通/船票/過路費</option><option value="住宿">酒店住宿</option><option value="飲食">餐飲美食/夜市</option><option value="玩樂">卡丁車/滑雪/景點</option><option value="行政">行政/開戶/駕照</option><option value="其他">其他雜費</option>
                         </select>
                     </div>
                     <div>
-                        <select id="input-exp-status" class="w-full px-2.5 py-1.5 text-[12px] border rounded-lg bg-white font-bold text-emerald-600">
+                        <select id="input-exp-status" class="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-white font-bold text-emerald-600">
                             <option value="paid">已付款</option><option value="unpaid">尚未付款</option>
                         </select>
                     </div>
                 </div>
-                <button onclick="addUserExpense()" class="w-full bg-brand-500 text-white font-bold py-2 rounded-lg text-[12px] transition active:scale-95 flex items-center justify-center space-x-1 shadow-sm">
+                <button onclick="addUserExpense()" class="w-full bg-brand-500 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 flex items-center justify-center space-x-1 shadow-sm">
                     <i class="fa-solid fa-circle-plus"></i><span>同步新增至雲端帳本</span>
                 </button>
             </div>
 
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-[12px] font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-list-check mr-2 text-emerald-500"></i>記帳即時明細</h3>
+                    <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-list-check mr-2 text-emerald-500"></i>記帳即時明細</h3>
                     <button onclick="clearAllExpenses()" class="text-[11px] text-red-500 font-bold transition active:scale-90">清空全部</button>
                 </div>
                 <div class="space-y-2" id="budget-items-list"></div>
@@ -293,8 +293,8 @@
 
     </main>
 
-    <nav id="bottom-nav" class="bg-white border-t border-slate-200 z-50 w-full shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-transform duration-300 pb-safe">
-        <div class="flex justify-around items-center pt-2 pb-1.5">
+    <nav id="bottom-nav" class="lock-text-size bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-50 w-full shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-transform duration-300 pb-[15px]">
+        <div class="flex justify-around items-center pt-2 pb-1">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[20px]"></i><span class="text-[10px] mt-1 font-bold">總覽</span></button>
             <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[20px]"></i><span class="text-[10px] mt-1 font-bold">行程</span></button>
             <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[20px]"></i><span class="text-[10px] mt-1 font-bold">攻略</span></button>
@@ -315,13 +315,13 @@
 
         document.addEventListener('focusin', function(e) {
             if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-                document.getElementById('bottom-nav').classList.add('hidden');
+                document.getElementById('bottom-nav').classList.add('translate-y-full');
             }
         });
         document.addEventListener('focusout', function(e) {
             if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
                 setTimeout(() => {
-                    document.getElementById('bottom-nav').classList.remove('hidden');
+                    document.getElementById('bottom-nav').classList.remove('translate-y-full');
                     window.scrollTo(0, 0); 
                 }, 10);
             }
@@ -716,7 +716,6 @@
                 listContainer.appendChild(div);
             });
 
-            // 修復的邏輯：先計算與更新上方面板，再處理零資料的顯示狀態
             let grandTotal = paidTotal + unpaidTotal; 
             document.getElementById('budget-paid-total').innerText = `NT$ ${paidTotal.toLocaleString()}`; 
             document.getElementById('budget-unpaid-total').innerText = `NT$ ${unpaidTotal.toLocaleString()}`; 
@@ -733,7 +732,6 @@
         function toggleExpenseStatus(index) { userExpenses[index].status = userExpenses[index].status === 'paid' ? 'unpaid' : 'paid'; pushBudgetDataToCloud(); }
         function deleteExpenseItem(index) { userExpenses.splice(index, 1); pushBudgetDataToCloud(); }
         
-        // 強制瞬間渲染 UI 的清空機制
         function clearAllExpenses() { 
             if(confirm("確定清空全部雲端帳本？")) { 
                 userExpenses = []; 
