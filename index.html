@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b2545">
     
-    <link rel="apple-touch-icon" href="icon.jpg?v=11">
+    <link rel="apple-touch-icon" href="icon.jpg?v=12">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -144,7 +144,7 @@
             <div id="day-details-container" class="space-y-4"></div>
 
             <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
-                <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-calendar-plus mr-1.5 text-brand-500"></i>在當前天數新增行程</h3>
+                <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-calendar-plus mr-1.5 text-brand-500"></i><span id="label-add-edit">在當前天數新增行程</span></h3>
                 <div class="grid grid-cols-3 gap-2">
                     <div><input type="text" id="input-evt-time" placeholder="時間區間" class="w-full px-2 py-1.5 text-xs border rounded-lg"></div>
                     <div class="col-span-2"><input type="text" id="input-evt-title" placeholder="行程主標題" class="w-full px-2 py-1.5 text-xs border rounded-lg"></div>
@@ -162,7 +162,10 @@
                     </div>
                 </div>
                 <div><textarea id="input-evt-desc" rows="2" placeholder="詳細說明與防坑備忘..." class="w-full px-2 py-1.5 text-xs border rounded-lg"></textarea></div>
-                <button onclick="addTripEvent()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">加入今日計畫</button>
+                <div class="flex space-x-2">
+                    <button id="btn-submit-evt" onclick="addTripEvent()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">加入今日計畫</button>
+                    <button id="btn-cancel-evt" onclick="cancelEditTripEvent()" class="hidden shrink-0 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold px-3 py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">取消</button>
+                </div>
             </div>
         </section>
 
@@ -186,7 +189,6 @@
             </div>
         </section>
 
-        <!-- 第四頁：個人化行李打包清單 -->
         <section id="tab-packing" class="hidden space-y-4">
             <div class="bg-gradient-to-br from-indigo-900 to-brand-900 text-white p-5 rounded-2xl shadow-md relative overflow-hidden">
                 <div class="relative z-10">
@@ -195,7 +197,6 @@
                         <h2 class="text-2xl font-bold">出發行李檢查</h2>
                         <span class="text-xs text-brand-100" id="packing-stat-text">已打包 0 / 26</span>
                     </div>
-                    <!-- 說明文案更新：強調是本機儲存，不影響他人 -->
                     <p class="text-xs text-brand-100 opacity-80 mt-1 leading-relaxed">完美整合手寫物品筆記。打勾狀態與自訂物品<strong class="text-white px-1">僅保存在您的手機本機</strong>，不會與他人互相干擾！</p>
                     <div class="w-full bg-white/10 rounded-full h-1.5 mt-4 overflow-hidden">
                         <div class="bg-amber-500 h-1.5 rounded-full transition-all duration-300" id="packing-progress-bar" style="width: 0%"></div>
@@ -211,7 +212,6 @@
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-soap mr-2 text-purple-500"></i>5. 衛生清潔與個人舒適</h3><div class="grid grid-cols-1 gap-2" id="packing-group-hygiene"></div></div>
             </div>
 
-            <!-- 開放給所有人使用，移除 admin-only class -->
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
                 <h3 class="text-xs font-extrabold text-slate-800"><i class="fa-solid fa-plus mr-1"></i>增加個人私人物品</h3>
                 <div class="grid grid-cols-3 gap-2">
@@ -322,7 +322,7 @@
         const db = firebase.firestore();
 
         const ADMIN_PASSWORD = "GBA2026_MASTER"; 
-        let isAdmin = false; let activeDay = 1;
+        let isAdmin = false; let activeDay = 1; let editEventIndex = -1;
         let tripDays = {}; let guideData = []; let userExpenses = []; let packingItems = []; let activeGuideTab = ""; let tripWarning = {};
 
         function toggleAdminAuth() {
@@ -344,12 +344,10 @@
 
         function applyAdminUI(show) {
             document.querySelectorAll('.admin-only').forEach(el => { el.style.display = show ? 'block' : 'none'; });
+            cancelEditTripEvent();
             renderItineraryPage(); renderGuidesPage();
         }
 
-        // ==========================================
-        // 個人化打包清單 (Local Storage 本機讀寫)
-        // ==========================================
         function loadLocalPackingList() {
             const localData = localStorage.getItem('gba_personal_packing');
             if (localData) {
@@ -385,7 +383,6 @@
                         tripDays = JSON.parse(JSON.stringify(defaultTripDays)); 
                         guideData = JSON.parse(JSON.stringify(defaultGuides)); 
                         tripWarning = JSON.parse(JSON.stringify(defaultTripWarning));
-                        // 打包清單不再寫入 Firebase
                         db.collection("gba_trip").doc("main_trip").set({ tripDays, guideData, tripWarning });
                     }
                 } catch (error) {
@@ -411,7 +408,6 @@
         }
 
         function pushTripDataToCloud() { 
-            // 移除了 packingItems 的上傳
             if (isAdmin) db.collection("gba_trip").doc("main_trip").set({ tripDays, guideData, tripWarning }, { merge: true }); 
         }
         function pushBudgetDataToCloud() { db.collection("gba_budget").doc("main_budget").set({ expenses: userExpenses }); }
@@ -420,7 +416,7 @@
             renderDashboard(); 
             renderItineraryPage(); 
             renderGuidesPage(); 
-            loadLocalPackingList(); // 初始化時從本機讀取打包清單
+            loadLocalPackingList(); 
         }
 
         function switchTab(tabId) {
@@ -487,16 +483,16 @@
                                     <span class="text-xs font-bold text-brand-500 bg-brand-50 px-2 py-0.5 rounded-md">${evt.time}</span>
                                     <div class="flex items-center space-x-2">
                                         ${evt.isTask ? '<span class="text-[9px] bg-amber-500 text-white font-extrabold px-1.5 py-0.5 rounded">核心任務</span>' : ''}
-                                        ${isAdmin ? `<button onclick="deleteTripEvent(${idx})" class="text-slate-300 hover:text-red-500 text-xs transition active:scale-90"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                                        ${isAdmin ? `<div class="flex items-center space-x-2.5 text-slate-300">
+                                            ${idx > 0 ? `<button onclick="moveTripEvent(${idx}, -1)" class="hover:text-brand-500 transition active:scale-90"><i class="fa-solid fa-arrow-up text-xs"></i></button>` : ''}
+                                            ${idx < dayData.events.length - 1 ? `<button onclick="moveTripEvent(${idx}, 1)" class="hover:text-brand-500 transition active:scale-90"><i class="fa-solid fa-arrow-down text-xs"></i></button>` : ''}
+                                            <button onclick="editTripEvent(${idx})" class="hover:text-amber-500 transition active:scale-90"><i class="fa-solid fa-pen text-xs"></i></button>
+                                            <button onclick="deleteTripEvent(${idx})" class="hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                                        </div>` : ''}
                                     </div>
                                 </div>
                                 <h4 class="text-xs font-extrabold text-slate-800 mt-2">${evt.title}</h4>
                                 <p class="text-xs text-slate-500 mt-1 leading-relaxed">${evt.desc}</p>
-                                ${evt.hasEasterEgg ? `
-                                    <div id="dafo-easter-egg-${idx}" class="mt-3 p-3 bg-slate-900 text-slate-300 rounded-lg text-xs space-y-2 transition-all duration-500">
-                                        <div class="flex items-center justify-between"><span class="font-bold text-amber-500"><i class="fa-solid fa-lightbulb mr-1"></i>大佛寺視覺彩蛋</span><button onclick="toggleDafoLights(${idx})" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-2 py-1 rounded text-[10px] transition active:scale-90">切換點燈</button></div>
-                                        <div id="dafo-status-text-${idx}" class="text-[10px] text-slate-400">目前狀態：白天（19:00前未點燈）</div>
-                                    </div>` : ''}
                             </div>
                         </div>`;
                 });
@@ -504,10 +500,53 @@
             container.innerHTML = htmlContent + `</div>`;
         }
 
-        function toggleDafoLights(idx) {
-            const container = document.getElementById(`dafo-easter-egg-${idx}`); const statusText = document.getElementById(`dafo-status-text-${idx}`);
-            if (container.style.backgroundColor === 'rgb(120, 53, 15)') { container.style.backgroundColor = '#0f172a'; container.style.color = '#cbd5e1'; statusText.innerText = '目前狀態：白天（19:00前未點燈）'; statusText.className = 'text-[10px] text-slate-400'; }
-            else { container.style.backgroundColor = '#78350f'; container.style.color = '#fef3c7'; statusText.innerText = '✨ 點燈開啟！金壁輝煌，神隱少女湯屋奇景呈現。'; statusText.className = 'text-[10px] text-amber-300 font-bold animate-pulse'; }
+        // ==========================================
+        // 行程編輯與排序系統
+        // ==========================================
+        function editTripEvent(idx) {
+            if(!isAdmin) return;
+            const evt = tripDays[activeDay].events[idx];
+            document.getElementById('input-evt-time').value = evt.time || '';
+            document.getElementById('input-evt-title').value = evt.title || '';
+            document.getElementById('input-evt-icon').value = evt.icon || 'landmark';
+            document.getElementById('input-evt-task').value = evt.isTask ? 'true' : 'false';
+            document.getElementById('input-evt-desc').value = evt.desc || '';
+            editEventIndex = idx;
+            
+            document.getElementById('label-add-edit').innerText = "編輯目前行程";
+            const btn = document.getElementById('btn-submit-evt');
+            btn.innerHTML = '儲存修改';
+            btn.className = 'flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm';
+            document.getElementById('btn-cancel-evt').classList.remove('hidden');
+
+            document.getElementById('input-evt-time').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function cancelEditTripEvent() {
+            editEventIndex = -1;
+            if(document.getElementById('input-evt-time')) document.getElementById('input-evt-time').value = '';
+            if(document.getElementById('input-evt-title')) document.getElementById('input-evt-title').value = '';
+            if(document.getElementById('input-evt-desc')) document.getElementById('input-evt-desc').value = '';
+            if(document.getElementById('label-add-edit')) document.getElementById('label-add-edit').innerText = "在當前天數新增行程";
+            
+            const btn = document.getElementById('btn-submit-evt');
+            if(btn) {
+                btn.innerHTML = '加入今日計畫';
+                btn.className = 'flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm';
+            }
+            const cancelBtn = document.getElementById('btn-cancel-evt');
+            if(cancelBtn) cancelBtn.classList.add('hidden');
+        }
+
+        function moveTripEvent(idx, dir) {
+            if(!isAdmin) return;
+            const events = tripDays[activeDay].events;
+            if (dir === -1 && idx > 0) {
+                [events[idx], events[idx - 1]] = [events[idx - 1], events[idx]];
+            } else if (dir === 1 && idx < events.length - 1) {
+                [events[idx], events[idx + 1]] = [events[idx + 1], events[idx]];
+            }
+            pushTripDataToCloud();
         }
 
         function updateDayInfo() {
@@ -521,10 +560,35 @@
 
         function addTripEvent() {
             if(!isAdmin) return; const title = document.getElementById('input-evt-title').value.trim(); if (!title) return;
-            tripDays[activeDay].events.push({ time: document.getElementById('input-evt-time').value.trim() || "隨時", icon: document.getElementById('input-evt-icon').value, isTask: document.getElementById('input-evt-task').value === "true", desc: document.getElementById('input-evt-desc').value.trim() });
-            pushTripDataToCloud(); document.getElementById('input-evt-title').value = ''; document.getElementById('input-evt-desc').value = '';
+            
+            const newEvt = { 
+                time: document.getElementById('input-evt-time').value.trim() || "隨時", 
+                icon: document.getElementById('input-evt-icon').value, 
+                isTask: document.getElementById('input-evt-task').value === "true", 
+                desc: document.getElementById('input-evt-desc').value.trim() 
+            };
+
+            if (editEventIndex > -1) {
+                tripDays[activeDay].events[editEventIndex] = newEvt;
+                cancelEditTripEvent();
+                showToast("行程已更新！");
+            } else {
+                tripDays[activeDay].events.push(newEvt);
+                document.getElementById('input-evt-title').value = ''; 
+                document.getElementById('input-evt-desc').value = '';
+                document.getElementById('input-evt-time').value = '';
+                showToast("已加入新行程！");
+            }
+            pushTripDataToCloud(); 
         }
-        function deleteTripEvent(idx) { if(!isAdmin) return; tripDays[activeDay].events.splice(idx, 1); pushTripDataToCloud(); }
+
+        function deleteTripEvent(idx) { 
+            if(!isAdmin) return; 
+            if(confirm("確定要刪除此行程嗎？")) {
+                tripDays[activeDay].events.splice(idx, 1); 
+                pushTripDataToCloud(); 
+            }
+        }
 
         function clearGuideInputs() {
             if(document.getElementById('input-guide-title')) document.getElementById('input-guide-title').value = '';
@@ -572,7 +636,6 @@
             Object.keys(groups).forEach(k => groups[k].innerHTML = ''); let checkedCount = 0;
             packingItems.forEach((item, index) => {
                 if (item.checked) checkedCount++; const div = document.createElement('div'); div.className = `flex items-center justify-between p-2 rounded-lg border ${item.checked ? 'bg-indigo-50/40 text-slate-400 line-through' : 'bg-slate-50'}`;
-                // 現在任何人都可刪除自己的清單物品
                 div.innerHTML = `<label class="flex items-center space-x-3 cursor-pointer flex-1"><input type="checkbox" onchange="togglePackingItem(${index}, this)" ${item.checked ? 'checked' : ''} class="w-4 h-4 text-brand-500"><span class="text-xs font-semibold">${item.name}</span></label><button onclick="deletePackingItem(${index})" class="text-slate-300 hover:text-red-500 text-xs transition active:scale-90"><i class="fa-solid fa-trash"></i></button>`;
                 if(groups[item.group]) groups[item.group].appendChild(div);
             });
@@ -582,24 +645,22 @@
 
         function togglePackingItem(index, cb) { 
             packingItems[index].checked = cb.checked; 
-            saveLocalPackingList(); // 改為本機存檔
+            saveLocalPackingList(); 
             renderPackingChecklist(); 
         }
 
         function addUserPackingItem() { 
-            // 移除了 admin 限制，任何人都能新增私人物品
             const name = document.getElementById('input-pack-name').value.trim(); 
             if(!name) return; 
             packingItems.push({ name, checked: false, group: document.getElementById('input-pack-group').value }); 
-            saveLocalPackingList(); // 儲存至本機
+            saveLocalPackingList(); 
             document.getElementById('input-pack-name').value = ''; 
             renderPackingChecklist();
         }
 
         function deletePackingItem(index) { 
-            // 任何人都可以刪除
             packingItems.splice(index, 1); 
-            saveLocalPackingList(); // 更新本機存檔
+            saveLocalPackingList(); 
             renderPackingChecklist();
         }
 
@@ -619,7 +680,11 @@
         function deleteExpenseItem(index) { userExpenses.splice(index, 1); pushBudgetDataToCloud(); }
         function clearAllExpenses() { if(confirm("確定清空全部雲端帳本？")) { userExpenses = []; pushBudgetDataToCloud(); } }
 
-        function setActiveDay(dayNum) { activeDay = dayNum; renderItineraryPage(); }
+        function setActiveDay(dayNum) { 
+            activeDay = dayNum; 
+            cancelEditTripEvent(); // 切換天數時取消編輯模式
+            renderItineraryPage(); 
+        }
         function showToast(m, w=false) { const t = document.getElementById('custom-toast'); document.getElementById('toast-message-text').innerText = m; t.classList.remove('hidden'); setTimeout(() => { t.style.opacity = '1'; t.style.transform = 'translateY(0)'; }, 50); setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.classList.add('hidden'), 300); }, 2000); }
 
         function resetToCloudTemplate() {
@@ -628,7 +693,6 @@
                 const resetGuide = JSON.parse(JSON.stringify(defaultGuides));
                 const resetWarn = JSON.parse(JSON.stringify(defaultTripWarning));
                 
-                // 同時清空本機的打包資料
                 localStorage.removeItem('gba_personal_packing');
                 
                 db.collection("gba_trip").doc("main_trip").set({ 
