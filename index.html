@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b2545">
     
-    <link rel="apple-touch-icon" href="icon.jpg?v=18">
+    <link rel="apple-touch-icon" href="icon.jpg?v=19">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,59 +30,30 @@
         }
     </script>
     <style>
-        /* 核心修復 1：免疫巨大字體設定 */
-        html { 
-            font-size: 16px !important;
-            -webkit-text-size-adjust: 100% !important;
-        }
-
-        /* 核心修復 2：絕對物理封鎖！釘死螢幕四角，根絕 iOS 虛擬留白 Bug */
-        body, html {
+        /* 終極佈局解法：使用 100dvh 完美貼合 iOS 真實可見視窗 */
+        html, body {
+            height: 100dvh;
             width: 100%;
-            height: 100%;
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            background-color: #0b2545; /* 避免下拉出現白光，與頂部同色 */
+            overflow: hidden; /* 鎖死外殼，只允許內部 main 滾動 */
+            background-color: #0b2545; /* 確保頂部下拉不會露出白邊 */
+            -webkit-text-size-adjust: 100% !important; /* 免疫長輩巨大字體設定 */
             touch-action: manipulation;
         }
 
-        /* 建立絕對佔滿螢幕的夾心餅乾容器 */
-        #app-layout {
+        /* App 夾心餅乾主容器 */
+        #app-container {
             display: flex;
             flex-direction: column;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
             height: 100%;
+            width: 100%;
             background-color: #f8fafc;
-            overflow: hidden;
         }
 
         .lock-text-size {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             -webkit-text-size-adjust: none !important;
-        }
-
-        /* 頂部動態島安全區填滿 */
-        .safe-top {
-            height: env(safe-area-inset-top);
-            width: 100%;
-            background-color: #0b2545;
-            flex-shrink: 0;
-        }
-        
-        /* 底部導航列精準貼合，僅保留 4px + 黑線安全距離 */
-        .safe-bottom {
-            padding-bottom: calc(4px + env(safe-area-inset-bottom));
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -94,12 +65,11 @@
     </style>
 </head>
 
-<body>
-    <!-- 物理釘死的 App 總容器 -->
-    <div id="app-layout">
+<body class="text-slate-800 font-sans select-none">
+    
+    <div id="app-container">
         
-        <!-- 動態島底色 -->
-        <div class="safe-top"></div>
+        <div class="shrink-0 w-full bg-brand-900" style="height: env(safe-area-inset-top);"></div>
 
         <header class="lock-text-size bg-brand-900 text-white shrink-0 shadow-md relative z-50">
             <div class="px-4 py-3 flex items-center justify-between">
@@ -139,8 +109,7 @@
             <p class="text-[12px] font-bold" id="toast-message-text">提示訊息</p>
         </div>
 
-        <!-- 彈性佔滿中間空間的內容區 -->
-        <main class="flex-1 overflow-y-auto p-4 pb-6 no-scrollbar relative" id="main-content">
+        <main class="flex-1 overflow-y-auto p-4 pb-8 no-scrollbar bg-slate-50 w-full relative" id="main-content">
             
             <section id="tab-dashboard" class="space-y-4">
                 <div class="lock-text-size bg-gradient-to-br from-brand-900 to-brand-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
@@ -340,9 +309,8 @@
             </section>
         </main>
 
-        <!-- 導航列：做為 flex-column 的最後一塊積木，搭配 safe-bottom 物理緊貼 -->
-        <nav id="bottom-nav" class="lock-text-size bg-white border-t border-slate-200 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] safe-bottom w-full">
-            <div class="flex justify-around items-center pt-2">
+        <nav id="bottom-nav" class="lock-text-size bg-white border-t border-slate-200 w-full shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]" style="padding-bottom: env(safe-area-inset-bottom);">
+            <div class="flex justify-around items-center pt-2 pb-1">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[20px]"></i><span class="text-[10px] mt-1 font-bold">總覽</span></button>
                 <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[20px]"></i><span class="text-[10px] mt-1 font-bold">行程</span></button>
                 <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[20px]"></i><span class="text-[10px] mt-1 font-bold">攻略</span></button>
@@ -363,7 +331,6 @@
         }, { passive: false });
         document.addEventListener('gesturestart', function (event) { event.preventDefault(); });
 
-        // 鍵盤回彈 Bug 終極修復：隱藏底部，並強制重繪
         document.addEventListener('focusin', function(e) {
             if(['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
                 document.getElementById('bottom-nav').style.display = 'none';
