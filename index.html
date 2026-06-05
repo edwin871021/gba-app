@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b2545">
     
-    <link rel="apple-touch-icon" href="icon.jpg?v=8">
+    <link rel="apple-touch-icon" href="icon.jpg?v=9">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -43,7 +43,6 @@
         .glow-gold { animation: pulse-gold 2s infinite; }
     </style>
 </head>
-<!-- 絕對鎖死外殼：fixed inset-0 w-full h-full -->
 <body class="text-slate-800 font-sans fixed inset-0 w-full h-full flex flex-col overflow-hidden select-none">
 
     <div class="fixed top-0 left-0 right-0 h-[env(safe-area-inset-top)] bg-brand-900 z-50"></div>
@@ -86,7 +85,6 @@
         <p class="text-xs font-bold" id="toast-message-text">提示訊息</p>
     </div>
 
-    <!-- 精準計算底部留白：calc(80px+env(safe-area-inset-bottom)) -->
     <main class="flex-1 overflow-y-auto p-4 pb-[calc(80px+env(safe-area-inset-bottom))] no-scrollbar bg-slate-50 relative" id="main-content">
         
         <section id="tab-dashboard" class="space-y-4">
@@ -101,7 +99,7 @@
                     <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10 text-center">
                         <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-xs text-slate-400">總里程 (預估)</p><p class="text-lg font-bold text-amber-400 mt-0.5">~350 km</p></div>
                         <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-xs text-slate-400">計畫跨城</p><p class="text-lg font-bold text-emerald-400 mt-0.5">4 城</p></div>
-                        <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-xs text-slate-400">交通工具</p><p class="text-lg font-bold text-sky-400 mt-0.5">自駕/船</p></div>
+                        <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-xs text-slate-400">交通工具</p><p class="text-lg font-bold text-sky-400 mt-0.5">自駕/船/高鐵</p></div>
                     </div>
                 </div>
             </div>
@@ -154,7 +152,7 @@
                 <div class="grid grid-cols-3 gap-2">
                     <div>
                         <select id="input-evt-icon" class="w-full px-1 py-1.5 text-xs border rounded-lg bg-white">
-                            <option value="car">🚗 自駕車</option><option value="landmark">📍 景點門點</option><option value="food">🍱 美食餐飲</option><option value="hotel">🏠 飯店住宿</option><option value="night">🌙 夜市晚景</option><option value="camera">📷 拍照攝影</option><option value="sim">📱 通訊電話</option><option value="bank">🏦 銀行開戶</option><option value="license">🪪 辦駕駛證</option><option value="ship">🚢 碼頭渡輪</option><option value="plane">✈️ 機場航空</option><option value="kart">🏎️ 卡丁車速</option><option value="ski">⛷️ 室內滑雪</option><option value="shopping">🛍️ 購物商圈</option>
+                            <option value="car">🚗 自駕車</option><option value="landmark">📍 景點門點</option><option value="food">🍱 美食餐飲</option><option value="hotel">🏠 飯店住宿</option><option value="night">🌙 夜市晚景</option><option value="camera">📷 拍照攝影</option><option value="sim">📱 通訊電話</option><option value="bank">🏦 銀行開戶</option><option value="license">🪪 辦駕駛證</option><option value="ship">🚢 碼頭渡輪</option><option value="train">🚄 高鐵火車</option><option value="plane">✈️ 機場航空</option><option value="kart">🏎️ 卡丁車速</option><option value="ski">⛷️ 室內滑雪</option><option value="shopping">🛍️ 購物商圈</option>
                         </select>
                     </div>
                     <div class="col-span-2">
@@ -275,7 +273,6 @@
 
     </main>
 
-    <!-- 加入 id="bottom-nav" 以便 JS 可以隱藏它 -->
     <nav id="bottom-nav" class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-50 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)] transition-transform duration-300 ease-in-out">
         <div class="flex h-[60px] justify-around items-center">
             <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 py-1.5 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-lg"></i><span class="text-[10px] mt-1 font-bold">總覽</span></button>
@@ -287,9 +284,6 @@
     </nav>
 
     <script>
-        // ==========================================
-        // 核心安全規則與原生 App 質感優化
-        // ==========================================
         document.addEventListener('touchstart', function (event) { if (event.touches.length > 1) event.preventDefault(); }, { passive: false });
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function (event) {
@@ -299,24 +293,20 @@
         }, { passive: false });
         document.addEventListener('gesturestart', function (event) { event.preventDefault(); });
 
-        // 原生質感優化：鍵盤彈出時自動隱藏底部導航欄
         document.addEventListener('focusin', function(e) {
             if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-                document.getElementById('bottom-nav').classList.add('translate-y-full'); // 將導航欄往下推移隱藏
+                document.getElementById('bottom-nav').classList.add('translate-y-full');
             }
         });
         document.addEventListener('focusout', function(e) {
             if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
                 setTimeout(() => {
-                    document.getElementById('bottom-nav').classList.remove('translate-y-full'); // 恢復導航欄
-                    window.scrollTo(0, 0); // 修復 iOS 鍵盤收起後的畫面位移空白 Bug
+                    document.getElementById('bottom-nav').classList.remove('translate-y-full');
+                    window.scrollTo(0, 0); 
                 }, 10);
             }
         });
 
-        // ==========================================
-        // Firebase 憑證配置區
-        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyBIFGsVxsisfseqQMtrE3BJQMW9EE6D65o",
             authDomain: "gba-road-sync.firebaseapp.com",
@@ -416,7 +406,7 @@
             document.getElementById('main-content').scrollTop = 0;
         }
 
-        const icons = { ship: '<i class="fa-solid fa-ship"></i>', sim: '<i class="fa-solid fa-mobile-screen-button"></i>', hotel: '<i class="fa-solid fa-hotel"></i>', night: '<i class="fa-solid fa-moon"></i>', camera: '<i class="fa-solid fa-camera"></i>', food: '<i class="fa-solid fa-utensils"></i>', temple: '<i class="fa-solid fa-synagogue"></i>', bank: '<i class="fa-solid fa-building-columns"></i>', license: '<i class="fa-solid fa-address-card"></i>', car: '<i class="fa-solid fa-car-side"></i>', speed: '<i class="fa-solid fa-gauge-high"></i>', kart: '<i class="fa-solid fa-motorcycle"></i>', landmark: '<i class="fa-solid fa-archway"></i>', bridge: '<i class="fa-solid fa-bridge"></i>', ski: '<i class="fa-solid fa-person-skiing"></i>', shopping: '<i class="fa-solid fa-bag-shopping"></i>', plane: '<i class="fa-solid fa-plane"></i>' };
+        const icons = { ship: '<i class="fa-solid fa-ship"></i>', sim: '<i class="fa-solid fa-mobile-screen-button"></i>', hotel: '<i class="fa-solid fa-hotel"></i>', night: '<i class="fa-solid fa-moon"></i>', camera: '<i class="fa-solid fa-camera"></i>', food: '<i class="fa-solid fa-utensils"></i>', temple: '<i class="fa-solid fa-synagogue"></i>', bank: '<i class="fa-solid fa-building-columns"></i>', license: '<i class="fa-solid fa-address-card"></i>', car: '<i class="fa-solid fa-car-side"></i>', speed: '<i class="fa-solid fa-gauge-high"></i>', kart: '<i class="fa-solid fa-motorcycle"></i>', landmark: '<i class="fa-solid fa-archway"></i>', bridge: '<i class="fa-solid fa-bridge"></i>', ski: '<i class="fa-solid fa-person-skiing"></i>', shopping: '<i class="fa-solid fa-bag-shopping"></i>', plane: '<i class="fa-solid fa-plane"></i>', train: '<i class="fa-solid fa-train"></i>' };
 
         function renderDashboard() {
             const container = document.getElementById('dashboard-hotel-list');
@@ -601,65 +591,59 @@
             }
         }
 
-        const defaultTripWarning = { title: "深圳限行與自駕防坑必看！", desc: "您租用的車輛為廣州牌（粵A）。深圳在工作日高峰期（07:00-09:00、17:30-19:30）嚴格限制外地車牌進入全市道路。規劃於 Day 6 (7/2 週四) 13:00~15:00 之間在深圳南山區據點還車，這個時段是絕對安全的離峰窗口！" };
+        const defaultTripWarning = { title: "深中通道與深圳還車防坑必看！", desc: "您於 Day 7 (7/3 週五) 清晨需從珠海經深中通道趕回深圳還車。請務必嚴格控時，行程已為您精準規劃於 06:30 提早出發，避開工作日最可怕的早高峰塞車與潛在的外地車牌限行，趕在 09:00 前至南油店優雅結算還車！" };
         const defaultTripDays = {
-            1: { date: "6/27", title: "Day 1 (6/27 週六) - 廣州直達 & 搶辦門號", city: "廣州", hotel: "廣州天河區酒店", events: [
-                { time: "15:00", icon: "ship", title: "香港國際機場 (HKG) 出發", desc: "搭乘 CX9879 渡輪前往廣州琶洲客運碼頭 (PFT)。在香港機場免再次出入境，行李直接在台北掛好渡輪聯運。" },
-                { time: "17:15", icon: "landmark", title: "抵達廣州琶洲客運碼頭", desc: "順利辦理入境通關並提領行李。此處直接位於廣州市中心海珠區，交通便利。" },
-                { time: "18:00 - 19:30", icon: "sim", title: "【核心任務】搶辦實名制電話卡", desc: "下船出站後，立刻打車衝去市區大型中國移動直營廳（如天河體育西大廳）。趕在 20:00 前以台胞證辦理實名門號。", isTask: true },
-                { time: "19:30", icon: "hotel", title: "🏠 入住廣州天河區酒店 Check-in", desc: "辦妥門號手續後，直接前往今晚入住的【廣州天河區】酒店辦理入住手續並放置行李。" },
-                { time: "20:30 之後", icon: "night", title: "花城廣場 & 海心沙散步", desc: "此處在琶洲對岸不遠，是平視欣賞點燈後的「廣州塔 (小蠻腰)」的最佳核心機位。在江風中測試剛辦好的行動上網並開通支付。" }
+            1: { date: "6/27", title: "Day 1 (6/27 六) - 抵達廣州 & 搶辦門號", city: "廣州", hotel: "珠江新城區域酒店", events: [
+                { time: "17:15", icon: "ship", title: "抵達廣州琶洲港 (PFT)", desc: "搭船抵達廣州琶洲港。" },
+                { time: "18:30 - 19:40", icon: "sim", title: "【核心任務】辦理實名制門號", desc: "下船後提行李直奔天河區中國移動直營營業廳，持台胞證辦理實名制大陸手機號（選低月租保號套餐，現場確認可收發簡訊）。", isTask: true },
+                { time: "晚上", icon: "night", title: "珠江新城 Check-in & 珠江夜景", desc: "前往珠江新城酒店放行李。隨後漫步花城廣場 ➔ 海心沙 ➔ 遠眺廣州塔（小蠻腰），欣賞頂級 CBD 夜景燈光秀並享用晚餐。" }
             ]},
-            2: { date: "6/28", title: "Day 2 (6/28 週日) - 嶺南西關老廣州文化", city: "廣州", hotel: "廣州天河區酒店", events: [
-                { time: "09:30 - 12:00", icon: "camera", title: "沙面島漫步", desc: "島上布滿十九世紀英法租界時期的歐式復古建築，環境幽雅，是人像攝影與街拍的天堂。" },
-                { time: "12:00 - 15:30", icon: "landmark", title: "永慶坊深度遊", desc: "西關歷史老街區與現代文創的融合代表。看嶺南老騎樓建築、逛非遺文化展示（粵劇等），品嚐道地西關小吃。" },
-                { time: "15:30 - 18:00", icon: "food", title: "上下九步行街吃個夠", desc: "老牌傳統商業一條街，邊逛邊吃。推薦嘗試：道地雙皮奶、西關竹昇麵。" },
-                { time: "18:30 之後", icon: "temple", title: "北京路步行街 & 大佛寺點燈", desc: "大佛寺在夜間點燈後金碧輝煌，極似吉卜力動畫《神隱少女》中的湯屋！", hasEasterEgg: true },
-                { time: "21:00", icon: "hotel", title: "🏠 返回廣州天河區酒店休息", desc: "結束北京路漫步與大佛寺拍照後，返回位於【廣州天河區】的酒店整理行李、洗澡休息，為明天的自駕任務養精蓄銳。" }
+            2: { date: "6/28", title: "Day 2 (6/28 日) - 嶺南歷史文化與街拍", city: "廣州", hotel: "珠江新城區域酒店", events: [
+                { time: "上午", icon: "camera", title: "沙面島街拍", desc: "漫步歐式巴洛克與新古典主義建築群，早晨陽光柔和，極適合街拍建築光影。" },
+                { time: "中午", icon: "food", title: "上下九步行街", desc: "享用老廣地道小吃（西關腸粉、雙皮奶、竹升麵）。" },
+                { time: "下午", icon: "landmark", title: "永慶坊", desc: "嶺南騎樓與現代設計碰撞的網紅歷史文創街區，可拍故事感照片。" },
+                { time: "晚上", icon: "temple", title: "北京路步行街 & 大佛寺點燈", desc: "晚餐後必拍，夜晚亮燈後神似《神隱少女》魔幻湯屋的視覺大片。", hasEasterEgg: true }
             ]},
-            3: { date: "6/29", title: "Day 3 (6/29 週一) - 辦開戶與臨時駕照 + 直奔唐家灣古鎮", city: "唐家灣", hotel: "珠海唐家古鎮客棧", events: [
-                { time: "09:00 - 11:30", icon: "bank", title: "【核心任務】富邦華一廣州分行開戶", desc: "銀行開門立刻進去辦理台胞開戶。確認拿金融卡並綁定微信/支付寶做一筆小額付費測試，確保帳戶安全暢通。", isTask: true },
-                { time: "13:30 - 14:15", icon: "license", title: "【核心任務】岑村車管總所辦理臨時駕照", desc: "提前預約下午審核。免體檢！現場窗口直接核對材料、繳交工本費 10 元人民幣，大約 30 分鐘即可當場製證發照！", isTask: true },
-                { time: "14:30 - 15:30", icon: "car", title: "一嗨租車：岑村據點取車", desc: "出示台胞證、台灣駕照以及剛拿到熱騰騰的臨時駕照。租下一輛粵A車輛，自駕大灣區公路之旅正式開始！", isTask: true },
-                { time: "15:30 - 17:00", icon: "speed", title: "【自駕首航】上高速公路直奔唐家灣古鎮", desc: "從天河區上廣澳高速開車直奔珠海北部的「唐家灣古鎮」（約1.5小時）。免去中途頻繁換酒店的疲勞！" },
-                { time: "17:30", icon: "hotel", title: "🏠 入住珠海唐家灣古鎮特色客棧 Check-in", desc: "抵達唐家灣古鎮後，先至極具特色、古色古香的【唐家灣古鎮】民俗客棧辦理入住登記、放置行李。" },
-                { time: "19:00 之後", icon: "food", title: "享用古鎮晚餐 & 漫步寧靜夜景", desc: "第一晚住在安靜悠閒的唐家灣。在靜謐的古鎮中享用當地特色泥燴雞、官塘茶果等經典老味道，隨後欣賞古鎮亮燈後的寧靜街景。" }
+            3: { date: "6/29", title: "Day 3 (6/29 一) - 極速開戶換證 & 奔深圳", city: "深圳", hotel: "車公廟區域酒店", events: [
+                { time: "09:00 - 11:30", icon: "bank", title: "【核心任務】富邦華一廣州分行開戶", desc: "持台胞證、台灣身份證及第一天辦好的門號開戶，現場綁定微信/支付寶。", isTask: true },
+                { time: "13:30 - 15:30", icon: "license", title: "【核心任務】換領臨時駕照", desc: "前往岑村車管總所。現場做自助體檢、拍照並提交駕照原件，當場領取臨時入境機動車駕駛許可。", isTask: true },
+                { time: "傍晚", icon: "train", title: "搭乘高鐵前往深圳", desc: "回酒店提行李前往高鐵站，搭乘高鐵前往深圳（抵達福田站或深圳北站），直接前往車公廟飯店放行李。" },
+                { time: "20:00 之後", icon: "night", title: "【減壓首選】水圍夜市單攻", desc: "搭地鐵/打車前往福田區水圍夜市（水圍文化村）。這晚節奏放慢，專心享受美食（炭烤生蠔、潮汕砂鍋粥或椰子雞），吃飽立刻回飯店休息。" }
             ]},
-            4: { date: "6/30", title: "Day 4 (6/30 週二) - 古鎮清晨 &rarr; 卡丁車飆速 &rarr; 快速道路直奔拱北", city: "拱北", hotel: "珠海拱北口岸酒店", events: [
-                { time: "08:30 - 10:30", icon: "landmark", title: "唐家灣古鎮清晨漫步", desc: "避開白天遊客。清晨在微光中漫步古鎮老街，參觀唐紹儀故居、共樂園、古榕樹，感受原汁原味的百年歷史底蘊。" },
-                { time: "11:00 - 13:30", icon: "kart", title: "珠海國際卡丁車場賽道飆速", desc: "卡丁車場就在古鎮隔壁！開車 5 分鐘抵達，體驗真正的國際級賽道，在安全合法的專業賽道上盡情飆速！" },
-                { time: "13:30 - 14:30", icon: "car", title: "【高架避堵】改行市區快速路南下拱北", desc: "發動車輛，不走沿海紅綠燈極多的情侶路，改走興業快線等市區快速道路直達南端的拱北口岸。完美省去大塞車的煩惱！" },
-                { time: "14:30", icon: "hotel", title: "🏠 入住珠海拱北口岸酒店 Check-in", desc: "開車抵達珠海最核心的「拱北口岸」周邊，辦理酒店入住手續（今晚與明晚皆入住拱北區，生活機能極佳）。" },
-                { time: "16:00 - 18:00", icon: "shopping", title: "逛富華里商圈 & 享用精緻晚餐", desc: "放好大件行李後，開車前往附近的時尚商圈「富華里」吃下午茶、逛街，並享用美味晚宴。" },
-                { time: "21:45 之後", icon: "night", title: "夏灣夜市：親歷攤車衝刺奇觀 & 宵夜美食", desc: "夏灣夜市就在拱北口岸附近，打車或開車 5 分鐘內直達。看準 21:45 城管哨音後攤車集體衝刺奇觀，大啖大排檔宵夜！" }
+            4: { date: "6/30", title: "Day 4 (6/30 二) - 深圳無車精華遊", city: "深圳", hotel: "車公廟區域酒店", events: [
+                { time: "10:00 - 14:00", icon: "shopping", title: "第一站：星河COCO Park", desc: "早上睡到飽，搭地鐵 1 號線直達「購物公園站」。在開放式商場逛街、喝杯網紅手搖飲，中午挑一家排隊名店享用午餐。" },
+                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "搭 1 號線直達「華強路站/華強北站」。趁 18:00 電子批發市場收攤前，朝聖開源硬體極客天堂，並拍攝經典街景。" },
+                { time: "18:00 - 21:30", icon: "night", title: "第三站：東門老街", desc: "搭 1 號線直達「老街站」。在東門町美食街邊走邊吃解決晚餐，用相機捕捉賽博朋克感的不夜城街頭大片。" },
+                { time: "22:00 之後", icon: "landmark", title: "【終極備選】深圳灣公園", desc: "若逛完東門體力依然充沛可前往。深夜少了大白天的酷熱，漫步海濱棧道，遠眺對岸香港元朗的燈火與跨海大橋夜景。" }
             ]},
-            5: { date: "7/01", title: "Day 5 (7/1 週三) - 皇家園林 &rarr; 史詩級情侶路海濱巡禮", city: "拱北", hotel: "珠海拱北口岸酒店", events: [
-                { time: "09:30 - 11:30", icon: "landmark", title: "圓明新園 & 北山大院", desc: "上午開車遊覽圓明新園（1:1仿北京圓明園），接著前往「北山大院」，漫步由清代祠堂改建的文青聚落，喝杯特色下午茶。" },
-                { time: "12:30 - 14:00", icon: "speed", title: "第一站：景山公園 (高空纜車 & 滑道)", desc: "【情侶路黃金大滿貫 1/4】導航至景山公園。搭乘索道纜車登頂，360度俯瞰整個香爐灣沙灘、日月貝海岸線。下山時，挑戰刺激無比的 alpine slide 管軌滑道，一路尖叫極速衝刺下滑山！" },
-                { time: "14:00 - 15:00", icon: "nature", title: "第二站：城市陽台 & 香爐灣沙灘踏浪", desc: "【情侶路黃金大滿貫 2/4】出公園直接過對面，抵達依山臨海的「城市陽台」立體公園。下到「香爐灣沙灘」，腳踩細沙，聽海濤拍岸。這裡是與海灣沙灘、大劇院合照的最佳精緻機位。" },
-                { time: "15:15 - 16:30", icon: "landmark", title: "第三站：珠海漁女像 & 愛情郵局黑白燈塔", desc: "【情侶路黃金大滿貫 3/4】開車沿著情侶中路南下。先路過與地標「珠海漁女」雕像合照；隨後開至「愛情郵局」，這裡有一座浪漫的黑白相間海邊燈塔，是絕佳的純白背景打卡照點。" },
-                { time: "17:00 - 20:00", icon: "night", title: "第四站：野狸島 & 日月貝大劇院點燈落日", desc: "【情侶路黃金大滿貫 4/4】開車跨越新月橋駛入野狸島，將車停在海韻城商場。傍晚坐在劇院廣場前觀賞「日月貝」大劇院在落日餘暉下的壯麗。19:00 劇院準時點燈，幻彩奪目。晚餐在商場海鮮街大快朵頤，隨後回拱北酒店睡覺。" }
+            5: { date: "7/01", title: "Day 5 (7/1 三) - 取車上橋 & 玩進珠海", city: "珠海", hotel: "拱北口岸區域酒店", events: [
+                { time: "09:00", icon: "car", title: "【核心任務】一嗨準時取車", desc: "前往【福田區規劃大廈停車場店】辦理取車手續，行李上車。", isTask: true },
+                { time: "09:30 - 11:30", icon: "bridge", title: "【解鎖自駕高光】深中通道", desc: "開車走全新通車的「深中通道」跨海大橋橫跨伶仃洋，體驗極致寬廣的跨海視野（車程約 1.5 ~ 2 小時）。" },
+                { time: "11:30 - 13:30", icon: "landmark", title: "第一站：唐家灣古鎮", desc: "一下大橋剛好順路抵達唐家灣。把車停好，漫步古近代名人故居與老街，並在古鎮裡享用粵式午餐。" },
+                { time: "13:45 - 15:45", icon: "kart", title: "第二站：珠海國際卡丁車場", desc: "開車幾分鐘就到隔壁，在國際標準賽道上開高規格卡丁車，釋放熱血貼地狂飆！" },
+                { time: "16:00 之後", icon: "camera", title: "【解鎖情侶路】野狸島 & 日月貝", desc: "順著海濱的情侶路往南開，沿途經過海天公園。車可直接開進野狸島停，黃昏亮燈時拍白色大貝殼歌劇院剪影極美。" },
+                { time: "晚上", icon: "night", title: "入住拱北口岸 & 夏灣夜市", desc: "前往拱北口岸酒店 Check-in。接著開車前往夏灣夜市（約 5-8 分鐘），觀看 21:45 攤車集體衝鋒，大啖烤生蠔與小龍蝦。" }
             ]},
-            6: { date: "7/02", title: "Day 6 (7/2 週四) - 橫跨深中通道 &rarr; 深圳南山區還車", city: "深圳", hotel: "深圳南山區酒店", events: [
-                { time: "09:30 - 11:30", icon: "car", title: "自駕出發：珠海拱北出發北上", desc: "在拱北口岸酒店退房，發動廣州車牌（粵A）車輛上高速向深圳出發。請控制好時間以避開高峰限行。" },
-                { time: "11:30 - 13:00", icon: "bridge", title: "【高光時刻】自駕行經「深中通道」", desc: "自駕駛上最新開通的世紀工程「深中通道」跨海大橋與長達 6.8 公里的海底隧道，在伶仃洋正中央飛馳！橫跨海洋直奔深圳。" },
-                { time: "13:00 - 15:00", icon: "car", title: "【精準限行控制】深圳南山區據點還車", desc: "直接開進深圳南山區（推薦後海、登良或深圳灣口岸）一嗨租車據點辦理還車！此時段為工作日完全非限行的安全離峰窗口。自駕行程在此圓滿完成！", isTask: true },
-                { time: "14:30", icon: "hotel", title: "🏠 入住深圳南山區酒店 Check-in", desc: "在南山據點還完車後，拉著手提行李輕鬆前往預訂的【南山區】精品設計酒店登記入住（今晚與明晚皆入住南山，免行李跨區折騰）。" },
-                { time: "15:30 - 18:00", icon: "landmark", title: "南投古城 & 深圳灣公園看落日", desc: "無車一身輕鬆！搭乘地鐵遊玩。漫步有 1700 年歷史的南投古城，隨後前往深圳灣公園吹海風，眺望夕陽下的深圳灣大橋與對岸香港海面。" },
-                { time: "18:30 之後", icon: "ship", title: "蛇口海上世界夜景與精釀", desc: "在海上世界觀看大輪船「明華輪」的水幕音樂噴泉。車子已經在南山還了，今晚終於可以痛快暢飲世界精釀啤酒！" }
+            6: { date: "7/02", title: "Day 6 (7/2 四) - 衝鋒車與情侶路南段", city: "珠海", hotel: "拱北口岸區域酒店", events: [
+                { time: "上午", icon: "temple", title: "圓明新園", desc: "按北京圓明園部分景觀 1:1 仿建，車程僅 10 分鐘，輕鬆走逛。" },
+                { time: "中午/下午", icon: "camera", title: "北山大院", desc: "漫步在古建築改建的文創區，找家極具設計感的咖啡廳享受黑膠與咖啡時光，極度適合街拍與人像創作。" },
+                { time: "15:30 - 17:30", icon: "speed", title: "【重頭戲】景山公園索道與衝鋒車", desc: "開車前往情侶中路的城市陽台，對面就是景山公園。坐索道上山頂俯瞰海景，再坐刺激的「衝鋒車」滑道極速下山！" },
+                { time: "傍晚", icon: "landmark", title: "【補齊情侶路南段】愛情郵局燈塔", desc: "出公園後直接順路攻略：城市陽台 ➔ 香爐灣沙灘 ➔ 珠海漁女 ➔ 愛情郵局（打卡網紅燈塔與夕陽海景）。" },
+                { time: "晚上", icon: "shopping", title: "富華里商圈晚餐", desc: "前往富華里開放式商業街區享用晚餐，或在情侶路沿線找海景餐廳，遠眺夜空中璀璨的港珠澳大橋。" }
             ]},
-            7: { date: "7/03", title: "Day 7 (7/3 五) - 冰雪體驗、科技購物與雙夜市連衝", city: "深圳", hotel: "深圳南山區酒店", events: [
-                { time: "09:30 - 12:30", icon: "ski", title: "世界之窗：阿爾卑斯冰雪世界室內滑雪", desc: "單獨購買滑雪票，不需進入世界之窗主景區。在大型室內雪場享受夏日滑雪、溜冰的暢快快感！" },
-                { time: "13:00 - 16:30", icon: "shopping", title: "深圳萬象天地朝聖", desc: "前往大沖站，在經典的巨型「抱抱象」裝置前合照，漫步時尚旗艦街區並享用精緻午餐。" },
-                { time: "17:00 - 19:30", icon: "sim", title: "華強北電子聖地 & 星河COCO Park", desc: "一窺華強北震撼的電子零件世界，隨後前往福田區核心的 COCO Park 商場散步。" },
-                { time: "20:00 之後", icon: "night", title: "【特種兵雙夜市連衝】東門老街 + 水圍夜市", desc: "先到老牌熱鬧的東門老街品嚐經典街頭小吃，再殺去充滿港式煙火氣的水圍夜市，大啖烤串、特色糖水宵夜。" },
-                { time: "22:30", icon: "hotel", title: "🏠 返回深圳南山區酒店休息", desc: "結束雙夜市的美食特種兵大餐後，搭乘地鐵快速返回位於【深圳南山區】的酒店整理行李、洗澡睡覺。" }
+            7: { date: "7/03", title: "Day 7 (7/3 五) - 極速還車 & 南山精華遊", city: "深圳", hotel: "南油區域酒店", events: [
+                { time: "06:30 - 08:15", icon: "bridge", title: "清晨出發跨越深中通道", desc: "清晨提早從拱北飯店退房出發，開車經深中通道跨海殺回深圳。" },
+                { time: "08:15 - 08:35", icon: "hotel", title: "先放行李至南油飯店", desc: "開車直奔位於南油附近的飯店，在飯店門口臨時停靠，把大行李箱拉去大廳辦理免費寄放，卸下負重。" },
+                { time: "08:35 - 08:50", icon: "car", title: "【核心任務】5分鐘極速還車", desc: "兩袖清風後，立刻開車前往「一嗨租車－深圳南油店」辦理還車，趕在 09:00 前優雅結算，完美結束 48 小時自駕！", isTask: true },
+                { time: "10:30 - 13:30", icon: "ski", title: "世界之窗室內滑雪", desc: "還完車後直接進室內滑雪場消暑，避開週末人潮。" },
+                { time: "14:00 - 16:00", icon: "shopping", title: "深圳萬象天地", desc: "搭地鐵/打車前往隔壁萬象天地。打卡抱樓大象地標，吹冷氣逛街，看各大頂級潮牌與汽車品牌的旗艦展廳。" },
+                { time: "16:30 - 18:30", icon: "landmark", title: "南投古城", desc: "打車幾分鐘就到，傍晚陽光柔和時，漫步在 1700 多年歷史與現代設計感碰撞的古城文創街區，光影極佳。" },
+                { time: "晚上", icon: "night", title: "海上世界夜景與精釀", desc: "回南油飯店辦理進房。隨後前往蛇口海上世界。看著退役明華輪核心商圈的音樂噴泉，享受悠閒的國際化異國情調與精釀啤酒。" }
             ]},
-            8: { date: "7/04", title: "Day 8 (7/4 六) - 海空聯運免出境優雅返台", city: "返台", hotel: "溫暖的家", events: [
-                { time: "09:00 - 11:00", icon: "food", title: "南山區悠閒早茶時光", desc: "在深圳南山區享受一頓豐富的粵式飲茶，吃蝦餃、燒賣。做最後的伴手禮補貨（如鮑師傅糕點）。" },
-                { time: "11:30", icon: "ship", title: "【神操作】抵達蛇口郵輪中心 (ZYK)", desc: "退房後拉上行李直奔蛇口客運碼頭，在國泰櫃檯辦理直掛行李與登機。直接將行李掛回台灣，並當場退香港離境稅，大約 30 分鐘搞定。從南山過去碼頭極近！" },
-                { time: "13:00", icon: "ship", title: "搭乘 CX9816 渡輪前往香港機場", desc: "大約 30 分鐘船程，直達香港機場海天客運碼頭（不入香港境、免提行李，直接進入機場禁區）。" },
-                { time: "13:40 - 15:45", icon: "landmark", title: "退稅 & 機場禁區免稅店", desc: "在機場窗口退回 120 港幣的離境稅，輕鬆前去登機口。" },
+            8: { date: "7/04", title: "Day 8 (7/4 六) - 歎早茶與優雅返台", city: "返台", hotel: "溫暖的家", events: [
+                { time: "09:00 - 10:45", icon: "food", title: "蘩樓（南山店）歎早茶", desc: "飯店退房後提著行李，9點準時進餐廳（南油附近最推老字號、手工現做的「蘩樓」）。點上一壺普洱，優雅地為這趟旅行收尾。" },
+                { time: "11:00 - 11:20", icon: "car", title: "計程車直奔郵輪中心", desc: "吃飽後直接在餐廳門口打車，載著行李直奔蛇口郵輪中心（ZYK），車程 10～15 分鐘，於 11:30 前優雅抵達。" },
+                { time: "13:00", icon: "ship", title: "搭乘 CX9816 渡輪前往香港", desc: "搭乘國泰快船前往香港國際機場（HKG）。在蛇口直接辦理值機、行李直掛，退 120 元港幣的離境稅。" },
                 { time: "15:45", icon: "plane", title: "搭乘國泰航空 CX422 返台", desc: "航班起飛返回台北（TPE），大約 17:40 抵達，大灣區特種兵自駕之旅完美收官！" }
             ]}
         };
