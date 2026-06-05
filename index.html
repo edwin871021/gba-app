@@ -1,3 +1,14 @@
+啊！我一眼就看出問題了，這是網頁排版中經典的 **「Flexbox 空間擠壓」** 現象。
+
+你看右邊的飯店名稱「珠江新城區域酒店」字數比較長，瀏覽器為了想辦法把右邊的字完整顯示出來，就霸道地把左邊「城市」的輸入框空間全部搶走，導致它被「擠扁」成一條線，連文字都看不到了。
+
+### 🛠️ 解決方案
+
+我已經為「城市」的輸入框加上了 `w-20 shrink-0`（固定寬度且絕對不允許被壓縮），同時也給右邊的飯店加上了彈性收縮保護。這樣一來，不管右邊的飯店名字打多長，左邊的城市框都**絕對會穩如泰山地顯示出來**，維持完美的排版比例。
+
+請再次複製這段最新程式碼，覆蓋您的 `index.html`，然後上傳 GitHub 覆蓋：
+
+```html
 <!DOCTYPE html>
 <html lang="zh-TW" class="h-full bg-brand-900">
 <head>
@@ -9,7 +20,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b2545">
     
-    <link rel="apple-touch-icon" href="icon.jpg?v=9">
+    <link rel="apple-touch-icon" href="icon.jpg?v=10">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -135,8 +146,9 @@
                     <i class="fa-solid fa-map-location-dot text-brand-500"></i><span>今日基本資訊 (編輯模式)</span>
                 </div>
                 <div class="flex space-x-2">
-                    <input type="text" id="input-day-city" class="w-1/3 px-2 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="城市">
-                    <input type="text" id="input-day-hotel" class="flex-1 px-2 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="住宿酒店">
+                    <!-- 加上 shrink-0 與固定寬度 w-20，絕對防止被擠壓 -->
+                    <input type="text" id="input-day-city" class="w-20 shrink-0 px-2 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="城市">
+                    <input type="text" id="input-day-hotel" class="flex-1 min-w-0 px-2 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="住宿酒店">
                     <button onclick="updateDayInfo()" class="shrink-0 bg-brand-500 hover:bg-brand-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition active:scale-90">同步修改</button>
                 </div>
             </div>
@@ -673,3 +685,5 @@
     </script>
 </body>
 </html>
+
+```
