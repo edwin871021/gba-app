@@ -33,7 +33,6 @@
         }
     </script>
     <style>
-        /* 免疫 iOS 長輩巨大字體設定，改由內部 Slider 控制 */
         html { 
             -webkit-text-size-adjust: none !important;
             touch-action: manipulation; 
@@ -59,7 +58,6 @@
             overflow: hidden;
         }
 
-        /* 絕對鎖死卡片與導航列文字，不受字體放大影響 */
         .lock-text-size {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             -webkit-text-size-adjust: none !important;
@@ -67,7 +65,6 @@
 
         .safe-top { height: env(safe-area-inset-top); width: 100%; background-color: #0b2545; flex-shrink: 0; }
         
-        /* 滑動條樣式優化 */
         input[type=range] {
             -webkit-appearance: none; background: transparent;
         }
@@ -103,33 +100,33 @@
             <div class="px-4 py-3 flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <div class="bg-brand-500 text-white p-1.5 rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-fire text-[14px] animate-bounce text-amber-400"></i>
+                        <i class="fa-solid fa-fire text-[0.9rem] animate-bounce text-amber-400"></i>
                     </div>
                     <div>
-                        <h1 class="text-[16px] font-bold tracking-tight leading-tight">大灣區旅遊助手</h1>
-                        <p class="text-[11px] text-brand-100 opacity-80 mt-0.5" id="sync-status">Firebase 數據同步中...</p>
+                        <h1 class="text-[1rem] font-bold tracking-tight leading-tight">大灣區旅遊助手</h1>
+                        <p class="text-[0.7rem] text-brand-100 opacity-80 mt-0.5" id="sync-status">Firebase 數據同步中...</p>
                     </div>
                 </div>
                 <div class="text-right flex items-center space-x-2 relative">
-                    <button id="btn-font-toggle" onclick="toggleFontSlider()" class="text-[16px] text-white font-bold transition active:scale-90 px-2 tracking-tighter">
-                        <span class="text-[11px]">A</span>A
+                    <button id="btn-font-toggle" onclick="toggleFontSlider()" class="text-[1rem] text-white font-bold transition active:scale-90 px-2 tracking-tighter">
+                        <span class="text-[0.7rem]">A</span>A
                     </button>
-                    <button onclick="toggleAdminAuth()" id="btn-auth" class="text-[11px] bg-slate-700 hover:bg-slate-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
+                    <button onclick="toggleAdminAuth()" id="btn-auth" class="text-[0.7rem] bg-slate-700 hover:bg-slate-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
                         <i class="fa-solid fa-lock mr-1"></i>解鎖編輯
                     </button>
-                    <button onclick="resetToCloudTemplate()" class="admin-only text-[11px] bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
+                    <button onclick="resetToCloudTemplate()" class="admin-only text-[0.7rem] bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
                         重置範本
                     </button>
 
                     <div id="font-slider-popup" class="hidden absolute top-[120%] right-0 bg-white p-4 rounded-xl shadow-2xl border border-slate-200 z-[100] flex items-center space-x-3 w-48 transition-all">
-                        <span class="text-[14px] text-slate-500 font-bold">A</span>
-                        <input type="range" id="font-size-slider" min="14" max="22" step="1" class="w-full">
-                        <span class="text-[20px] text-slate-800 font-bold">A</span>
+                        <span class="text-[0.9rem] text-slate-500 font-bold">A</span>
+                        <input type="range" id="font-size-slider" min="14" max="26" step="1" class="w-full">
+                        <span class="text-[1.25rem] text-slate-800 font-bold">A</span>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-brand-800/50 px-4 py-2 border-t border-brand-800 flex justify-between items-center text-[11px] text-slate-300">
+            <div class="bg-brand-800/50 px-4 py-2 border-t border-brand-800 flex justify-between items-center text-[0.7rem] text-slate-300">
                 <div class="flex items-center space-x-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span id="current-city-indicator">當前城市：讀取中...</span>
@@ -143,24 +140,24 @@
 
         <div id="custom-toast" class="hidden fixed top-[env(safe-area-inset-top,1rem)] left-4 right-4 bg-slate-900 text-white p-3.5 rounded-xl shadow-2xl z-50 transition-all duration-300 transform translate-y-[-20px] opacity-0 flex items-center space-x-3 border border-white/10 mt-4">
             <div class="text-amber-500" id="toast-icon-box"><i class="fa-solid fa-circle-info"></i></div>
-            <p class="text-[12px] font-bold" id="toast-message-text">提示訊息</p>
+            <p class="text-[0.8rem] font-bold" id="toast-message-text">提示訊息</p>
         </div>
 
         <main class="flex-1 overflow-y-auto p-4 pb-6 no-scrollbar relative" id="main-content">
             
             <section id="tab-dashboard" class="space-y-4">
-                <div class="lock-text-size bg-gradient-to-br from-brand-900 to-brand-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
+                <div class="bg-gradient-to-br from-brand-900 to-brand-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
                     <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4">
                         <i class="fa-solid fa-route text-9xl"></i>
                     </div>
                     <div class="relative z-10">
-                        <span class="text-[12px] uppercase tracking-widest text-amber-500 font-bold">Trip Dashboard 雲端資訊盤</span>
-                        <h2 class="text-[24px] font-bold mt-1 leading-tight" id="dashboard-hero-title">讀取中...</h2>
-                        <p class="text-[14px] text-slate-300 mt-2 leading-relaxed" id="dashboard-hero-desc">讀取中...</p>
+                        <span class="text-[0.75rem] uppercase tracking-widest text-amber-500 font-bold">Trip Dashboard 雲端資訊盤</span>
+                        <h2 class="text-[1.5rem] font-bold mt-1 leading-tight" id="dashboard-hero-title">讀取中...</h2>
+                        <p class="text-[0.9rem] text-slate-300 mt-2 leading-relaxed" id="dashboard-hero-desc">讀取中...</p>
                         <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10 text-center">
-                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">總里程 (預估)</p><p class="text-[18px] font-bold text-amber-400 mt-0.5">~350 km</p></div>
-                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">計畫跨城</p><p class="text-[18px] font-bold text-emerald-400 mt-0.5">4 城</p></div>
-                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">交通工具</p><p class="text-[18px] font-bold text-sky-400 mt-0.5">自駕/高鐵</p></div>
+                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[0.75rem] text-slate-400">總里程 (預估)</p><p class="text-[1.15rem] font-bold text-amber-400 mt-0.5">~350 km</p></div>
+                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[0.75rem] text-slate-400">計畫跨城</p><p class="text-[1.15rem] font-bold text-emerald-400 mt-0.5">4 城</p></div>
+                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[0.75rem] text-slate-400">交通工具</p><p class="text-[1.15rem] font-bold text-sky-400 mt-0.5">自駕/高鐵</p></div>
                         </div>
                     </div>
                 </div>
@@ -175,22 +172,22 @@
                 <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-start space-x-3 shadow-sm">
                     <div class="text-amber-500 shrink-0 mt-0.5"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
                     <div>
-                        <h4 class="text-xs font-bold text-amber-800" id="dashboard-warning-title">讀取中...</h4>
-                        <p class="text-xs text-amber-700 mt-1 leading-relaxed" id="dashboard-warning-desc">讀取中...</p>
+                        <h4 class="text-[0.8rem] font-bold text-amber-800" id="dashboard-warning-title">讀取中...</h4>
+                        <p class="text-[0.8rem] text-amber-700 mt-1 leading-relaxed" id="dashboard-warning-desc">讀取中...</p>
                     </div>
                 </div>
 
                 <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 mt-4">
                     <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-pen-to-square mr-1.5 text-brand-500"></i>編輯首頁標題與簡介</h3>
-                    <input type="text" id="input-dash-title" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="大標題">
-                    <textarea id="input-dash-desc" rows="3" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="簡介內容..."></textarea>
+                    <input type="text" id="input-dash-title" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="大標題">
+                    <textarea id="input-dash-desc" rows="3" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="簡介內容..."></textarea>
                     <button onclick="updateDashboardInfo()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">發布更新標題簡介</button>
                 </div>
 
                 <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 mt-4">
                     <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-pen-to-square mr-1.5 text-brand-500"></i>編輯底部注意事項</h3>
-                    <input type="text" id="input-warn-title" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="標題">
-                    <textarea id="input-warn-desc" rows="3" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="內容..."></textarea>
+                    <input type="text" id="input-warn-title" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="標題">
+                    <textarea id="input-warn-desc" rows="3" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="內容..."></textarea>
                     <button onclick="updateWarning()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">發布更新注意事項</button>
                 </div>
             </section>
@@ -203,8 +200,8 @@
                         <i class="fa-solid fa-map-location-dot text-brand-500"></i><span>今日基本資訊 (編輯模式)</span>
                     </div>
                     <div class="flex space-x-2">
-                        <input type="text" id="input-day-city" class="w-20 shrink-0 px-2 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="城市">
-                        <input type="text" id="input-day-hotel" class="flex-1 min-w-0 px-2 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white" placeholder="住宿酒店">
+                        <input type="text" id="input-day-city" class="w-20 shrink-0 px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="城市">
+                        <input type="text" id="input-day-hotel" class="flex-1 min-w-0 px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="住宿酒店">
                         <button onclick="updateDayInfo()" class="shrink-0 bg-brand-500 hover:bg-brand-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition active:scale-90">同步修改</button>
                     </div>
                 </div>
@@ -214,22 +211,22 @@
                 <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
                     <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-calendar-plus mr-1.5 text-brand-500"></i><span id="label-add-edit">在當前天數新增行程</span></h3>
                     <div class="grid grid-cols-3 gap-2">
-                        <div><input type="text" id="input-evt-time" placeholder="時間區間" class="w-full px-2 py-1.5 text-xs border rounded-lg"></div>
-                        <div class="col-span-2"><input type="text" id="input-evt-title" placeholder="行程主標題" class="w-full px-2 py-1.5 text-xs border rounded-lg"></div>
+                        <div><input type="text" id="input-evt-time" placeholder="時間區間" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg"></div>
+                        <div class="col-span-2"><input type="text" id="input-evt-title" placeholder="行程主標題" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg"></div>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
                         <div>
-                            <select id="input-evt-icon" class="w-full px-1 py-1.5 text-xs border rounded-lg bg-white">
+                            <select id="input-evt-icon" class="w-full px-1 py-1.5 text-[0.8rem] border rounded-lg bg-white">
                                 <option value="car">🚗 自駕車</option><option value="landmark">📍 景點門點</option><option value="food">🍱 美食餐飲</option><option value="hotel">🏠 飯店住宿</option><option value="night">🌙 夜市晚景</option><option value="camera">📷 拍照攝影</option><option value="sim">📱 通訊電話</option><option value="bank">🏦 銀行開戶</option><option value="license">🪪 辦駕駛證</option><option value="ship">🚢 碼頭渡輪</option><option value="train">🚄 高鐵火車</option><option value="plane">✈️ 機場航空</option><option value="kart">🏎️ 卡丁車速</option><option value="ski">⛷️ 室內滑雪</option><option value="shopping">🛍️ 購物商圈</option>
                             </select>
                         </div>
                         <div class="col-span-2">
-                            <select id="input-evt-task" class="w-full px-1 py-1.5 text-xs border rounded-lg bg-white font-bold text-slate-700">
+                            <select id="input-evt-task" class="w-full px-1 py-1.5 text-[0.8rem] border rounded-lg bg-white font-bold text-slate-700">
                                 <option value="false">普通遊玩行程</option><option value="true" class="text-amber-600">★ 核心任務（高亮）</option>
                             </select>
                         </div>
                     </div>
-                    <div><textarea id="input-evt-desc" rows="2" placeholder="詳細說明與防坑備忘..." class="w-full px-2 py-1.5 text-xs border rounded-lg"></textarea></div>
+                    <div><textarea id="input-evt-desc" rows="2" placeholder="詳細說明與防坑備忘..." class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg"></textarea></div>
                     <div class="flex space-x-2">
                         <button id="btn-submit-evt" onclick="addTripEvent()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">加入今日計畫</button>
                         <button id="btn-cancel-evt" onclick="cancelEditTripEvent()" class="hidden shrink-0 bg-slate-300 hover:bg-slate-400 text-slate-700 font-bold px-3 py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">取消</button>
@@ -244,11 +241,11 @@
                 
                 <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
                     <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-folder-plus mr-1.5 text-brand-500"></i>建立全新辦事攻略分類</h3>
-                    <div><input type="text" id="input-guide-title" placeholder="分類名稱 (自動編號，例如：保險辦理)" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white"></div>
-                    <div><input type="text" id="input-guide-desc" placeholder="前言摘要說明..." class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white"></div>
+                    <div><input type="text" id="input-guide-title" placeholder="分類名稱 (自動編號，例如：保險辦理)" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white"></div>
+                    <div><input type="text" id="input-guide-desc" placeholder="前言摘要說明..." class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white"></div>
                     <div class="grid grid-cols-2 gap-2">
-                        <div><textarea id="input-guide-s1" rows="2" placeholder="重點步驟一內容..." class="w-full px-2 py-1 text-xs border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
-                        <div><textarea id="input-guide-s2" rows="2" placeholder="重點步驟二內容..." class="w-full px-2 py-1 text-xs border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
+                        <div><textarea id="input-guide-s1" rows="2" placeholder="重點步驟一內容..." class="w-full px-2 py-1 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
+                        <div><textarea id="input-guide-s2" rows="2" placeholder="重點步驟二內容..." class="w-full px-2 py-1 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
                     </div>
                     <div class="flex space-x-2">
                         <button onclick="addUserGuide()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">確認新增</button>
@@ -258,14 +255,14 @@
             </section>
 
             <section id="tab-packing" class="hidden space-y-4">
-                <div class="lock-text-size bg-gradient-to-br from-indigo-900 to-brand-900 text-white p-5 rounded-2xl shadow-md relative overflow-hidden">
+                <div class="bg-gradient-to-br from-indigo-900 to-brand-900 text-white p-5 rounded-2xl shadow-md relative overflow-hidden">
                     <div class="relative z-10">
-                        <span class="text-[12px] uppercase tracking-widest text-amber-500 font-bold">Personal Packing List</span>
+                        <span class="text-[0.75rem] uppercase tracking-widest text-amber-500 font-bold">Personal Packing List</span>
                         <div class="flex justify-between items-baseline mt-1">
-                            <h2 class="text-[24px] font-bold leading-tight">出發行李檢查</h2>
-                            <span class="text-[12px] text-brand-100" id="packing-stat-text">已打包 0 / 26</span>
+                            <h2 class="text-[1.5rem] font-bold leading-tight">出發行李檢查</h2>
+                            <span class="text-[0.75rem] text-brand-100" id="packing-stat-text">已打包 0 / 26</span>
                         </div>
-                        <p class="text-[12px] text-brand-100 opacity-80 mt-1 leading-relaxed">完美整合手寫物品筆記。打勾狀態與自訂物品<strong class="text-white px-1">僅保存在您的手機本機</strong>，不會與他人互相干擾！</p>
+                        <p class="text-[0.75rem] text-brand-100 opacity-80 mt-1 leading-relaxed">完美整合手寫物品筆記。打勾狀態與自訂物品<strong class="text-white px-1">僅保存在您的手機本機</strong>，不會與他人互相干擾！</p>
                         <div class="w-full bg-white/10 rounded-full h-1.5 mt-4 overflow-hidden">
                             <div class="bg-amber-500 h-1.5 rounded-full transition-all duration-300" id="packing-progress-bar" style="width: 0%"></div>
                         </div>
@@ -273,85 +270,85 @@
                 </div>
                 
                 <div class="space-y-4">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-passport mr-2 text-red-500"></i>1. 必備核心證件包</h3><div class="grid grid-cols-1 gap-2" id="packing-group-docs"></div></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-laptop-code mr-2 text-blue-500"></i>2. 電子通訊與充電組</h3><div class="grid grid-cols-1 gap-2" id="packing-group-tech"></div></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-umbrella mr-2 text-amber-500"></i>3. 日常隨身攜帶組</h3><div class="grid grid-cols-1 gap-2" id="packing-group-daily"></div></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-shirt mr-2 text-green-500"></i>4. 衣物穿戴與防護</h3><div class="grid grid-cols-1 gap-2" id="packing-group-clothes"></div></div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-xs font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-soap mr-2 text-purple-500"></i>5. 衛生清潔與個人舒適</h3><div class="grid grid-cols-1 gap-2" id="packing-group-hygiene"></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-sm font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-passport mr-2 text-red-500"></i>1. 必備核心證件包</h3><div class="grid grid-cols-1 gap-2" id="packing-group-docs"></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-sm font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-laptop-code mr-2 text-blue-500"></i>2. 電子通訊與充電組</h3><div class="grid grid-cols-1 gap-2" id="packing-group-tech"></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-sm font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-umbrella mr-2 text-amber-500"></i>3. 日常隨身攜帶組</h3><div class="grid grid-cols-1 gap-2" id="packing-group-daily"></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-sm font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-shirt mr-2 text-green-500"></i>4. 衣物穿戴與防護</h3><div class="grid grid-cols-1 gap-2" id="packing-group-clothes"></div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><h3 class="text-sm font-extrabold text-brand-900 border-b border-slate-100 pb-2 mb-3 flex items-center"><i class="fa-solid fa-soap mr-2 text-purple-500"></i>5. 衛生清潔與個人舒適</h3><div class="grid grid-cols-1 gap-2" id="packing-group-hygiene"></div></div>
                 </div>
 
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-xs font-extrabold text-slate-800"><i class="fa-solid fa-plus mr-1"></i>增加個人私人物品</h3>
-                        <button onclick="resetPersonalPackingList()" class="text-[11px] text-red-500 font-bold transition active:scale-90 px-2 py-1 bg-red-50 rounded-lg"><i class="fa-solid fa-rotate-right mr-1"></i>重置清單</button>
+                        <h3 class="text-sm font-extrabold text-slate-800"><i class="fa-solid fa-plus mr-1"></i>增加個人私人物品</h3>
+                        <button onclick="resetPersonalPackingList()" class="text-[0.7rem] text-red-500 font-bold transition active:scale-90 px-2 py-1 bg-red-50 rounded-lg"><i class="fa-solid fa-rotate-right mr-1"></i>重置清單</button>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
-                        <div class="col-span-2"><input type="text" id="input-pack-name" placeholder="例如：個人藥品、隱形眼鏡" class="w-full px-3 py-1.5 text-xs border rounded-lg"></div>
+                        <div class="col-span-2"><input type="text" id="input-pack-name" placeholder="例如：個人藥品、隱形眼鏡" class="w-full px-3 py-1.5 text-[0.85rem] border rounded-lg"></div>
                         <div>
-                            <select id="input-pack-group" class="w-full px-1 py-1.5 text-xs border rounded-lg bg-white">
+                            <select id="input-pack-group" class="w-full px-1 py-1.5 text-[0.85rem] border rounded-lg bg-white">
                                 <option value="docs">核心證件</option><option value="tech">電子通訊</option><option value="daily">日常隨身</option><option value="clothes">衣物穿戴</option><option value="hygiene">衛生舒適</option>
                             </select>
                         </div>
                     </div>
-                    <button onclick="addUserPackingItem()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg text-xs transition shadow-sm active:scale-95">新增到我的本機清單</button>
+                    <button onclick="addUserPackingItem()" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg text-sm transition shadow-sm active:scale-95">新增到我的本機清單</button>
                 </div>
             </section>
 
             <section id="tab-budget" class="hidden space-y-4">
-                <div class="lock-text-size bg-gradient-to-br from-indigo-800 to-indigo-950 text-white p-5 rounded-2xl shadow-md">
+                <div class="bg-gradient-to-br from-indigo-800 to-indigo-950 text-white p-5 rounded-2xl shadow-md">
                     <div class="flex justify-between items-start">
-                        <span class="text-[12px] uppercase tracking-widest text-indigo-300 font-bold">Trip Ledger 動態分帳本</span>
-                        <button onclick="toggleMemberEdit()" class="text-[10px] bg-indigo-700 hover:bg-indigo-600 px-2.5 py-1 rounded-lg text-white transition shadow-sm"><i class="fa-solid fa-users-gear mr-1"></i>管理付款人</button>
+                        <span class="text-[0.75rem] uppercase tracking-widest text-indigo-300 font-bold">Trip Ledger 動態分帳本</span>
+                        <button onclick="toggleMemberEdit()" class="text-[0.65rem] bg-indigo-700 hover:bg-indigo-600 px-2.5 py-1 rounded-lg text-white transition shadow-sm"><i class="fa-solid fa-users-gear mr-1"></i>管理付款人</button>
                     </div>
                     <div class="mt-3">
-                        <p class="text-[12px] text-indigo-300">目前總開銷</p>
-                        <h2 class="text-[28px] font-extrabold leading-tight" id="budget-total-expense">NT$ 0</h2>
+                        <p class="text-[0.75rem] text-indigo-300">目前總開銷</p>
+                        <h2 class="text-[1.75rem] font-extrabold leading-tight" id="budget-total-expense">NT$ 0</h2>
                     </div>
             
                     <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-indigo-700/50" id="budget-payers-summary">
                     </div>
             
-                    <div class="mt-4 bg-indigo-900/50 p-3 rounded-xl text-[12px] text-indigo-200 flex flex-col border border-indigo-700/50 space-y-1.5" id="budget-settlement-box">
+                    <div class="mt-4 bg-indigo-900/50 p-3 rounded-xl text-[0.75rem] text-indigo-200 flex flex-col border border-indigo-700/50 space-y-1.5" id="budget-settlement-box">
                     </div>
                 </div>
             
                 <div id="member-edit-section" class="hidden bg-indigo-50 p-4 rounded-xl shadow-sm border border-indigo-100 space-y-3 transition-all">
-                    <h3 class="text-xs font-extrabold text-indigo-800 flex items-center"><i class="fa-solid fa-users mr-1.5"></i>自訂下拉選單與分帳名單</h3>
+                    <h3 class="text-sm font-extrabold text-indigo-800 flex items-center"><i class="fa-solid fa-users mr-1.5"></i>自訂下拉選單與分帳名單</h3>
                     <div class="flex space-x-2">
-                        <input type="text" id="input-new-member" placeholder="輸入名稱 (如: 小明)" class="flex-1 px-3 py-1.5 text-xs border border-indigo-200 rounded-lg bg-white focus:outline-indigo-500">
-                        <button onclick="addBudgetMember()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition active:scale-95 shadow-sm">新增</button>
+                        <input type="text" id="input-new-member" placeholder="輸入名稱 (如: 小明)" class="flex-1 px-3 py-1.5 text-[0.85rem] border border-indigo-200 rounded-lg bg-white focus:outline-indigo-500">
+                        <button onclick="addBudgetMember()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-sm transition active:scale-95 shadow-sm">新增</button>
                     </div>
                     <div class="flex flex-wrap gap-2 pt-1" id="member-tags-container">
-                        </div>
-                    <p class="text-[10px] text-indigo-400 leading-tight">提示：上方結算區會自動根據目前的「人數」進行平均分攤 (AA制)。刪除付款人不會刪除歷史帳目。</p>
+                    </div>
+                    <p class="text-[0.65rem] text-indigo-400 leading-tight">提示：上方結算區會自動根據目前的「人數」進行平均分攤 (AA制)。刪除付款人不會刪除歷史帳目。</p>
                 </div>
             
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-plus mr-1.5 text-brand-500"></i>新增記帳項目</h3>
+                    <h3 class="text-sm font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-plus mr-1.5 text-brand-500"></i>新增記帳項目</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <div><input type="text" id="input-exp-name" placeholder="項目名稱 (如：晚餐)" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white"></div>
-                        <div><input type="number" id="input-exp-cost" placeholder="金額 (NTD)" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white"></div>
+                        <div><input type="text" id="input-exp-name" placeholder="項目名稱 (如：晚餐)" class="w-full px-3 py-1.5 text-[0.85rem] border rounded-lg bg-slate-50 focus:bg-white"></div>
+                        <div><input type="number" id="input-exp-cost" placeholder="金額 (NTD)" class="w-full px-3 py-1.5 text-[0.85rem] border rounded-lg bg-slate-50 focus:bg-white"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <select id="input-exp-category" class="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white">
+                            <select id="input-exp-category" class="w-full px-2.5 py-1.5 text-[0.85rem] border rounded-lg bg-slate-50 focus:bg-white">
                                 <option value="交通">交通車資</option><option value="住宿">酒店住宿</option><option value="飲食">餐飲美食</option><option value="玩樂">門票娛樂</option><option value="行政">行政規費</option><option value="其他">其他雜費</option>
                             </select>
                         </div>
                         <div>
-                            <select id="input-exp-payer" class="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white font-bold text-indigo-700">
+                            <select id="input-exp-payer" class="w-full px-2.5 py-1.5 text-[0.85rem] border rounded-lg bg-slate-50 focus:bg-white font-bold text-indigo-700">
                             </select>
                         </div>
                     </div>
-                    <button onclick="addUserExpense()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 flex items-center justify-center space-x-1 shadow-sm">
+                    <button onclick="addUserExpense()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-sm transition active:scale-95 flex items-center justify-center space-x-1 shadow-sm">
                         <i class="fa-solid fa-cloud-arrow-up"></i><span>新增至雲端帳本</span>
                     </button>
                 </div>
             
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-list-check mr-2 text-indigo-500"></i>記帳即時明細</h3>
-                        <button onclick="clearAllExpenses()" class="text-[11px] text-red-500 font-bold transition active:scale-90 bg-red-50 px-2 py-1 rounded-md">清空全部</button>
+                        <h3 class="text-sm font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-list-check mr-2 text-indigo-500"></i>記帳即時明細</h3>
+                        <button onclick="clearAllExpenses()" class="text-[0.7rem] text-red-500 font-bold transition active:scale-90 bg-red-50 px-2 py-1 rounded-md">清空全部</button>
                     </div>
                     <div class="space-y-2" id="budget-items-list"></div>
                 </div>
@@ -360,24 +357,22 @@
 
         <nav id="bottom-nav" class="lock-text-size bg-white border-t border-slate-200 w-full shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-transform duration-300" style="padding-bottom: calc(4px + env(safe-area-inset-bottom));">
             <div class="flex justify-around items-center pt-2 pb-1">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[20px]"></i><span class="text-[10px] mt-1 font-bold">總覽</span></button>
-                <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[20px]"></i><span class="text-[10px] mt-1 font-bold">行程</span></button>
-                <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[20px]"></i><span class="text-[10px] mt-1 font-bold">攻略</span></button>
-                <button onclick="switchTab('packing')" id="nav-packing" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-suitcase text-[20px]"></i><span class="text-[10px] mt-1 font-bold">打包</span></button>
-                <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-wallet text-[20px]"></i><span class="text-[10px] mt-1 font-bold">記帳</span></button>
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">總覽</span></button>
+                <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">行程</span></button>
+                <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">攻略</span></button>
+                <button onclick="switchTab('packing')" id="nav-packing" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-suitcase text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">打包</span></button>
+                <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-wallet text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">記帳</span></button>
             </div>
         </nav>
         
     </div>
 
     <script>
-        // 控制 aA 字體調整選單的顯示與隱藏
         function toggleFontSlider() {
             const popup = document.getElementById('font-slider-popup');
             popup.classList.toggle('hidden');
         }
 
-        // 點擊畫面其他地方時，自動關閉字體選單
         document.addEventListener('click', function(e) {
             const popup = document.getElementById('font-slider-popup');
             const btn = document.getElementById('btn-font-toggle');
@@ -386,7 +381,6 @@
             }
         });
 
-        // 載入與監聽 Slider 滑動事件
         window.addEventListener('DOMContentLoaded', () => {
             const slider = document.getElementById('font-size-slider');
             if (slider) {
@@ -434,7 +428,7 @@
         const ADMIN_PASSWORD = "GBA2026_MASTER"; 
         let isAdmin = false; let activeDay = 1; let editEventIndex = -1;
         let tripDays = {}; let guideData = []; let userExpenses = []; let packingItems = []; let activeGuideTab = ""; let tripWarning = {};
-        let budgetMembers = ['我', '伴侶']; // 預設付款人名單
+        let budgetMembers = ['我', '伴侶'];
         
         const defaultDashboardInfo = { title: "大灣區旅遊助手", desc: "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！(若需變更行程，請點右上角輸入密碼解鎖)" };
         let dashboardInfo = {};
@@ -445,13 +439,13 @@
                 if (pass === ADMIN_PASSWORD) {
                     isAdmin = true;
                     document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i>已鎖定編輯';
-                    document.getElementById('btn-auth').className = "text-[11px] bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
+                    document.getElementById('btn-auth').className = "text-[0.7rem] bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
                     showToast("身分認證成功！已解鎖權限。"); applyAdminUI(true);
                 } else if (pass !== null) { showToast("密碼錯誤，拒絕存取編輯權限。", true); }
             } else {
                 isAdmin = false;
                 document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock mr-1"></i>解鎖編輯';
-                document.getElementById('btn-auth').className = "text-[11px] bg-slate-700 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
+                document.getElementById('btn-auth').className = "text-[0.7rem] bg-slate-700 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
                 showToast("已退出管理模式。"); applyAdminUI(false);
             }
         }
@@ -577,7 +571,7 @@
                 container.innerHTML = '';
                 Object.keys(tripDays).forEach(day => {
                     const item = tripDays[day]; const div = document.createElement('div'); div.className = "flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100";
-                    div.innerHTML = `<span class="font-semibold text-slate-700 text-[12px]">Day ${day} (${item.city || ''})</span><span class="font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded text-[12px]">🏠 ${item.hotel || ''}</span>`;
+                    div.innerHTML = `<span class="font-semibold text-slate-700 text-[0.85rem]">Day ${day} (${item.city || ''})</span><span class="font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded text-[0.85rem]">🏠 ${item.hotel || ''}</span>`;
                     container.appendChild(div);
                 });
             }
@@ -612,35 +606,35 @@
             const navBar = document.getElementById('day-nav-bar'); navBar.innerHTML = '';
             for (let i = 1; i <= 8; i++) {
                 const d = tripDays[i]; const btn = document.createElement('button'); btn.onclick = () => setActiveDay(i);
-                btn.className = (i === activeDay) ? "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[12px] bg-brand-900 text-white border-brand-900 transition active:scale-95" : "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[12px] bg-white text-slate-500 border-slate-200 transition active:scale-95";
-                btn.innerHTML = `Day ${i}<br><span class="text-[10px] font-normal">${d.date || ''} ${d.city || ''}</span>`;
+                btn.className = (i === activeDay) ? "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[0.85rem] bg-brand-900 text-white border-brand-900 transition active:scale-95" : "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[0.85rem] bg-white text-slate-500 border-slate-200 transition active:scale-95";
+                btn.innerHTML = `Day ${i}<br><span class="text-[0.65rem] font-normal">${d.date || ''} ${d.city || ''}</span>`;
                 navBar.appendChild(btn);
             }
 
             let htmlContent = `<div class="relative pl-6 border-l-2 border-slate-200 space-y-4 ml-3">`;
-            if (!dayData.events || dayData.events.length === 0) { htmlContent += `<p class="text-[12px] text-slate-400 py-4">本日尚無排定細節。</p>`; }
+            if (!dayData.events || dayData.events.length === 0) { htmlContent += `<p class="text-[0.85rem] text-slate-400 py-4">本日尚無排定細節。</p>`; }
             else {
                 dayData.events.forEach((evt, idx) => {
-                    const iconSvg = icons[evt.icon] || '<i class="fa-solid fa-circle text-[12px]"></i>';
+                    const iconSvg = icons[evt.icon] || '<i class="fa-solid fa-circle text-[0.75rem]"></i>';
                     let cardClass = evt.isTask ? "bg-amber-50/70 p-4 rounded-xl border-2 border-amber-200 relative" : "bg-white p-4 rounded-xl border border-slate-100 relative";
                     htmlContent += `
                         <div class="relative">
-                            <div class="absolute -left-[38px] top-1.5 w-6 h-6 rounded-full bg-white border border-slate-200 text-brand-500 flex items-center justify-center text-[10px] shadow-sm z-10">${iconSvg}</div>
+                            <div class="absolute -left-[38px] top-1.5 w-6 h-6 rounded-full bg-white border border-slate-200 text-brand-500 flex items-center justify-center text-[0.7rem] shadow-sm z-10">${iconSvg}</div>
                             <div class="${cardClass}">
                                 <div class="flex justify-between items-start">
-                                    <span class="text-[12px] font-bold text-brand-500 bg-brand-50 px-2 py-0.5 rounded-md">${evt.time}</span>
+                                    <span class="text-[0.8rem] font-bold text-brand-500 bg-brand-50 px-2 py-0.5 rounded-md">${evt.time}</span>
                                     <div class="flex items-center space-x-2">
-                                        ${evt.isTask ? '<span class="text-[9px] bg-amber-500 text-white font-extrabold px-1.5 py-0.5 rounded">核心任務</span>' : ''}
+                                        ${evt.isTask ? '<span class="text-[0.65rem] bg-amber-500 text-white font-extrabold px-1.5 py-0.5 rounded">核心任務</span>' : ''}
                                         ${isAdmin ? `<div class="flex items-center space-x-2.5 text-slate-300">
-                                            ${idx > 0 ? `<button onclick="moveTripEvent(${idx}, -1)" class="hover:text-brand-500 transition active:scale-90"><i class="fa-solid fa-arrow-up text-[12px]"></i></button>` : ''}
-                                            ${idx < dayData.events.length - 1 ? `<button onclick="moveTripEvent(${idx}, 1)" class="hover:text-brand-500 transition active:scale-90"><i class="fa-solid fa-arrow-down text-[12px]"></i></button>` : ''}
-                                            <button onclick="editTripEvent(${idx})" class="hover:text-amber-500 transition active:scale-90"><i class="fa-solid fa-pen text-[12px]"></i></button>
-                                            <button onclick="deleteTripEvent(${idx})" class="hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-trash-can text-[12px]"></i></button>
+                                            ${idx > 0 ? `<button onclick="moveTripEvent(${idx}, -1)" class="hover:text-brand-500 transition active:scale-90"><i class="fa-solid fa-arrow-up text-[0.8rem]"></i></button>` : ''}
+                                            ${idx < dayData.events.length - 1 ? `<button onclick="moveTripEvent(${idx}, 1)" class="hover:text-brand-500 transition active:scale-90"><i class="fa-solid fa-arrow-down text-[0.8rem]"></i></button>` : ''}
+                                            <button onclick="editTripEvent(${idx})" class="hover:text-amber-500 transition active:scale-90"><i class="fa-solid fa-pen text-[0.8rem]"></i></button>
+                                            <button onclick="deleteTripEvent(${idx})" class="hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-trash-can text-[0.8rem]"></i></button>
                                         </div>` : ''}
                                     </div>
                                 </div>
-                                <h4 class="text-[12px] font-extrabold text-slate-800 mt-2">${evt.title}</h4>
-                                <p class="text-[12px] text-slate-500 mt-1 leading-relaxed">${evt.desc}</p>
+                                <h4 class="text-[1rem] font-extrabold text-slate-800 mt-2">${evt.title}</h4>
+                                <p class="text-[0.85rem] text-slate-500 mt-1 leading-relaxed">${evt.desc}</p>
                             </div>
                         </div>`;
                 });
@@ -661,7 +655,7 @@
             document.getElementById('label-add-edit').innerText = "編輯目前行程";
             const btn = document.getElementById('btn-submit-evt');
             btn.innerHTML = '儲存修改';
-            btn.className = 'flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-[12px] transition active:scale-95 shadow-sm';
+            btn.className = 'flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-sm transition active:scale-95 shadow-sm';
             document.getElementById('btn-cancel-evt').classList.remove('hidden');
 
             document.getElementById('input-evt-time').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -677,7 +671,7 @@
             const btn = document.getElementById('btn-submit-evt');
             if(btn) {
                 btn.innerHTML = '加入今日計畫';
-                btn.className = 'flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-[12px] transition active:scale-95 shadow-sm';
+                btn.className = 'flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-sm transition active:scale-95 shadow-sm';
             }
             const cancelBtn = document.getElementById('btn-cancel-evt');
             if(cancelBtn) cancelBtn.classList.add('hidden');
@@ -747,14 +741,14 @@
             if (guideData.length === 0) return; if (!activeGuideTab || !guideData.some(g => g.id === activeGuideTab)) activeGuideTab = guideData[0].id;
             guideData.forEach((g, index) => {
                 const btn = document.createElement('button'); btn.onclick = () => { activeGuideTab = g.id; renderGuidesPage(); };
-                btn.className = (g.id === activeGuideTab) ? "shrink-0 text-center py-2 px-4 text-[12px] font-bold rounded-lg bg-white text-slate-800 shadow-sm transition active:scale-95" : "shrink-0 text-center py-2 px-4 text-[12px] font-bold rounded-lg text-slate-600 transition active:scale-95";
+                btn.className = (g.id === activeGuideTab) ? "shrink-0 text-center py-2 px-4 text-[0.85rem] font-bold rounded-lg bg-white text-slate-800 shadow-sm transition active:scale-95" : "shrink-0 text-center py-2 px-4 text-[0.85rem] font-bold rounded-lg text-slate-600 transition active:scale-95";
                 const displayTitle = g.title.replace(/^\d+\.\s*/, '');
                 btn.innerText = `${index + 1}. ${displayTitle}`; tabsBar.appendChild(btn);
                 if (g.id === activeGuideTab) {
                     contentsContainer.innerHTML = `
                         <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm space-y-3">
-                            <h3 class="font-bold text-slate-900 text-[14px]">${index + 1}. ${displayTitle}</h3><p class="text-[12px] text-slate-500 leading-relaxed">${g.desc}</p>
-                            <div class="space-y-2 border-l-2 border-brand-500 pl-3 text-[12px]">
+                            <h3 class="font-bold text-slate-900 text-[1rem]">${index + 1}. ${displayTitle}</h3><p class="text-[0.85rem] text-slate-500 leading-relaxed">${g.desc}</p>
+                            <div class="space-y-2 border-l-2 border-brand-500 pl-3 text-[0.85rem]">
                                 ${g.s1 ? `<div><p class="font-bold text-slate-800">細節指引一</p><p class="text-slate-500">${g.s1}</p></div>` : ''}
                                 ${g.s2 ? `<div><p class="font-bold text-slate-800">細節指引二</p><p class="text-slate-500">${g.s2}</p></div>` : ''}
                             </div>
@@ -781,7 +775,7 @@
             Object.keys(groups).forEach(k => groups[k].innerHTML = ''); let checkedCount = 0;
             packingItems.forEach((item, index) => {
                 if (item.checked) checkedCount++; const div = document.createElement('div'); div.className = `flex items-center justify-between p-2 rounded-lg border ${item.checked ? 'bg-indigo-50/40 text-slate-400 line-through' : 'bg-slate-50'}`;
-                div.innerHTML = `<label class="flex items-center space-x-3 cursor-pointer flex-1"><input type="checkbox" onchange="togglePackingItem(${index}, this)" ${item.checked ? 'checked' : ''} class="w-4 h-4 text-brand-500"><span class="text-[12px] font-semibold">${item.name}</span></label><button onclick="deletePackingItem(${index})" class="text-slate-300 hover:text-red-500 text-[12px] transition active:scale-90"><i class="fa-solid fa-trash"></i></button>`;
+                div.innerHTML = `<label class="flex items-center space-x-3 cursor-pointer flex-1"><input type="checkbox" onchange="togglePackingItem(${index}, this)" ${item.checked ? 'checked' : ''} class="w-4 h-4 text-brand-500"><span class="text-[0.85rem] font-semibold">${item.name}</span></label><button onclick="deletePackingItem(${index})" class="text-slate-300 hover:text-red-500 text-[0.85rem] transition active:scale-90"><i class="fa-solid fa-trash"></i></button>`;
                 if(groups[item.group]) groups[item.group].appendChild(div);
             });
             document.getElementById('header-packing-count').innerText = `${checkedCount}/${packingItems.length}`; document.getElementById('packing-stat-text').innerText = `已打包 ${checkedCount} / ${packingItems.length}`;
@@ -809,7 +803,6 @@
             renderPackingChecklist();
         }
 
-        // --- 全新預算 AA 制邏輯 ---
         function toggleMemberEdit() {
             const el = document.getElementById('member-edit-section');
             el.classList.toggle('hidden');
@@ -852,35 +845,35 @@
                 const isArchived = !budgetMembers.includes(payer); 
                 summaryContainer.innerHTML += `
                     <div class="${isArchived ? 'opacity-50' : ''}">
-                        <p class="text-[10px] text-indigo-300 truncate">👤 ${payer}</p>
-                        <p class="text-[14px] font-bold mt-0.5">NT$ ${payerTotals[payer].toLocaleString()}</p>
+                        <p class="text-[0.65rem] text-indigo-300 truncate">👤 ${payer}</p>
+                        <p class="text-[0.95rem] font-bold mt-0.5">NT$ ${payerTotals[payer].toLocaleString()}</p>
                     </div>
                 `;
             });
 
             const activeCount = budgetMembers.length;
-            let settlementHtml = `<div class="flex items-center mb-1.5"><i class="fa-solid fa-scale-balanced mr-2"></i><span class="font-bold text-[13px] text-white">自動 AA 結算 (依目前 ${activeCount} 人均攤)</span></div>`;
+            let settlementHtml = `<div class="flex items-center mb-1.5"><i class="fa-solid fa-scale-balanced mr-2"></i><span class="font-bold text-[0.9rem] text-white">自動 AA 結算 (依目前 ${activeCount} 人均攤)</span></div>`;
 
             if (activeCount > 0 && totalExpense > 0) {
                 const avg = totalExpense / activeCount;
-                settlementHtml += `<p class="text-[11px] text-indigo-300 mb-2 font-medium">每人應付基準：NT$ ${Math.round(avg).toLocaleString()}</p><div class="space-y-1">`;
+                settlementHtml += `<p class="text-[0.75rem] text-indigo-300 mb-2 font-medium">每人應付基準：NT$ ${Math.round(avg).toLocaleString()}</p><div class="space-y-1">`;
                 
                 budgetMembers.forEach(m => {
                     const paid = payerTotals[m] || 0;
                     const diff = paid - avg;
                     if (diff > 0) {
-                        settlementHtml += `<p class="text-[11px]"><span class="text-emerald-400 font-bold bg-emerald-400/10 px-1 rounded">${m}</span> 多付了，應收回 <strong class="text-white px-0.5">NT$ ${Math.round(diff).toLocaleString()}</strong></p>`;
+                        settlementHtml += `<p class="text-[0.75rem]"><span class="text-emerald-400 font-bold bg-emerald-400/10 px-1 rounded">${m}</span> 多付了，應收回 <strong class="text-white px-0.5">NT$ ${Math.round(diff).toLocaleString()}</strong></p>`;
                     } else if (diff < 0) {
-                        settlementHtml += `<p class="text-[11px]"><span class="text-amber-400 font-bold bg-amber-400/10 px-1 rounded">${m}</span> 少付了，需補給 <strong class="text-white px-0.5">NT$ ${Math.round(Math.abs(diff)).toLocaleString()}</strong></p>`;
+                        settlementHtml += `<p class="text-[0.75rem]"><span class="text-amber-400 font-bold bg-amber-400/10 px-1 rounded">${m}</span> 少付了，需補給 <strong class="text-white px-0.5">NT$ ${Math.round(Math.abs(diff)).toLocaleString()}</strong></p>`;
                     } else {
-                        settlementHtml += `<p class="text-[11px]"><span class="text-indigo-300">${m}</span> 剛好打平</p>`;
+                        settlementHtml += `<p class="text-[0.75rem]"><span class="text-indigo-300">${m}</span> 剛好打平</p>`;
                     }
                 });
                 settlementHtml += `</div>`;
             } else if (totalExpense === 0) {
-                settlementHtml += `<p class="text-[11px] text-indigo-300">目前尚無開銷資料。</p>`;
+                settlementHtml += `<p class="text-[0.75rem] text-indigo-300">目前尚無開銷資料。</p>`;
             } else {
-                settlementHtml += `<p class="text-[11px] text-amber-400">請先新增付款人以進行計算。</p>`;
+                settlementHtml += `<p class="text-[0.75rem] text-amber-400">請先新增付款人以進行計算。</p>`;
             }
             document.getElementById('budget-settlement-box').innerHTML = settlementHtml;
 
@@ -899,8 +892,8 @@
             const tagsContainer = document.getElementById('member-tags-container');
             tagsContainer.innerHTML = budgetMembers.map((m, idx) => `
                 <div class="flex items-center bg-white border border-indigo-200 rounded-full pl-3 pr-1 py-1 shadow-sm">
-                    <span class="text-[11px] text-indigo-800 font-bold mr-2">${m}</span>
-                    <button onclick="deleteBudgetMember(${idx})" class="w-5 h-5 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-300 hover:bg-red-50 hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-xmark text-[10px]"></i></button>
+                    <span class="text-[0.7rem] text-indigo-800 font-bold mr-2">${m}</span>
+                    <button onclick="deleteBudgetMember(${idx})" class="w-5 h-5 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-300 hover:bg-red-50 hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-xmark text-[0.6rem]"></i></button>
                 </div>
             `).join('');
 
@@ -908,28 +901,28 @@
             listContainer.innerHTML = '';
             
             if (userExpenses.length === 0) { 
-                listContainer.innerHTML = `<div class="text-center py-6 text-[12px] text-slate-400">目前雲端無記帳資料。</div>`; 
+                listContainer.innerHTML = `<div class="text-center py-6 text-[0.85rem] text-slate-400">目前雲端無記帳資料。</div>`; 
             } else {
                 userExpenses.forEach((item, index) => {
                     const div = document.createElement('div');
                     div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl bg-slate-50`;
                     div.innerHTML = `
-                        <div class="flex items-center space-x-3 text-[12px] flex-1 min-w-0">
+                        <div class="flex items-center space-x-3 text-[0.85rem] flex-1 min-w-0">
                             <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 bg-indigo-100 text-indigo-600">
-                                <i class="fa-solid fa-receipt text-[11px]"></i>
+                                <i class="fa-solid fa-receipt text-[0.7rem]"></i>
                             </div>
                             <div class="truncate pr-2">
-                                <p class="font-extrabold text-slate-800 text-[13px] truncate">${item.name}</p>
+                                <p class="font-extrabold text-slate-800 text-[0.9rem] truncate">${item.name}</p>
                                 <div class="flex items-center space-x-1.5 mt-1">
-                                    <span class="text-[9px] px-1.5 py-0.5 border border-slate-200 bg-white text-slate-500 rounded font-medium">${item.category}</span>
-                                    <span class="text-[9px] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-bold truncate max-w-[80px]">${item.payer}</span>
+                                    <span class="text-[0.6rem] px-1.5 py-0.5 border border-slate-200 bg-white text-slate-500 rounded font-medium">${item.category}</span>
+                                    <span class="text-[0.6rem] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-bold truncate max-w-[80px]">${item.payer}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="flex items-center space-x-3 shrink-0 pl-1">
-                            <span class="text-[13px] font-black text-slate-800 tracking-tight">NT$ ${item.cost.toLocaleString()}</span>
+                            <span class="text-[0.9rem] font-black text-slate-800 tracking-tight">NT$ ${item.cost.toLocaleString()}</span>
                             <button onclick="deleteExpenseItem(${index})" class="text-slate-300 hover:text-red-500 transition active:scale-90 p-1.5">
-                                <i class="fa-solid fa-trash-can text-[14px]"></i>
+                                <i class="fa-solid fa-trash-can text-[0.95rem]"></i>
                             </button>
                         </div>
                     `;
