@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0b2545">
     
-    <link rel="apple-touch-icon" href="icon.jpg?v=22">
+    <link rel="apple-touch-icon" href="icon.jpg?v=21">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,25 +33,33 @@
         }
     </script>
     <style>
+        /* 免疫 iOS 長輩巨大字體設定，改由內部 Slider 控制 */
         html { 
             -webkit-text-size-adjust: none !important;
             touch-action: manipulation; 
         }
 
         body, html {
-            width: 100%; height: 100%;
-            position: fixed; top: 0; bottom: 0; left: 0; right: 0;
-            margin: 0; padding: 0; overflow: hidden;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0; bottom: 0; left: 0; right: 0;
+            margin: 0; padding: 0;
+            overflow: hidden;
             background-color: #0b2545;
         }
 
         #app-layout {
-            display: flex; flex-direction: column;
-            position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0; bottom: 0; left: 0; right: 0;
             width: 100%; height: 100%;
-            background-color: #f8fafc; overflow: hidden;
+            background-color: #f8fafc;
+            overflow: hidden;
         }
 
+        /* 絕對鎖死卡片與導航列文字，不受字體放大影響 */
         .lock-text-size {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             -webkit-text-size-adjust: none !important;
@@ -59,19 +67,22 @@
 
         .safe-top { height: env(safe-area-inset-top); width: 100%; background-color: #0b2545; flex-shrink: 0; }
         
-        input[type=range] { -webkit-appearance: none; background: transparent; }
+        /* 滑動條樣式優化 */
+        input[type=range] {
+            -webkit-appearance: none; background: transparent;
+        }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 20px; width: 20px;
-            border-radius: 50%; background: #ffffff; border: 2px solid #0070f3;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); margin-top: -8px; cursor: pointer;
+            -webkit-appearance: none;
+            height: 20px; width: 20px;
+            border-radius: 50%; background: #ffffff;
+            border: 2px solid #0070f3;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            margin-top: -8px; cursor: pointer;
         }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 4px; cursor: pointer; background: #e2e8f0; border-radius: 2px;
-        }
-
-        .nav-safe-bottom { padding-bottom: 8px; }
-        @media (display-mode: standalone) {
-            .nav-safe-bottom { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+            width: 100%; height: 4px;
+            cursor: pointer; background: #e2e8f0;
+            border-radius: 2px;
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -135,7 +146,7 @@
             <p class="text-[12px] font-bold" id="toast-message-text">提示訊息</p>
         </div>
 
-        <main class="flex-1 overflow-y-auto p-4 pb-8 no-scrollbar relative w-full" id="main-content">
+        <main class="flex-1 overflow-y-auto p-4 pb-6 no-scrollbar relative" id="main-content">
             
             <section id="tab-dashboard" class="space-y-4">
                 <div class="lock-text-size bg-gradient-to-br from-brand-900 to-brand-800 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
@@ -286,74 +297,71 @@
                 </div>
             </section>
 
-            <!-- ======================= 全新家庭旅遊記帳系統 ======================= -->
-            <section id="tab-budget" class="hidden space-y-4 pb-6">
+            <section id="tab-budget" class="hidden space-y-4">
                 <div class="lock-text-size bg-gradient-to-br from-emerald-800 to-emerald-950 text-white p-5 rounded-2xl shadow-md">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[12px] uppercase tracking-widest text-emerald-300 font-bold"><i class="fa-solid fa-users mr-1"></i>家庭公積金與代墊帳本</span>
+                    <span class="text-[12px] uppercase tracking-widest text-emerald-300 font-bold">Trip Ledger 旅遊分帳本</span>
+                    <div class="mt-3">
+                        <p class="text-[12px] text-emerald-300">目前總開銷</p>
+                        <h2 class="text-[28px] font-extrabold leading-tight" id="budget-total-expense">NT$ 0</h2>
                     </div>
-                    <div class="grid grid-cols-3 gap-3 mt-4 text-center">
-                        <div class="bg-black/20 p-2.5 rounded-xl">
-                            <p class="text-[10px] text-emerald-200">總行程開銷</p>
-                            <h2 class="text-[18px] font-extrabold text-white mt-0.5" id="budget-calc-total">NT$ 0</h2>
+                    <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-emerald-700/50">
+                        <div>
+                            <p class="text-[10px] text-emerald-400">💰 公積金支出</p>
+                            <p class="text-[14px] font-bold mt-0.5" id="budget-public-total">0</p>
                         </div>
-                        <div class="bg-white/10 p-2.5 rounded-xl border border-emerald-700/50">
-                            <p class="text-[10px] text-emerald-200">公費已支出</p>
-                            <h2 class="text-[18px] font-extrabold text-emerald-300 mt-0.5" id="budget-public-total">NT$ 0</h2>
+                        <div>
+                            <p class="text-[10px] text-emerald-400">🧍 我代墊</p>
+                            <p class="text-[14px] font-bold mt-0.5" id="budget-me-total">0</p>
                         </div>
-                        <div class="bg-amber-500/20 p-2.5 rounded-xl border border-amber-500/30">
-                            <p class="text-[10px] text-amber-200">代墊待結算</p>
-                            <h2 class="text-[18px] font-extrabold text-amber-400 mt-0.5" id="budget-advance-total">NT$ 0</h2>
+                        <div>
+                            <p class="text-[10px] text-emerald-400">👩‍❤️‍👨 伴侶代墊</p>
+                            <p class="text-[14px] font-bold mt-0.5" id="budget-partner-total">0</p>
                         </div>
                     </div>
-                    <p class="text-[10px] text-emerald-400/80 mt-3 leading-relaxed">💡 提示：標示為「共同分攤」但由「個人代墊」的項目，會自動計入待結算總額。</p>
+                    <div class="mt-3 bg-emerald-900/50 p-2.5 rounded-lg text-[12px] text-emerald-200 flex items-center border border-emerald-700/50">
+                        <i class="fa-solid fa-scale-balanced mr-2"></i>
+                        <span id="budget-settlement-text">目前帳務平衡，無需拆帳。</span>
+                    </div>
                 </div>
 
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
                     <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-plus mr-1.5 text-brand-500"></i>新增記帳項目</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <div><input type="text" id="input-exp-name" placeholder="項目名稱" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white"></div>
+                        <div><input type="text" id="input-exp-name" placeholder="項目名稱 (如：晚餐)" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white"></div>
                         <div><input type="number" id="input-exp-cost" placeholder="金額 (NTD)" class="w-full px-3 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white"></div>
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <select id="input-exp-category" class="w-full px-2 py-1.5 text-xs border rounded-lg bg-white text-slate-600">
-                                <option value="交通">🚗 交通/過路費</option><option value="住宿">🏠 酒店住宿</option><option value="飲食">🍱 餐飲美食</option><option value="玩樂">🎢 門票/玩樂</option><option value="行政">🪪 行政/開戶</option><option value="其他">🛍️ 其他雜費</option>
+                            <select id="input-exp-category" class="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white">
+                                <option value="交通">交通車資</option><option value="住宿">酒店住宿</option><option value="飲食">餐飲美食</option><option value="玩樂">門票娛樂</option><option value="行政">行政規費</option><option value="其他">其他雜費</option>
                             </select>
                         </div>
                         <div>
-                            <select id="input-exp-payer" class="w-full px-2 py-1.5 text-xs border rounded-lg bg-white font-bold text-brand-600">
-                                <option value="公費">💰 共同公費支出</option>
-                                <option value="自己">🙋‍♂️ 自己墊付</option>
-                                <option value="爸爸">👨 爸爸墊付</option>
-                                <option value="媽媽">👩 媽媽墊付</option>
-                                <option value="伴侶">👩‍❤️‍👨 伴侶墊付</option>
+                            <select id="input-exp-payer" class="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white font-bold text-slate-700">
+                                <option value="public" class="text-emerald-600">💰 從公積金扣</option>
+                                <option value="me" class="text-brand-600">🧍 我先代墊</option>
+                                <option value="partner" class="text-amber-600">👩‍❤️‍👨 伴侶代墊</option>
+                                <option value="unpaid" class="text-slate-400">⏳ 尚未付款</option>
                             </select>
                         </div>
                     </div>
-                    <div>
-                        <select id="input-exp-type" class="w-full px-2 py-1.5 text-xs border rounded-lg bg-slate-50 text-slate-700">
-                            <option value="共同">👨‍👩‍👧‍👦 全家共同分攤 (計入總額)</option>
-                            <option value="個人">👤 個人私人開銷 (不計入結算)</option>
-                        </select>
-                    </div>
-                    <button onclick="addUserExpense()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 flex items-center justify-center space-x-1 shadow-sm">
-                        <i class="fa-solid fa-circle-plus"></i><span>同步新增至家庭帳本</span>
+                    <button onclick="addUserExpense()" class="w-full bg-brand-500 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 flex items-center justify-center space-x-1 shadow-sm">
+                        <i class="fa-solid fa-cloud-arrow-up"></i><span>同步新增至雲端帳本</span>
                     </button>
                 </div>
 
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-list-check mr-2 text-emerald-500"></i>記帳即時明細</h3>
-                        <button onclick="clearAllExpenses()" class="text-[11px] text-red-500 font-bold transition active:scale-90 px-2 py-1 bg-red-50 rounded-lg">清空全部</button>
+                        <button onclick="clearAllExpenses()" class="text-[11px] text-red-500 font-bold transition active:scale-90 bg-red-50 px-2 py-1 rounded-md">清空全部</button>
                     </div>
                     <div class="space-y-2" id="budget-items-list"></div>
                 </div>
             </section>
         </main>
 
-        <nav id="bottom-nav" class="lock-text-size bg-white border-t border-slate-200 w-full shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] nav-safe-bottom z-50">
-            <div class="flex justify-around items-center pt-2">
+        <nav id="bottom-nav" class="lock-text-size bg-white border-t border-slate-200 w-full shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-transform duration-300" style="padding-bottom: calc(4px + env(safe-area-inset-bottom));">
+            <div class="flex justify-around items-center pt-2 pb-1">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[20px]"></i><span class="text-[10px] mt-1 font-bold">總覽</span></button>
                 <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[20px]"></i><span class="text-[10px] mt-1 font-bold">行程</span></button>
                 <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[20px]"></i><span class="text-[10px] mt-1 font-bold">攻略</span></button>
@@ -365,11 +373,13 @@
     </div>
 
     <script>
+        // 控制 aA 字體調整選單的顯示與隱藏
         function toggleFontSlider() {
             const popup = document.getElementById('font-slider-popup');
             popup.classList.toggle('hidden');
         }
 
+        // 點擊畫面其他地方時，自動關閉字體選單
         document.addEventListener('click', function(e) {
             const popup = document.getElementById('font-slider-popup');
             const btn = document.getElementById('btn-font-toggle');
@@ -378,6 +388,7 @@
             }
         });
 
+        // 載入與監聽 Slider 滑動事件
         window.addEventListener('DOMContentLoaded', () => {
             const slider = document.getElementById('font-size-slider');
             if (slider) {
@@ -792,94 +803,123 @@
         }
 
         function renderBudget() {
-            const listContainer = document.getElementById('budget-items-list'); 
-            listContainer.innerHTML = ''; 
-            let grandTotal = 0; let publicTotal = 0; let advanceTotal = 0;
+            const listContainer = document.getElementById('budget-items-list');
+            listContainer.innerHTML = '';
             
-            if (userExpenses.length === 0) { 
-                listContainer.innerHTML = `<div class="text-center py-6 text-[12px] text-slate-400">目前雲端無記帳資料。</div>`; 
-            }
-
+            let totalExpense = 0;
+            let publicTotal = 0;
+            let meTotal = 0;
+            let partnerTotal = 0;
+            
             userExpenses.forEach((item, index) => {
-                const payer = item.payer || '公費';
-                const type = item.type || '共同';
+                let payer = item.payer;
+                if (!payer) payer = (item.status === 'paid') ? 'public' : 'unpaid';
 
-                if (type === '共同') {
-                    grandTotal += item.cost;
-                    if (payer === '公費') {
-                        publicTotal += item.cost;
-                    } else {
-                        advanceTotal += item.cost;
-                    }
+                if (payer !== 'unpaid') totalExpense += item.cost;
+                if (payer === 'public') publicTotal += item.cost;
+                if (payer === 'me') meTotal += item.cost;
+                if (payer === 'partner') partnerTotal += item.cost;
+
+                let payerBadge = '';
+                let bgClass = 'bg-slate-50';
+                let iconClass = 'bg-slate-200 text-slate-500';
+                let iconHtml = '<i class="fa-solid fa-clock text-[9px]"></i>';
+
+                if(payer === 'public') {
+                    payerBadge = '<span class="text-[9px] px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded font-bold">💰 公積金</span>';
+                    bgClass = 'bg-emerald-50/30';
+                    iconClass = 'bg-emerald-500 text-white';
+                    iconHtml = '<i class="fa-solid fa-vault text-[9px]"></i>';
+                } else if (payer === 'me') {
+                    payerBadge = '<span class="text-[9px] px-1.5 py-0.5 bg-brand-100 text-brand-700 rounded font-bold">🧍 我代墊</span>';
+                    bgClass = 'bg-brand-50/30';
+                    iconClass = 'bg-brand-500 text-white';
+                    iconHtml = '<i class="fa-solid fa-user text-[9px]"></i>';
+                } else if (payer === 'partner') {
+                    payerBadge = '<span class="text-[9px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded font-bold">👩‍❤️‍👨 伴侶代墊</span>';
+                    bgClass = 'bg-amber-50/30';
+                    iconClass = 'bg-amber-500 text-white';
+                    iconHtml = '<i class="fa-solid fa-user-group text-[9px]"></i>';
+                } else {
+                    payerBadge = '<span class="text-[9px] px-1.5 py-0.5 bg-slate-200 text-slate-500 rounded font-bold">⏳ 未付款</span>';
                 }
 
-                let typeBadge = type === '共同' ? `<span class="text-[9px] px-1.5 py-0.5 bg-emerald-50 text-emerald-600 rounded">共同</span>` : `<span class="text-[9px] px-1.5 py-0.5 bg-slate-100 text-slate-500 rounded">個人</span>`;
-                let payerBadge = payer === '公費' ? `<span class="text-[9px] px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded border border-amber-100">公費付</span>` : `<span class="text-[9px] px-1.5 py-0.5 bg-brand-50 text-brand-600 rounded border border-brand-100">${payer}墊</span>`;
-
-                const div = document.createElement('div'); 
-                div.className = `flex justify-between items-center p-3 border rounded-xl bg-white shadow-sm`;
+                const div = document.createElement('div');
+                div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl ${bgClass}`;
                 div.innerHTML = `
                     <div class="flex items-center space-x-3 text-[12px] flex-1">
-                        <div class="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-brand-500 shrink-0">
-                            <i class="fa-solid fa-receipt text-[12px]"></i>
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center shadow-sm shrink-0 ${iconClass}">
+                            ${iconHtml}
                         </div>
                         <div>
-                            <p class="font-extrabold text-slate-800">${item.name} <span class="text-[10px] text-slate-400 font-normal ml-1">(${item.category})</span></p>
-                            <div class="flex space-x-1 mt-1">
-                                ${typeBadge} ${payerBadge}
+                            <p class="font-extrabold text-slate-800 text-[13px]">${item.name}</p>
+                            <div class="flex items-center space-x-1.5 mt-1">
+                                <span class="text-[9px] px-1 py-0.5 border border-slate-200 bg-white text-slate-500 rounded font-medium">${item.category}</span>
+                                ${payerBadge}
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-3 text-right">
-                        <div>
-                            <span class="text-[14px] font-black text-slate-800 block">NT$ ${item.cost.toLocaleString()}</span>
-                        </div>
-                        <button onclick="deleteExpenseItem(${index});" class="text-slate-300 hover:text-red-500 transition active:scale-90 p-1"><i class="fa-solid fa-trash-can text-[14px]"></i></button>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-[13px] font-black text-slate-800 tracking-tight">NT$ ${item.cost.toLocaleString()}</span>
+                        <button onclick="deleteExpenseItem(${index})" class="text-slate-300 hover:text-red-500 transition active:scale-90 shrink-0 p-1">
+                            <i class="fa-solid fa-trash-can text-[14px]"></i>
+                        </button>
                     </div>
                 `;
                 listContainer.appendChild(div);
             });
 
-            document.getElementById('budget-calc-total').innerText = `NT$ ${grandTotal.toLocaleString()}`; 
-            document.getElementById('budget-public-total').innerText = `NT$ ${publicTotal.toLocaleString()}`; 
-            document.getElementById('budget-advance-total').innerText = `NT$ ${advanceTotal.toLocaleString()}`; 
-            document.getElementById('header-budget-total').innerText = `NT$ ${grandTotal.toLocaleString()}`;
+            document.getElementById('budget-total-expense').innerText = `NT$ ${totalExpense.toLocaleString()}`;
+            document.getElementById('budget-public-total').innerText = `NT$ ${publicTotal.toLocaleString()}`;
+            document.getElementById('budget-me-total').innerText = `NT$ ${meTotal.toLocaleString()}`;
+            document.getElementById('budget-partner-total').innerText = `NT$ ${partnerTotal.toLocaleString()}`;
+            document.getElementById('header-budget-total').innerText = `NT$ ${totalExpense.toLocaleString()}`;
+
+            const settlementText = document.getElementById('budget-settlement-text');
+            const diff = meTotal - partnerTotal;
+            
+            if (meTotal === 0 && partnerTotal === 0) {
+                settlementText.innerHTML = '目前皆為公款支出或未付款，無須拆帳。';
+            } else if (diff > 0) {
+                const owe = Math.round(diff / 2);
+                settlementText.innerHTML = `<span class="text-amber-300 font-bold">結算進度：</span>伴侶需給您 <strong class="text-white px-1 text-[14px]">NT$ ${owe.toLocaleString()}</strong>`;
+            } else if (diff < 0) {
+                const owe = Math.round(Math.abs(diff) / 2);
+                settlementText.innerHTML = `<span class="text-amber-300 font-bold">結算進度：</span>您需給伴侶 <strong class="text-white px-1 text-[14px]">NT$ ${owe.toLocaleString()}</strong>`;
+            } else {
+                settlementText.innerHTML = '兩人代墊金額一致，完美平衡！';
+            }
+
+            if (userExpenses.length === 0) { 
+                listContainer.innerHTML = `<div class="text-center py-6 text-[12px] text-slate-400">目前雲端無記帳資料。</div>`; 
+            }
         }
 
         function addUserExpense() { 
             const name = document.getElementById('input-exp-name').value.trim(); 
             const cost = parseInt(document.getElementById('input-exp-cost').value); 
-            if(!name || isNaN(cost)) {
-                showToast("請輸入完整的名稱與金額！", true);
-                return;
-            }
+            if(!name || isNaN(cost)) return; 
             
             userExpenses.push({ 
                 name, 
                 cost, 
                 category: document.getElementById('input-exp-category').value, 
-                payer: document.getElementById('input-exp-payer').value,
-                type: document.getElementById('input-exp-type').value 
+                payer: document.getElementById('input-exp-payer').value
             }); 
-            
             pushBudgetDataToCloud(); 
             document.getElementById('input-exp-name').value = ''; 
             document.getElementById('input-exp-cost').value = ''; 
-            showToast("已加入記帳！");
         }
 
-        function deleteExpenseItem(index) { userExpenses.splice(index, 1); pushBudgetDataToCloud(); }
-        
+        function deleteExpenseItem(index) { 
+            userExpenses.splice(index, 1); 
+            pushBudgetDataToCloud(); 
+        }
+
         function clearAllExpenses() { 
             if(confirm("確定清空全部雲端帳本？")) { 
                 userExpenses = []; 
                 pushBudgetDataToCloud(); 
-                document.getElementById('budget-calc-total').innerText = `NT$ 0`; 
-                document.getElementById('budget-public-total').innerText = `NT$ 0`; 
-                document.getElementById('budget-advance-total').innerText = `NT$ 0`; 
-                document.getElementById('header-budget-total').innerText = `NT$ 0`;
-                document.getElementById('budget-items-list').innerHTML = `<div class="text-center py-6 text-[12px] text-slate-400">目前雲端無記帳資料。</div>`;
-                showToast("帳本已清空！");
             } 
         }
 
