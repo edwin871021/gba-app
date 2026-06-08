@@ -298,32 +298,34 @@
             </section>
 
             <section id="tab-budget" class="hidden space-y-4">
-                <div class="lock-text-size bg-gradient-to-br from-emerald-800 to-emerald-950 text-white p-5 rounded-2xl shadow-md">
-                    <span class="text-[12px] uppercase tracking-widest text-emerald-300 font-bold">Trip Ledger 旅遊分帳本</span>
+                <div class="lock-text-size bg-gradient-to-br from-indigo-800 to-indigo-950 text-white p-5 rounded-2xl shadow-md">
+                    <div class="flex justify-between items-start">
+                        <span class="text-[12px] uppercase tracking-widest text-indigo-300 font-bold">Trip Ledger 動態分帳本</span>
+                        <button onclick="toggleMemberEdit()" class="text-[10px] bg-indigo-700 hover:bg-indigo-600 px-2.5 py-1 rounded-lg text-white transition shadow-sm"><i class="fa-solid fa-users-gear mr-1"></i>管理付款人</button>
+                    </div>
                     <div class="mt-3">
-                        <p class="text-[12px] text-emerald-300">目前總開銷</p>
+                        <p class="text-[12px] text-indigo-300">目前總開銷</p>
                         <h2 class="text-[28px] font-extrabold leading-tight" id="budget-total-expense">NT$ 0</h2>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-emerald-700/50">
-                        <div>
-                            <p class="text-[10px] text-emerald-400">💰 公積金支出</p>
-                            <p class="text-[14px] font-bold mt-0.5" id="budget-public-total">0</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-emerald-400">🧍 我代墊</p>
-                            <p class="text-[14px] font-bold mt-0.5" id="budget-me-total">0</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-emerald-400">👩‍❤️‍👨 伴侶代墊</p>
-                            <p class="text-[14px] font-bold mt-0.5" id="budget-partner-total">0</p>
-                        </div>
+            
+                    <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-indigo-700/50" id="budget-payers-summary">
                     </div>
-                    <div class="mt-3 bg-emerald-900/50 p-2.5 rounded-lg text-[12px] text-emerald-200 flex items-center border border-emerald-700/50">
-                        <i class="fa-solid fa-scale-balanced mr-2"></i>
-                        <span id="budget-settlement-text">目前帳務平衡，無需拆帳。</span>
+            
+                    <div class="mt-4 bg-indigo-900/50 p-3 rounded-xl text-[12px] text-indigo-200 flex flex-col border border-indigo-700/50 space-y-1.5" id="budget-settlement-box">
                     </div>
                 </div>
-
+            
+                <div id="member-edit-section" class="hidden bg-indigo-50 p-4 rounded-xl shadow-sm border border-indigo-100 space-y-3 transition-all">
+                    <h3 class="text-xs font-extrabold text-indigo-800 flex items-center"><i class="fa-solid fa-users mr-1.5"></i>自訂下拉選單與分帳名單</h3>
+                    <div class="flex space-x-2">
+                        <input type="text" id="input-new-member" placeholder="輸入名稱 (如: 小明)" class="flex-1 px-3 py-1.5 text-xs border border-indigo-200 rounded-lg bg-white focus:outline-indigo-500">
+                        <button onclick="addBudgetMember()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition active:scale-95 shadow-sm">新增</button>
+                    </div>
+                    <div class="flex flex-wrap gap-2 pt-1" id="member-tags-container">
+                        </div>
+                    <p class="text-[10px] text-indigo-400 leading-tight">提示：上方結算區會自動根據目前的「人數」進行平均分攤 (AA制)。刪除付款人不會刪除歷史帳目。</p>
+                </div>
+            
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
                     <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-plus mr-1.5 text-brand-500"></i>新增記帳項目</h3>
                     <div class="grid grid-cols-2 gap-2">
@@ -337,22 +339,18 @@
                             </select>
                         </div>
                         <div>
-                            <select id="input-exp-payer" class="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white font-bold text-slate-700">
-                                <option value="public" class="text-emerald-600">💰 從公積金扣</option>
-                                <option value="me" class="text-brand-600">🧍 我先代墊</option>
-                                <option value="partner" class="text-amber-600">👩‍❤️‍👨 伴侶代墊</option>
-                                <option value="unpaid" class="text-slate-400">⏳ 尚未付款</option>
+                            <select id="input-exp-payer" class="w-full px-2.5 py-1.5 text-xs border rounded-lg bg-slate-50 focus:bg-white font-bold text-indigo-700">
                             </select>
                         </div>
                     </div>
-                    <button onclick="addUserExpense()" class="w-full bg-brand-500 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 flex items-center justify-center space-x-1 shadow-sm">
-                        <i class="fa-solid fa-cloud-arrow-up"></i><span>同步新增至雲端帳本</span>
+                    <button onclick="addUserExpense()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 flex items-center justify-center space-x-1 shadow-sm">
+                        <i class="fa-solid fa-cloud-arrow-up"></i><span>新增至雲端帳本</span>
                     </button>
                 </div>
-
+            
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-list-check mr-2 text-emerald-500"></i>記帳即時明細</h3>
+                        <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-list-check mr-2 text-indigo-500"></i>記帳即時明細</h3>
                         <button onclick="clearAllExpenses()" class="text-[11px] text-red-500 font-bold transition active:scale-90 bg-red-50 px-2 py-1 rounded-md">清空全部</button>
                     </div>
                     <div class="space-y-2" id="budget-items-list"></div>
@@ -436,6 +434,7 @@
         const ADMIN_PASSWORD = "GBA2026_MASTER"; 
         let isAdmin = false; let activeDay = 1; let editEventIndex = -1;
         let tripDays = {}; let guideData = []; let userExpenses = []; let packingItems = []; let activeGuideTab = ""; let tripWarning = {};
+        let budgetMembers = ['我', '伴侶']; // 預設付款人名單
         
         const defaultDashboardInfo = { title: "大灣區旅遊助手", desc: "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！(若需變更行程，請點右上角輸入密碼解鎖)" };
         let dashboardInfo = {};
@@ -525,9 +524,15 @@
             db.collection("gba_budget").doc("main_budget").onSnapshot((doc) => {
                 try {
                     if (doc.exists) { 
-                        userExpenses = JSON.parse(JSON.stringify(doc.data().expenses || [])); 
+                        const data = doc.data();
+                        userExpenses = JSON.parse(JSON.stringify(data.expenses || [])); 
+                        if (data.members && data.members.length > 0) {
+                            budgetMembers = JSON.parse(JSON.stringify(data.members));
+                        }
                         renderBudget(); 
-                    } else { db.collection("gba_budget").doc("main_budget").set({ expenses: [] }); }
+                    } else { 
+                        db.collection("gba_budget").doc("main_budget").set({ expenses: [], members: budgetMembers }); 
+                    }
                 } catch (e) {
                     console.error(e); userExpenses = []; renderBudget();
                 }
@@ -537,7 +542,9 @@
         function pushTripDataToCloud() { 
             if (isAdmin) db.collection("gba_trip").doc("main_trip").set({ tripDays, guideData, tripWarning, dashboardInfo }, { merge: true }); 
         }
-        function pushBudgetDataToCloud() { db.collection("gba_budget").doc("main_budget").set({ expenses: userExpenses }); }
+        function pushBudgetDataToCloud() { 
+            db.collection("gba_budget").doc("main_budget").set({ expenses: userExpenses, members: budgetMembers }); 
+        }
         
         function initAppRender() { 
             renderDashboard(); 
@@ -802,109 +809,150 @@
             renderPackingChecklist();
         }
 
+        // --- 全新預算 AA 制邏輯 ---
+        function toggleMemberEdit() {
+            const el = document.getElementById('member-edit-section');
+            el.classList.toggle('hidden');
+        }
+
+        function addBudgetMember() {
+            const input = document.getElementById('input-new-member');
+            const val = input.value.trim();
+            if(val && !budgetMembers.includes(val)) {
+                budgetMembers.push(val);
+                input.value = '';
+                pushBudgetDataToCloud();
+            }
+        }
+
+        function deleteBudgetMember(idx) {
+            if(confirm(`確定要將「${budgetMembers[idx]}」從名單移除嗎？\n(注意：已記在他們名下的帳不會消失，但不會被計入未來的 AA 分攤)`)) {
+                budgetMembers.splice(idx, 1);
+                pushBudgetDataToCloud();
+            }
+        }
+
         function renderBudget() {
+            let totalExpense = 0;
+            let payerTotals = {};
+
+            budgetMembers.forEach(m => payerTotals[m] = 0);
+
+            userExpenses.forEach(item => {
+                totalExpense += item.cost;
+                if (payerTotals[item.payer] === undefined) {
+                    payerTotals[item.payer] = 0; 
+                }
+                payerTotals[item.payer] += item.cost;
+            });
+
+            const summaryContainer = document.getElementById('budget-payers-summary');
+            summaryContainer.innerHTML = '';
+            Object.keys(payerTotals).forEach(payer => {
+                const isArchived = !budgetMembers.includes(payer); 
+                summaryContainer.innerHTML += `
+                    <div class="${isArchived ? 'opacity-50' : ''}">
+                        <p class="text-[10px] text-indigo-300 truncate">👤 ${payer}</p>
+                        <p class="text-[14px] font-bold mt-0.5">NT$ ${payerTotals[payer].toLocaleString()}</p>
+                    </div>
+                `;
+            });
+
+            const activeCount = budgetMembers.length;
+            let settlementHtml = `<div class="flex items-center mb-1.5"><i class="fa-solid fa-scale-balanced mr-2"></i><span class="font-bold text-[13px] text-white">自動 AA 結算 (依目前 ${activeCount} 人均攤)</span></div>`;
+
+            if (activeCount > 0 && totalExpense > 0) {
+                const avg = totalExpense / activeCount;
+                settlementHtml += `<p class="text-[11px] text-indigo-300 mb-2 font-medium">每人應付基準：NT$ ${Math.round(avg).toLocaleString()}</p><div class="space-y-1">`;
+                
+                budgetMembers.forEach(m => {
+                    const paid = payerTotals[m] || 0;
+                    const diff = paid - avg;
+                    if (diff > 0) {
+                        settlementHtml += `<p class="text-[11px]"><span class="text-emerald-400 font-bold bg-emerald-400/10 px-1 rounded">${m}</span> 多付了，應收回 <strong class="text-white px-0.5">NT$ ${Math.round(diff).toLocaleString()}</strong></p>`;
+                    } else if (diff < 0) {
+                        settlementHtml += `<p class="text-[11px]"><span class="text-amber-400 font-bold bg-amber-400/10 px-1 rounded">${m}</span> 少付了，需補給 <strong class="text-white px-0.5">NT$ ${Math.round(Math.abs(diff)).toLocaleString()}</strong></p>`;
+                    } else {
+                        settlementHtml += `<p class="text-[11px]"><span class="text-indigo-300">${m}</span> 剛好打平</p>`;
+                    }
+                });
+                settlementHtml += `</div>`;
+            } else if (totalExpense === 0) {
+                settlementHtml += `<p class="text-[11px] text-indigo-300">目前尚無開銷資料。</p>`;
+            } else {
+                settlementHtml += `<p class="text-[11px] text-amber-400">請先新增付款人以進行計算。</p>`;
+            }
+            document.getElementById('budget-settlement-box').innerHTML = settlementHtml;
+
+            document.getElementById('budget-total-expense').innerText = `NT$ ${totalExpense.toLocaleString()}`;
+            document.getElementById('header-budget-total').innerText = `NT$ ${totalExpense.toLocaleString()}`;
+
+            const selectPayer = document.getElementById('input-exp-payer');
+            const currentVal = selectPayer.value; 
+            if (budgetMembers.length > 0) {
+                selectPayer.innerHTML = budgetMembers.map(m => `<option value="${m}">🙋 ${m}</option>`).join('');
+                if (budgetMembers.includes(currentVal)) selectPayer.value = currentVal;
+            } else {
+                selectPayer.innerHTML = `<option value="">請先新增付款人</option>`;
+            }
+
+            const tagsContainer = document.getElementById('member-tags-container');
+            tagsContainer.innerHTML = budgetMembers.map((m, idx) => `
+                <div class="flex items-center bg-white border border-indigo-200 rounded-full pl-3 pr-1 py-1 shadow-sm">
+                    <span class="text-[11px] text-indigo-800 font-bold mr-2">${m}</span>
+                    <button onclick="deleteBudgetMember(${idx})" class="w-5 h-5 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-300 hover:bg-red-50 hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-xmark text-[10px]"></i></button>
+                </div>
+            `).join('');
+
             const listContainer = document.getElementById('budget-items-list');
             listContainer.innerHTML = '';
             
-            let totalExpense = 0;
-            let publicTotal = 0;
-            let meTotal = 0;
-            let partnerTotal = 0;
-            
-            userExpenses.forEach((item, index) => {
-                let payer = item.payer;
-                if (!payer) payer = (item.status === 'paid') ? 'public' : 'unpaid';
-
-                if (payer !== 'unpaid') totalExpense += item.cost;
-                if (payer === 'public') publicTotal += item.cost;
-                if (payer === 'me') meTotal += item.cost;
-                if (payer === 'partner') partnerTotal += item.cost;
-
-                let payerBadge = '';
-                let bgClass = 'bg-slate-50';
-                let iconClass = 'bg-slate-200 text-slate-500';
-                let iconHtml = '<i class="fa-solid fa-clock text-[9px]"></i>';
-
-                if(payer === 'public') {
-                    payerBadge = '<span class="text-[9px] px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded font-bold">💰 公積金</span>';
-                    bgClass = 'bg-emerald-50/30';
-                    iconClass = 'bg-emerald-500 text-white';
-                    iconHtml = '<i class="fa-solid fa-vault text-[9px]"></i>';
-                } else if (payer === 'me') {
-                    payerBadge = '<span class="text-[9px] px-1.5 py-0.5 bg-brand-100 text-brand-700 rounded font-bold">🧍 我代墊</span>';
-                    bgClass = 'bg-brand-50/30';
-                    iconClass = 'bg-brand-500 text-white';
-                    iconHtml = '<i class="fa-solid fa-user text-[9px]"></i>';
-                } else if (payer === 'partner') {
-                    payerBadge = '<span class="text-[9px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded font-bold">👩‍❤️‍👨 伴侶代墊</span>';
-                    bgClass = 'bg-amber-50/30';
-                    iconClass = 'bg-amber-500 text-white';
-                    iconHtml = '<i class="fa-solid fa-user-group text-[9px]"></i>';
-                } else {
-                    payerBadge = '<span class="text-[9px] px-1.5 py-0.5 bg-slate-200 text-slate-500 rounded font-bold">⏳ 未付款</span>';
-                }
-
-                const div = document.createElement('div');
-                div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl ${bgClass}`;
-                div.innerHTML = `
-                    <div class="flex items-center space-x-3 text-[12px] flex-1">
-                        <div class="w-7 h-7 rounded-full flex items-center justify-center shadow-sm shrink-0 ${iconClass}">
-                            ${iconHtml}
-                        </div>
-                        <div>
-                            <p class="font-extrabold text-slate-800 text-[13px]">${item.name}</p>
-                            <div class="flex items-center space-x-1.5 mt-1">
-                                <span class="text-[9px] px-1 py-0.5 border border-slate-200 bg-white text-slate-500 rounded font-medium">${item.category}</span>
-                                ${payerBadge}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <span class="text-[13px] font-black text-slate-800 tracking-tight">NT$ ${item.cost.toLocaleString()}</span>
-                        <button onclick="deleteExpenseItem(${index})" class="text-slate-300 hover:text-red-500 transition active:scale-90 shrink-0 p-1">
-                            <i class="fa-solid fa-trash-can text-[14px]"></i>
-                        </button>
-                    </div>
-                `;
-                listContainer.appendChild(div);
-            });
-
-            document.getElementById('budget-total-expense').innerText = `NT$ ${totalExpense.toLocaleString()}`;
-            document.getElementById('budget-public-total').innerText = `NT$ ${publicTotal.toLocaleString()}`;
-            document.getElementById('budget-me-total').innerText = `NT$ ${meTotal.toLocaleString()}`;
-            document.getElementById('budget-partner-total').innerText = `NT$ ${partnerTotal.toLocaleString()}`;
-            document.getElementById('header-budget-total').innerText = `NT$ ${totalExpense.toLocaleString()}`;
-
-            const settlementText = document.getElementById('budget-settlement-text');
-            const diff = meTotal - partnerTotal;
-            
-            if (meTotal === 0 && partnerTotal === 0) {
-                settlementText.innerHTML = '目前皆為公款支出或未付款，無須拆帳。';
-            } else if (diff > 0) {
-                const owe = Math.round(diff / 2);
-                settlementText.innerHTML = `<span class="text-amber-300 font-bold">結算進度：</span>伴侶需給您 <strong class="text-white px-1 text-[14px]">NT$ ${owe.toLocaleString()}</strong>`;
-            } else if (diff < 0) {
-                const owe = Math.round(Math.abs(diff) / 2);
-                settlementText.innerHTML = `<span class="text-amber-300 font-bold">結算進度：</span>您需給伴侶 <strong class="text-white px-1 text-[14px]">NT$ ${owe.toLocaleString()}</strong>`;
-            } else {
-                settlementText.innerHTML = '兩人代墊金額一致，完美平衡！';
-            }
-
             if (userExpenses.length === 0) { 
                 listContainer.innerHTML = `<div class="text-center py-6 text-[12px] text-slate-400">目前雲端無記帳資料。</div>`; 
+            } else {
+                userExpenses.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl bg-slate-50`;
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-3 text-[12px] flex-1 min-w-0">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 bg-indigo-100 text-indigo-600">
+                                <i class="fa-solid fa-receipt text-[11px]"></i>
+                            </div>
+                            <div class="truncate pr-2">
+                                <p class="font-extrabold text-slate-800 text-[13px] truncate">${item.name}</p>
+                                <div class="flex items-center space-x-1.5 mt-1">
+                                    <span class="text-[9px] px-1.5 py-0.5 border border-slate-200 bg-white text-slate-500 rounded font-medium">${item.category}</span>
+                                    <span class="text-[9px] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-bold truncate max-w-[80px]">${item.payer}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3 shrink-0 pl-1">
+                            <span class="text-[13px] font-black text-slate-800 tracking-tight">NT$ ${item.cost.toLocaleString()}</span>
+                            <button onclick="deleteExpenseItem(${index})" class="text-slate-300 hover:text-red-500 transition active:scale-90 p-1.5">
+                                <i class="fa-solid fa-trash-can text-[14px]"></i>
+                            </button>
+                        </div>
+                    `;
+                    listContainer.appendChild(div);
+                });
             }
         }
 
         function addUserExpense() { 
             const name = document.getElementById('input-exp-name').value.trim(); 
             const cost = parseInt(document.getElementById('input-exp-cost').value); 
-            if(!name || isNaN(cost)) return; 
+            const payer = document.getElementById('input-exp-payer').value;
+            
+            if(!name || isNaN(cost) || !payer) {
+                showToast("請確認項目名稱、金額與付款人都已填寫！", true);
+                return; 
+            }
             
             userExpenses.push({ 
                 name, 
                 cost, 
                 category: document.getElementById('input-exp-category').value, 
-                payer: document.getElementById('input-exp-payer').value
+                payer: payer
             }); 
             pushBudgetDataToCloud(); 
             document.getElementById('input-exp-name').value = ''; 
@@ -917,7 +965,7 @@
         }
 
         function clearAllExpenses() { 
-            if(confirm("確定清空全部雲端帳本？")) { 
+            if(confirm("確定清空全部雲端帳本？(此操作不可恢復)")) { 
                 userExpenses = []; 
                 pushBudgetDataToCloud(); 
             } 
@@ -942,7 +990,8 @@
                 db.collection("gba_trip").doc("main_trip").set({ 
                     tripDays: resetTrip, guideData: resetGuide, tripWarning: resetWarn, dashboardInfo: resetDash 
                 }).then(() => {
-                    db.collection("gba_budget").doc("main_budget").set({ expenses: [] }).then(() => {
+                    budgetMembers = ['我', '伴侶'];
+                    db.collection("gba_budget").doc("main_budget").set({ expenses: [], members: budgetMembers }).then(() => {
                         showToast("重置成功，正在重新整理...");
                         setTimeout(() => location.reload(), 1000);
                     });
