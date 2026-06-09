@@ -126,7 +126,7 @@
                 </div>
             </div>
             
-            <div class="bg-brand-800/50 px-4 py-2 border-t border-brand-800 flex justify-between items-center text-[0.7rem] text-slate-300">
+            <div class="bg-brand-800/50 px-4 py-2 border-t border-brand-800 flex justify-between items-center text-[12px] text-slate-300">
                 <div class="flex items-center space-x-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span id="current-city-indicator">當前城市：讀取中...</span>
@@ -155,9 +155,9 @@
                         <h2 class="text-[1.5rem] font-bold mt-1 leading-tight" id="dashboard-hero-title">讀取中...</h2>
                         <p class="text-[0.9rem] text-slate-300 mt-2 leading-relaxed" id="dashboard-hero-desc">讀取中...</p>
                         <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10 text-center">
-                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[0.75rem] text-slate-400">總里程 (預估)</p><p class="text-[1.15rem] font-bold text-amber-400 mt-0.5">~350 km</p></div>
-                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[0.75rem] text-slate-400">計畫跨城</p><p class="text-[1.15rem] font-bold text-emerald-400 mt-0.5">4 城</p></div>
-                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[0.75rem] text-slate-400">交通工具</p><p class="text-[1.15rem] font-bold text-sky-400 mt-0.5">自駕/高鐵</p></div>
+                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">總里程 (預估)</p><p class="text-[1.15rem] font-bold text-amber-400 mt-0.5">~350 km</p></div>
+                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">計畫跨城</p><p class="text-[1.15rem] font-bold text-emerald-400 mt-0.5">4 城</p></div>
+                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">交通工具</p><p class="text-[1.15rem] font-bold text-sky-400 mt-0.5">自駕/高鐵</p></div>
                         </div>
                     </div>
                 </div>
@@ -260,9 +260,9 @@
                         <span class="text-[0.75rem] uppercase tracking-widest text-amber-500 font-bold">Personal Packing List</span>
                         <div class="flex justify-between items-baseline mt-1">
                             <h2 class="text-[1.5rem] font-bold leading-tight">出發行李檢查</h2>
-                            <span class="text-[0.75rem] text-brand-100" id="packing-stat-text">已打包 0 / 26</span>
+                            <span class="text-[12px] text-brand-100" id="packing-stat-text">已打包 0 / 26</span>
                         </div>
-                        <p class="text-[0.75rem] text-brand-100 opacity-80 mt-1 leading-relaxed">完美整合手寫物品筆記。打勾狀態與自訂物品<strong class="text-white px-1">僅保存在您的手機本機</strong>，不會與他人互相干擾！</p>
+                        <p class="text-[12px] text-brand-100 opacity-80 mt-1 leading-relaxed">完美整合手寫物品筆記。打勾狀態與自訂物品<strong class="text-white px-1">僅保存在您的手機本機</strong>，不會與他人互相干擾！</p>
                         <div class="w-full bg-white/10 rounded-full h-1.5 mt-4 overflow-hidden">
                             <div class="bg-amber-500 h-1.5 rounded-full transition-all duration-300" id="packing-progress-bar" style="width: 0%"></div>
                         </div>
@@ -357,11 +357,11 @@
 
         <nav id="bottom-nav" class="lock-text-size bg-white border-t border-slate-200 w-full shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-transform duration-300" style="padding-bottom: calc(4px + env(safe-area-inset-bottom));">
             <div class="flex justify-around items-center pt-2 pb-1">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">總覽</span></button>
-                <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">行程</span></button>
-                <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">攻略</span></button>
-                <button onclick="switchTab('packing')" id="nav-packing" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-suitcase text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">打包</span></button>
-                <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-wallet text-[1.25rem]"></i><span class="text-[0.65rem] mt-1 font-bold">記帳</span></button>
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">總覽</span></button>
+                <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">行程</span></button>
+                <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">攻略</span></button>
+                <button onclick="switchTab('packing')" id="nav-packing" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-suitcase text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">打包</span></button>
+                <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-wallet text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">記帳</span></button>
             </div>
         </nav>
         
@@ -606,8 +606,8 @@
             const navBar = document.getElementById('day-nav-bar'); navBar.innerHTML = '';
             for (let i = 1; i <= 8; i++) {
                 const d = tripDays[i]; const btn = document.createElement('button'); btn.onclick = () => setActiveDay(i);
-                btn.className = (i === activeDay) ? "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[0.85rem] bg-brand-900 text-white border-brand-900 transition active:scale-95" : "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[0.85rem] bg-white text-slate-500 border-slate-200 transition active:scale-95";
-                btn.innerHTML = `Day ${i}<br><span class="text-[0.65rem] font-normal">${d.date || ''} ${d.city || ''}</span>`;
+                btn.className = (i === activeDay) ? "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[12px] bg-brand-900 text-white border-brand-900 transition active:scale-95" : "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[12px] bg-white text-slate-500 border-slate-200 transition active:scale-95";
+                btn.innerHTML = `Day ${i}<br><span class="text-[12px] font-normal opacity-80 mt-0.5 block">${d.date || ''} ${d.city || ''}</span>`;
                 navBar.appendChild(btn);
             }
 
@@ -741,7 +741,7 @@
             if (guideData.length === 0) return; if (!activeGuideTab || !guideData.some(g => g.id === activeGuideTab)) activeGuideTab = guideData[0].id;
             guideData.forEach((g, index) => {
                 const btn = document.createElement('button'); btn.onclick = () => { activeGuideTab = g.id; renderGuidesPage(); };
-                btn.className = (g.id === activeGuideTab) ? "shrink-0 text-center py-2 px-4 text-[0.85rem] font-bold rounded-lg bg-white text-slate-800 shadow-sm transition active:scale-95" : "shrink-0 text-center py-2 px-4 text-[0.85rem] font-bold rounded-lg text-slate-600 transition active:scale-95";
+                btn.className = (g.id === activeGuideTab) ? "shrink-0 text-center py-2 px-4 text-[12px] font-bold rounded-lg bg-white text-slate-800 shadow-sm transition active:scale-95" : "shrink-0 text-center py-2 px-4 text-[12px] font-bold rounded-lg text-slate-600 transition active:scale-95";
                 const displayTitle = g.title.replace(/^\d+\.\s*/, '');
                 btn.innerText = `${index + 1}. ${displayTitle}`; tabsBar.appendChild(btn);
                 if (g.id === activeGuideTab) {
@@ -845,7 +845,7 @@
                 const isArchived = !budgetMembers.includes(payer); 
                 summaryContainer.innerHTML += `
                     <div class="${isArchived ? 'opacity-50' : ''}">
-                        <p class="text-[0.65rem] text-indigo-300 truncate">👤 ${payer}</p>
+                        <p class="text-[12px] text-indigo-300 truncate">👤 ${payer}</p>
                         <p class="text-[0.95rem] font-bold mt-0.5">NT$ ${payerTotals[payer].toLocaleString()}</p>
                     </div>
                 `;
