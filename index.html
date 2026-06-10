@@ -240,16 +240,17 @@
                 <hr class="border-slate-200">
                 
                 <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-folder-plus mr-1.5 text-brand-500"></i>建立全新辦事攻略分類</h3>
-                    <div><input type="text" id="input-guide-title" placeholder="分類名稱 (自動編號，例如：保險辦理)" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white"></div>
+                    <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-folder-plus mr-1.5 text-brand-500"></i>編輯或新增攻略分類</h3>
+                    <div><input type="text" id="input-guide-title" placeholder="分類名稱 (例如：保險辦理)" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white"></div>
                     <div><input type="text" id="input-guide-desc" placeholder="前言摘要說明..." class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white"></div>
                     <div class="grid grid-cols-2 gap-2">
                         <div><textarea id="input-guide-s1" rows="2" placeholder="重點步驟一內容..." class="w-full px-2 py-1 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
                         <div><textarea id="input-guide-s2" rows="2" placeholder="重點步驟二內容..." class="w-full px-2 py-1 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white"></textarea></div>
                     </div>
                     <div class="flex space-x-2">
-                        <button onclick="addUserGuide()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">確認新增</button>
-                        <button onclick="deleteCurrentGuide()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-lg text-xs transition active:scale-95 shadow-sm">刪除此攻略</button>
+                        <button onclick="saveCurrentGuide()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">儲存修改</button>
+                        <button onclick="addUserGuide()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">新增為新分類</button>
+                        <button onclick="deleteCurrentGuide()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 rounded-lg text-xs transition active:scale-95 shadow-sm">刪除</button>
                     </div>
                 </div>
             </section>
@@ -729,13 +730,6 @@
             }
         }
 
-        function clearGuideInputs() {
-            if(document.getElementById('input-guide-title')) document.getElementById('input-guide-title').value = '';
-            if(document.getElementById('input-guide-desc')) document.getElementById('input-guide-desc').value = '';
-            if(document.getElementById('input-guide-s1')) document.getElementById('input-guide-s1').value = '';
-            if(document.getElementById('input-guide-s2')) document.getElementById('input-guide-s2').value = '';
-        }
-
         function renderGuidesPage() {
             const tabsBar = document.getElementById('guide-tabs-bar'); const contentsContainer = document.getElementById('guide-contents-container'); tabsBar.innerHTML = ''; contentsContainer.innerHTML = '';
             if (guideData.length === 0) return; if (!activeGuideTab || !guideData.some(g => g.id === activeGuideTab)) activeGuideTab = guideData[0].id;
@@ -744,6 +738,7 @@
                 btn.className = (g.id === activeGuideTab) ? "shrink-0 text-center py-2 px-4 text-[12px] font-bold rounded-lg bg-white text-slate-800 shadow-sm transition active:scale-95" : "shrink-0 text-center py-2 px-4 text-[12px] font-bold rounded-lg text-slate-600 transition active:scale-95";
                 const displayTitle = g.title.replace(/^\d+\.\s*/, '');
                 btn.innerText = `${index + 1}. ${displayTitle}`; tabsBar.appendChild(btn);
+                
                 if (g.id === activeGuideTab) {
                     contentsContainer.innerHTML = `
                         <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm space-y-3">
@@ -753,21 +748,41 @@
                                 ${g.s2 ? `<div><p class="font-bold text-slate-800">細節指引二</p><p class="text-slate-500">${g.s2}</p></div>` : ''}
                             </div>
                         </div>`;
+                    
+                    if(document.getElementById('input-guide-title')) document.getElementById('input-guide-title').value = g.title;
+                    if(document.getElementById('input-guide-desc')) document.getElementById('input-guide-desc').value = g.desc || '';
+                    if(document.getElementById('input-guide-s1')) document.getElementById('input-guide-s1').value = g.s1 || '';
+                    if(document.getElementById('input-guide-s2')) document.getElementById('input-guide-s2').value = g.s2 || '';
                 }
             });
+        }
+
+        function saveCurrentGuide() {
+            if(!isAdmin) return;
+            const title = document.getElementById('input-guide-title').value.trim(); 
+            if(!title) return;
+            const idx = guideData.findIndex(g => g.id === activeGuideTab);
+            if (idx > -1) {
+                guideData[idx].title = title.replace(/^\d+\.\s*/, '');
+                guideData[idx].desc = document.getElementById('input-guide-desc').value.trim();
+                guideData[idx].s1 = document.getElementById('input-guide-s1').value.trim();
+                guideData[idx].s2 = document.getElementById('input-guide-s2').value.trim();
+                pushTripDataToCloud(); 
+                showToast("攻略修改已儲存！");
+            }
         }
         
         function addUserGuide() { 
             if(!isAdmin) return; const title = document.getElementById('input-guide-title').value.trim(); if(!title) return; 
             const id = 'guide_' + Date.now();
             guideData.push({ id, title: title.replace(/^\d+\.\s*/, ''), desc: document.getElementById('input-guide-desc').value.trim(), s1: document.getElementById('input-guide-s1').value.trim(), s2: document.getElementById('input-guide-s2').value.trim() }); 
-            activeGuideTab = id; pushTripDataToCloud(); clearGuideInputs(); showToast("成功新增攻略分類！");
+            activeGuideTab = id; pushTripDataToCloud(); showToast("成功新增攻略分類！");
         }
         
         function deleteCurrentGuide() { 
             if(!isAdmin || guideData.length <= 1) { showToast("至少需保留一個攻略分類！", true); return; }
             guideData = guideData.filter(g => g.id !== activeGuideTab); activeGuideTab = guideData[0].id; 
-            pushTripDataToCloud(); clearGuideInputs(); showToast("已刪除該攻略分類！");
+            pushTripDataToCloud(); showToast("已刪除該攻略分類！");
         }
 
         function renderPackingChecklist() {
@@ -858,17 +873,45 @@
                 const avg = totalExpense / activeCount;
                 settlementHtml += `<p class="text-[0.75rem] text-indigo-300 mb-2 font-medium">每人應付基準：NT$ ${Math.round(avg).toLocaleString()}</p><div class="space-y-1">`;
                 
+                let debtors = [];
+                let creditors = [];
+
                 budgetMembers.forEach(m => {
                     const paid = payerTotals[m] || 0;
                     const diff = paid - avg;
-                    if (diff > 0) {
-                        settlementHtml += `<p class="text-[0.75rem]"><span class="text-emerald-400 font-bold bg-emerald-400/10 px-1 rounded">${m}</span> 多付了，應收回 <strong class="text-white px-0.5">NT$ ${Math.round(diff).toLocaleString()}</strong></p>`;
-                    } else if (diff < 0) {
-                        settlementHtml += `<p class="text-[0.75rem]"><span class="text-amber-400 font-bold bg-amber-400/10 px-1 rounded">${m}</span> 少付了，需補給 <strong class="text-white px-0.5">NT$ ${Math.round(Math.abs(diff)).toLocaleString()}</strong></p>`;
-                    } else {
-                        settlementHtml += `<p class="text-[0.75rem]"><span class="text-indigo-300">${m}</span> 剛好打平</p>`;
-                    }
+                    if (diff < -0.5) debtors.push({ name: m, amount: Math.abs(diff) });
+                    else if (diff > 0.5) creditors.push({ name: m, amount: diff });
                 });
+
+                debtors.sort((a, b) => b.amount - a.amount);
+                creditors.sort((a, b) => b.amount - a.amount);
+
+                let transactions = [];
+                let i = 0, j = 0;
+
+                while (i < debtors.length && j < creditors.length) {
+                    let debtor = debtors[i];
+                    let creditor = creditors[j];
+
+                    let amountToPay = Math.min(debtor.amount, creditor.amount);
+
+                    if (amountToPay > 0.5) {
+                        transactions.push(`<p class="text-[0.75rem]"><span class="text-amber-400 font-bold bg-amber-400/10 px-1 rounded">${debtor.name}</span> 需給 <span class="text-emerald-400 font-bold bg-emerald-400/10 px-1 rounded">${creditor.name}</span> <strong class="text-white px-0.5">NT$ ${Math.round(amountToPay).toLocaleString()}</strong></p>`);
+                    }
+
+                    debtor.amount -= amountToPay;
+                    creditor.amount -= amountToPay;
+
+                    if (debtor.amount < 0.5) i++;
+                    if (creditor.amount < 0.5) j++;
+                }
+
+                if (transactions.length > 0) {
+                    settlementHtml += transactions.join('');
+                } else {
+                    settlementHtml += `<p class="text-[0.75rem] text-emerald-400 font-bold">目前帳務已完美打平！</p>`;
+                }
+                
                 settlementHtml += `</div>`;
             } else if (totalExpense === 0) {
                 settlementHtml += `<p class="text-[0.75rem] text-indigo-300">目前尚無開銷資料。</p>`;
