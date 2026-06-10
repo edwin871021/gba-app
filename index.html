@@ -154,10 +154,21 @@
                         <span class="text-[0.75rem] uppercase tracking-widest text-amber-500 font-bold">Trip Dashboard 雲端資訊盤</span>
                         <h2 class="text-[1.5rem] font-bold mt-1 leading-tight" id="dashboard-hero-title">讀取中...</h2>
                         <p class="text-[0.9rem] text-slate-300 mt-2 leading-relaxed" id="dashboard-hero-desc">讀取中...</p>
+                        
+                        <!-- 修改三格資訊：移除了總里程，加入了今日落腳點，且全部改為從雲端動態讀取 -->
                         <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10 text-center">
-                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">總里程 (預估)</p><p class="text-[1.15rem] font-bold text-amber-400 mt-0.5">~350 km</p></div>
-                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">計畫跨城</p><p class="text-[1.15rem] font-bold text-emerald-400 mt-0.5">4 城</p></div>
-                            <div class="bg-white/5 p-2.5 rounded-xl"><p class="text-[12px] text-slate-400">交通工具</p><p class="text-[1.15rem] font-bold text-sky-400 mt-0.5">自駕/高鐵</p></div>
+                            <div class="bg-white/5 p-2.5 rounded-xl">
+                                <p class="text-[12px] text-slate-400">今日落腳點</p>
+                                <p class="text-[1.05rem] font-bold text-amber-400 mt-0.5 truncate" id="dash-stat-hotel">讀取中</p>
+                            </div>
+                            <div class="bg-white/5 p-2.5 rounded-xl">
+                                <p class="text-[12px] text-slate-400">計畫跨城</p>
+                                <p class="text-[1.15rem] font-bold text-emerald-400 mt-0.5" id="dash-stat-cities">4 城</p>
+                            </div>
+                            <div class="bg-white/5 p-2.5 rounded-xl">
+                                <p class="text-[12px] text-slate-400">交通工具</p>
+                                <p class="text-[1.05rem] font-bold text-sky-400 mt-0.5 truncate" id="dash-stat-transport">自駕/高鐵</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -178,10 +189,21 @@
                 </div>
 
                 <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 mt-4">
-                    <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-pen-to-square mr-1.5 text-brand-500"></i>編輯首頁標題與簡介</h3>
+                    <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-pen-to-square mr-1.5 text-brand-500"></i>編輯首頁基本與指標資訊</h3>
                     <input type="text" id="input-dash-title" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="大標題">
-                    <textarea id="input-dash-desc" rows="3" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="簡介內容..."></textarea>
-                    <button onclick="updateDashboardInfo()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">發布更新標題簡介</button>
+                    <textarea id="input-dash-desc" rows="2" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="簡介內容..."></textarea>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[0.65rem] font-bold text-slate-500 block mb-1">計畫跨城指標</label>
+                            <input type="text" id="input-dash-cities" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="例如：4 城">
+                        </div>
+                        <div>
+                            <label class="text-[0.65rem] font-bold text-slate-500 block mb-1">交通工具指標</label>
+                            <input type="text" id="input-dash-transport" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="例如：自駕/高鐵">
+                        </div>
+                    </div>
+                    <button onclick="updateDashboardInfo()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">發布更新基本指標</button>
                 </div>
 
                 <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 mt-4">
@@ -204,20 +226,36 @@
                 <div id="day-nav-bar" class="flex space-x-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth"></div>
 
                 <div class="admin-only bg-white p-3 rounded-xl shadow-sm border border-slate-100 space-y-2">
-                    <div class="flex items-center space-x-2 text-xs font-bold text-brand-900 shrink-0">
-                        <i class="fa-solid fa-map-location-dot text-brand-500"></i><span>今日基本資訊 (編輯模式)</span>
+                    <div class="flex items-center justify-between text-xs font-bold text-brand-900">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-map-location-dot text-brand-500"></i><span>今日基本資訊與彈性調配</span>
+                        </div>
+                        <!-- 新增：整天行程前後置調換按鈕 -->
+                        <button id="btn-swap-day" onclick="swapWithNextDay()" class="bg-amber-500 text-white px-2 py-1 rounded hover:bg-amber-600 transition text-[11px]">
+                            <i class="fa-solid fa-right-left mr-1"></i>將本日行程整天與下一天互換
+                        </button>
                     </div>
-                    <div class="flex space-x-2">
-                        <input type="text" id="input-day-city" class="w-20 shrink-0 px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="城市">
-                        <input type="text" id="input-day-hotel" class="flex-1 min-w-0 px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="住宿酒店">
-                        <button onclick="updateDayInfo()" class="shrink-0 bg-brand-500 hover:bg-brand-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition active:scale-90">同步修改</button>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">日期 (可改)</label>
+                            <input type="text" id="input-day-date" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="例: 6/27">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">當前城市</label>
+                            <input type="text" id="input-day-city" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="城市">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">住宿酒店</label>
+                            <input type="text" id="input-day-hotel" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="住宿酒店">
+                        </div>
                     </div>
+                    <button onclick="updateDayInfo()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-1.5 rounded-lg text-xs transition active:scale-90">保存本日全域資訊與日期變更</button>
                 </div>
 
                 <div id="day-details-container" class="space-y-4"></div>
 
                 <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
-                    <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-calendar-plus mr-1.5 text-brand-500"></i><span id="label-add-edit">在當前天數新增行程</span></h3>
+                    <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid Christmas fa-calendar-plus mr-1.5 text-brand-500"></i><span id="label-add-edit">在當前天數新增行程</span></h3>
                     <div class="grid grid-cols-3 gap-2">
                         <div><input type="text" id="input-evt-time" placeholder="時間區間" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg"></div>
                         <div class="col-span-2"><input type="text" id="input-evt-title" placeholder="行程主標題" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg"></div>
@@ -439,12 +477,17 @@
         let tripDays = {}; let guideData = []; let userExpenses = []; let packingItems = []; let activeGuideTab = ""; let tripWarning = {};
         let budgetMembers = ['我', '伴侶'];
         
-        const defaultDashboardInfo = { title: "大灣區旅遊助手", desc: "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！(若需變更行程，請點右上角輸入密碼解鎖)" };
+        const defaultDashboardInfo = { 
+            title: "大灣區旅遊助手", 
+            desc: "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！(若需變更行程，請點右上角輸入密碼解鎖)",
+            cities: "4 城",
+            transport: "自駕/高鐵"
+        };
         let dashboardInfo = {};
 
         function toggleAdminAuth() {
             if (!isAdmin) {
-                const pass = prompt("請輸入權限解鎖密碼進行修改：");
+                const pass = prompt("請輸入權慢解鎖密碼進行修改：");
                 if (pass === ADMIN_PASSWORD) {
                     isAdmin = true;
                     document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i>已鎖定編輯';
@@ -571,16 +614,27 @@
 
         function renderDashboard() {
             document.getElementById('dashboard-hero-title').innerText = dashboardInfo.title || "大灣區旅遊助手";
-            document.getElementById('dashboard-hero-desc').innerText = dashboardInfo.desc || "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！(若需變更行程，請點右上角輸入密碼解鎖)";
+            document.getElementById('dashboard-hero-desc').innerText = dashboardInfo.desc || "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！";
+            
+            // 動態更新可修改的三格狀態
+            document.getElementById('dash-stat-cities').innerText = dashboardInfo.cities || "4 城";
+            document.getElementById('dash-stat-transport').innerText = dashboardInfo.transport || "自駕/高鐵";
+            
+            // 動態抓取今日落腳點飯店名稱
+            const todayHotel = tripDays[activeDay] ? tripDays[activeDay].hotel : "未排定";
+            document.getElementById('dash-stat-hotel').innerText = todayHotel;
+
             if(document.getElementById('input-dash-title')) document.getElementById('input-dash-title').value = dashboardInfo.title || "";
             if(document.getElementById('input-dash-desc')) document.getElementById('input-dash-desc').value = dashboardInfo.desc || "";
+            if(document.getElementById('input-dash-cities')) document.getElementById('input-dash-cities').value = dashboardInfo.cities || "4 城";
+            if(document.getElementById('input-dash-transport')) document.getElementById('input-dash-transport').value = dashboardInfo.transport || "自駕/高鐵";
 
             const container = document.getElementById('dashboard-hotel-list');
             if (container) {
                 container.innerHTML = '';
-                Object.keys(tripDays).forEach(day => {
+                Object.keys(tripDays).sort((a,b)=>a-b).forEach(day => {
                     const item = tripDays[day]; const div = document.createElement('div'); div.className = "flex justify-between items-center p-2 bg-slate-50 rounded-lg border border-slate-100";
-                    div.innerHTML = `<span class="font-semibold text-slate-700 text-[0.85rem]">Day ${day} (${item.city || ''})</span><span class="font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded text-[0.85rem]">🏠 ${item.hotel || ''}</span>`;
+                    div.innerHTML = `<span class="font-semibold text-slate-700 text-[0.85rem]">Day ${day} (${item.date || ''} - ${item.city || ''})</span><span class="font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded text-[0.85rem]">🏠 ${item.hotel || '未設定'}</span>`;
                     container.appendChild(div);
                 });
             }
@@ -594,9 +648,11 @@
             if(!isAdmin) return;
             dashboardInfo.title = document.getElementById('input-dash-title').value.trim();
             dashboardInfo.desc = document.getElementById('input-dash-desc').value.trim();
+            dashboardInfo.cities = document.getElementById('input-dash-cities').value.trim();
+            dashboardInfo.transport = document.getElementById('input-dash-transport').value.trim();
             pushTripDataToCloud(); 
             renderDashboard();
-            showToast("首頁標題資訊已更新！");
+            showToast("首頁大盤指標資訊已更新！");
         }
 
         function updateWarning() {
@@ -606,13 +662,46 @@
             pushTripDataToCloud(); showToast("注意事項已更新！");
         }
 
-        // 新增：匯出成 Markdown
+        // 新增：把本日跟下一天的 events、城市、飯店完整對調 (日期保留原本順序)
+        function swapWithNextDay() {
+            if(!isAdmin) return;
+            const currentNum = parseInt(activeDay);
+            if(currentNum >= 8) {
+                showToast("已經是最後一天，無法與下一天交換！", true);
+                return;
+            }
+            const nextNum = currentNum + 1;
+            if(!confirm(`確定要把 Day ${currentNum} 的排定行程，整天與 Day ${nextNum} 進行對換嗎？\n(注意：兩天的目標日期文字將維持不動，僅對調玩樂事件、地點與住宿飯店)`)) return;
+            
+            const curData = tripDays[currentNum];
+            const nextData = tripDays[nextNum];
+            
+            // 交換主要內容物件 (交換 city、hotel、events)
+            const tempCity = curData.city;
+            const tempHotel = curData.hotel;
+            const tempEvents = curData.events || [];
+            
+            curData.city = nextData.city;
+            curData.hotel = nextData.hotel;
+            curData.events = nextData.events || [];
+            
+            nextData.city = tempCity;
+            nextData.hotel = tempHotel;
+            nextData.events = tempEvents;
+            
+            pushTripDataToCloud();
+            showToast(`Day ${currentNum} 與 Day ${nextNum} 整天行程對調成功！`);
+            renderDashboard();
+            renderItineraryPage();
+        }
+
         function exportToMarkdown() {
             if(!isAdmin) return;
             let md = `# ${dashboardInfo.title || '大灣區旅遊助手'}\n\n`;
             md += `${dashboardInfo.desc || ''}\n\n`;
+            md += `- **計畫跨城:** ${dashboardInfo.cities || '4 城'}\n`;
+            md += `- **交通工具:** ${dashboardInfo.transport || '自駕/高鐵'}\n\n`;
 
-            // 匯出行程
             md += `## 📅 詳細行程\n\n`;
             for(let i=1; i<=8; i++) {
                 if(!tripDays[i]) continue;
@@ -631,7 +720,6 @@
                 md += `\n`;
             }
 
-            // 匯出攻略
             md += `## 📖 實用攻略\n\n`;
             if(guideData && guideData.length > 0) {
                 guideData.forEach((g, idx) => {
@@ -646,7 +734,6 @@
                 md += `尚無攻略資料。\n\n`;
             }
 
-            // 匯出帳務總結
             md += `## 💰 記帳總覽\n\n`;
             let totalExpense = 0;
             let payerTotals = {};
@@ -666,7 +753,6 @@
             });
             md += `\n---\n*由大灣區旅遊助手自動匯出*`;
 
-            // 複製到剪貼簿
             navigator.clipboard.writeText(md).then(() => {
                 showToast("Markdown 已複製！請前往 Notion 貼上。");
             }).catch(err => {
@@ -678,14 +764,21 @@
         function renderItineraryPage() {
             const container = document.getElementById('day-details-container'); const dayData = tripDays[activeDay]; if(!dayData) return;
             document.getElementById('current-city-indicator').innerText = `當前城市：${dayData.city || ''}`;
+            
+            if(document.getElementById('input-day-date')) document.getElementById('input-day-date').value = dayData.date || '';
             if(document.getElementById('input-day-city')) document.getElementById('input-day-city').value = dayData.city || '';
             if(document.getElementById('input-day-hotel')) document.getElementById('input-day-hotel').value = dayData.hotel || '';
 
+            // 隱藏最後一天的對調按鈕，防止超出 index
+            const swapBtn = document.getElementById('btn-swap-day');
+            if(swapBtn) swapBtn.style.display = (parseInt(activeDay) >= 8) ? 'none' : 'block';
+
             const navBar = document.getElementById('day-nav-bar'); navBar.innerHTML = '';
             for (let i = 1; i <= 8; i++) {
-                const d = tripDays[i]; const btn = document.createElement('button'); btn.onclick = () => setActiveDay(i);
+                const d = tripDays[i] || { date: '未定', city: '' }; 
+                const btn = document.createElement('button'); btn.onclick = () => setActiveDay(i);
                 btn.className = (i === activeDay) ? "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[12px] bg-brand-900 text-white border-brand-900 transition active:scale-95" : "shrink-0 px-3.5 py-2 rounded-xl text-center border font-bold text-[12px] bg-white text-slate-500 border-slate-200 transition active:scale-95";
-                btn.innerHTML = `Day ${i}<br><span class="text-[12px] font-normal opacity-80 mt-0.5 block">${d.date || ''} ${d.city || ''}</span>`;
+                btn.innerHTML = `Day i<br><span class="text-[12px] font-normal opacity-80 mt-0.5 block">${d.date || ''} ${d.city || ''}</span>`;
                 navBar.appendChild(btn);
             }
 
@@ -768,11 +861,18 @@
 
         function updateDayInfo() {
             if(!isAdmin) return;
+            const newDate = document.getElementById('input-day-date').value.trim();
             const newCity = document.getElementById('input-day-city').value.trim();
             const newHotel = document.getElementById('input-day-hotel').value.trim();
+            
+            if(newDate) tripDays[activeDay].date = newDate;
             if(newCity) tripDays[activeDay].city = newCity;
             if(newHotel) tripDays[activeDay].hotel = newHotel;
-            pushTripDataToCloud(); showToast("全域城市與住宿同步變更！");
+            
+            pushTripDataToCloud(); 
+            showToast("全域城市、日期與住宿飯店同步變更！");
+            renderDashboard();
+            renderItineraryPage();
         }
 
         function addTripEvent() {
@@ -1087,6 +1187,7 @@
         function setActiveDay(dayNum) { 
             activeDay = dayNum; 
             cancelEditTripEvent(); 
+            renderDashboard();
             renderItineraryPage(); 
         }
         function showToast(m, w=false) { const t = document.getElementById('custom-toast'); document.getElementById('toast-message-text').innerText = m; t.classList.remove('hidden'); setTimeout(() => { t.style.opacity = '1'; t.style.transform = 'translateY(0)'; }, 50); setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.classList.add('hidden'), 300); }, 2000); }
@@ -1113,9 +1214,12 @@
         }
 
         const defaultTripWarning = { title: "深中通道與深圳還車防坑必看！", desc: "您於 Day 7 (7/3 週五) 清晨需從珠海經深中通道趕回深圳還車。請務必嚴格控時，行程已為您精準規劃於 06:30 提早出發，避開工作日最可怕的早高峰塞車與潛在外地車牌限行，趕在 09:00 前至南油店優雅結算還車！" };
+        
+        // 已精準導入 image_d2b85b.png 的四段客運/航班數據
         const defaultTripDays = {
             1: { date: "6/27", title: "Day 1 (6/27 六) - 抵達廣州 & 搶辦門號", city: "廣州", hotel: "珠江新城區域酒店", events: [
-                { time: "17:15", icon: "ship", title: "抵達廣州琶洲港 (PFT)", desc: "搭船抵達廣州琶洲港。" },
+                { time: "10:50 - 13:00", icon: "plane", title: "【航班預訂】國泰航空 CX489 赴港", desc: "台北 (TPE) ➔ 香港 (HKG) 航班起飛。預訂參考編號：FQXYIW。" },
+                { time: "15:00 - 17:15", icon: "ship", title: "【船班預訂】國泰快船 CX9879 轉廣州", desc: "香港機場海碼頭搭乘快船直奔廣州琶洲港 (PFT)。免入境香港，行李直掛。" },
                 { time: "18:30 - 19:40", icon: "sim", title: "【核心任務】辦理實名制門號", desc: "下船後提行李直奔天河區中國移動直營營業廳，持台胞證辦理實名制大陸手機號（選低月租保號套餐，現場確認可收發簡訊）。", isTask: true },
                 { time: "晚上", icon: "night", title: "珠江新城 Check-in & 珠江夜景", desc: "前往珠江新城酒店放行李。隨後漫步花城廣場 ➔ 海心沙 ➔ 遠眺廣州塔（小蠻腰），欣賞頂級 CBD 夜景燈光秀並享用晚餐。" }
             ]},
@@ -1133,7 +1237,7 @@
             ]},
             4: { date: "6/30", title: "Day 4 (6/30 二) - 深圳無車精華遊", city: "深圳", hotel: "車公廟區域酒店", events: [
                 { time: "10:00 - 14:00", icon: "shopping", title: "第一站：星河COCO Park", desc: "早上睡到飽，搭地鐵 1 號線直達「購物公園站」。在開放式商場逛街、喝杯網紅手搖飲，中午挑一家排隊名店享用午餐。" },
-                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "搭 1 號線直達「華強路站/華強北站」。趁 18:00 電子批發市場收攤前，朝聖開源硬體極客天堂，並拍攝經典街景。" },
+                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "搭 1 號線直達「華強路站/華強北站」。趁 18:00 電子批發市場收攤前，朝裝開源硬體極客天堂，並拍攝經典街景。" },
                 { time: "18:00 - 21:30", icon: "night", title: "第三站：東門老街", desc: "搭 1 號線直達「老街站」。在東門町美食街邊走邊吃解決晚餐，用相機捕捉賽博朋克感的不夜城街頭大片。" },
                 { time: "22:00 之後", icon: "landmark", title: "【終極備選】深圳灣公園", desc: "若逛完東門體力依然充沛可前往。深夜少了大白天的酷熱，漫步海濱棧道，遠眺對岸香港元朗的燈火與跨海大橋夜景。" }
             ]},
@@ -1164,10 +1268,11 @@
             8: { date: "7/04", title: "Day 8 (7/4 六) - 歎早茶與優雅返台", city: "返台", hotel: "溫暖的家", events: [
                 { time: "09:00 - 10:45", icon: "food", title: "蘩樓（南山店）歎早茶", desc: "飯店退房後提著行李，9點準時進餐廳（南油附近最推老字號、手工現做的「蘩樓」）。點上一壺普洱，優雅地為這趟旅行收尾。" },
                 { time: "11:00 - 11:20", icon: "car", title: "計程車直奔郵輪中心", desc: "吃飽後直接在餐廳門口打車，載著行李直奔蛇口郵輪中心（ZYK），車程 10～15 分鐘，於 11:30 前優雅抵達。" },
-                { time: "13:00", icon: "ship", title: "搭乘 CX9816 渡輪前往香港", desc: "搭乘國泰快船前往香港國際機場（HKG）。在蛇口直接辦理值機、行李直掛，退 120 元港幣的離境稅。" },
-                { time: "15:45", icon: "plane", title: "搭乘國泰航空 CX422 返台", desc: "航班起飛返回台北（TPE），大約 17:40 抵達，大灣區特種兵自駕之旅完美收官！" }
+                { time: "13:00 - 13:40", icon: "ship", title: "【跨境預訂】國泰快船 CX9816 前往香港", desc: "搭乘國泰跨境快船由深圳蛇口 (ZYK) ➔ 香港國際機場 (HKG)。直接辦理行李直掛與退稅。" },
+                { time: "15:45 - 17:40", icon: "plane", title: "【航班預訂】國泰航空 CX422 返台", desc: "由香港 (HKG) 起飛返回台北 (TPE)，大灣區自駕探險特種兵之旅完美收官！" }
             ]}
         };
+
         const defaultGuides = [
             { id: "mobile", title: "辦電話卡", desc: "門號是大陸電子支付與銀行開戶的根基。必須在 Day 1 琶洲港上岸後立刻前往直營營業廳辦理。", s1: "1. 指名「直營大營業廳」：普通加盟店無系統權限處理「台胞證」實名。推薦去天河區「體育西大廳」。", s2: "2. 告知需開通「港澳台漫遊」與收簡訊：回台灣後需要持續接收網銀交易簡訊，務必確認系統有開通「國際及港澳台漫遊簡訊」功能。" },
             { id: "fubon", title: "富邦開戶", desc: "台資背景銀行，對於台灣同胞開戶最為友善、材料最簡便。主要用於綁定微信支付與支付寶。", s1: "🔑 必備證件與材料：台胞證正本 (需在有效期內)、台灣駕照、台灣身分證正本、剛辦好已實名的內地門號 (需收驗證碼)、下榻酒店地址與預訂資訊。", s2: "" },
