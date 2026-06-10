@@ -100,33 +100,33 @@
             <div class="px-4 py-3 flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <div class="bg-brand-500 text-white p-1.5 rounded-lg flex items-center justify-center">
-                        <i class="fa-solid fa-fire text-[0.9rem] animate-bounce text-amber-400"></i>
+                        <i class="fa-solid fa-fire text-[13px] animate-bounce text-amber-400"></i>
                     </div>
                     <div>
-                        <h1 class="text-[1rem] font-bold tracking-tight leading-tight">大灣區旅遊助手</h1>
-                        <p class="text-[0.7rem] text-brand-100 opacity-80 mt-0.5" id="sync-status">Firebase 數據同步中...</p>
+                        <h1 class="text-[16px] font-bold tracking-tight leading-tight">大灣區旅遊助手</h1>
+                        <p class="text-[13px] text-brand-100 opacity-80 mt-0.5" id="sync-status">Firebase 數據同步中...</p>
                     </div>
                 </div>
                 <div class="text-right flex items-center space-x-2 relative">
-                    <button id="btn-font-toggle" onclick="toggleFontSlider()" class="text-[1rem] text-white font-bold transition active:scale-90 px-2 tracking-tighter">
-                        <span class="text-[0.7rem]">A</span>A
+                    <button id="btn-font-toggle" onclick="toggleFontSlider()" class="text-[16px] text-white font-bold transition active:scale-90 px-2 tracking-tighter">
+                        <span class="text-[13px]">A</span>A
                     </button>
-                    <button onclick="toggleAdminAuth()" id="btn-auth" class="text-[0.7rem] bg-slate-700 hover:bg-slate-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
+                    <button onclick="toggleAdminAuth()" id="btn-auth" class="text-[13px] bg-slate-700 hover:bg-slate-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
                         <i class="fa-solid fa-lock mr-1"></i>解鎖編輯
                     </button>
-                    <button onclick="resetToCloudTemplate()" class="admin-only text-[0.7rem] bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
+                    <button onclick="resetToCloudTemplate()" class="admin-only text-[13px] bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-1.5 rounded-lg transition active:scale-90 shadow-sm">
                         重置範本
                     </button>
 
                     <div id="font-slider-popup" class="hidden absolute top-[120%] right-0 bg-white p-4 rounded-xl shadow-2xl border border-slate-200 z-[100] flex items-center space-x-3 w-48 transition-all">
-                        <span class="text-[0.9rem] text-slate-500 font-bold">A</span>
+                        <span class="text-[13px] text-slate-500 font-bold">A</span>
                         <input type="range" id="font-size-slider" min="14" max="26" step="1" class="w-full">
-                        <span class="text-[1.25rem] text-slate-800 font-bold">A</span>
+                        <span class="text-[18px] text-slate-800 font-bold">A</span>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-brand-800/50 px-4 py-2 border-t border-brand-800 flex justify-between items-center text-[12px] text-slate-300">
+            <div class="bg-brand-800/50 px-4 py-2 border-t border-brand-800 flex justify-between items-center text-[13px] text-slate-300">
                 <div class="flex items-center space-x-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span id="current-city-indicator">當前城市：讀取中...</span>
@@ -189,6 +189,14 @@
                     <input type="text" id="input-warn-title" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="標題">
                     <textarea id="input-warn-desc" rows="3" class="w-full px-3 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="內容..."></textarea>
                     <button onclick="updateWarning()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm">發布更新注意事項</button>
+                </div>
+
+                <div class="admin-only bg-indigo-50 p-4 rounded-xl shadow-sm border border-indigo-100 space-y-3 mt-4">
+                    <h3 class="text-xs font-extrabold text-indigo-900 flex items-center"><i class="fa-solid fa-file-export mr-1.5 text-indigo-500"></i>匯出旅程紀錄 (Notion 適用)</h3>
+                    <p class="text-[0.75rem] text-indigo-600 leading-relaxed">一鍵將所有「行程表、攻略指引、花費總額」打包成 Markdown 語法，複製後可直接貼上至 Notion，完美還原排版留存！</p>
+                    <button onclick="exportToMarkdown()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm flex items-center justify-center">
+                        <i class="fa-solid fa-copy mr-1.5"></i>複製 Markdown 語法
+                    </button>
                 </div>
             </section>
 
@@ -358,11 +366,11 @@
 
         <nav id="bottom-nav" class="lock-text-size bg-white border-t border-slate-200 w-full shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-transform duration-300" style="padding-bottom: calc(4px + env(safe-area-inset-bottom));">
             <div class="flex justify-around items-center pt-2 pb-1">
-                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">總覽</span></button>
-                <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">行程</span></button>
-                <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">攻略</span></button>
-                <button onclick="switchTab('packing')" id="nav-packing" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-suitcase text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">打包</span></button>
-                <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-wallet text-[1.25rem]"></i><span class="text-[12px] mt-1 font-bold">記帳</span></button>
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center justify-center flex-1 text-brand-500 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-chart-pie text-[1.25rem]"></i><span class="text-[13px] mt-1 font-bold">總覽</span></button>
+                <button onclick="switchTab('itinerary')" id="nav-itinerary" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-calendar-day text-[1.25rem]"></i><span class="text-[13px] mt-1 font-bold">行程</span></button>
+                <button onclick="switchTab('guides')" id="nav-guides" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-passport text-[1.25rem]"></i><span class="text-[13px] mt-1 font-bold">攻略</span></button>
+                <button onclick="switchTab('packing')" id="nav-packing" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-suitcase text-[1.25rem]"></i><span class="text-[13px] mt-1 font-bold">打包</span></button>
+                <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-wallet text-[1.25rem]"></i><span class="text-[13px] mt-1 font-bold">記帳</span></button>
             </div>
         </nav>
         
@@ -440,13 +448,13 @@
                 if (pass === ADMIN_PASSWORD) {
                     isAdmin = true;
                     document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i>已鎖定編輯';
-                    document.getElementById('btn-auth').className = "text-[0.7rem] bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
+                    document.getElementById('btn-auth').className = "text-[13px] bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
                     showToast("身分認證成功！已解鎖權限。"); applyAdminUI(true);
                 } else if (pass !== null) { showToast("密碼錯誤，拒絕存取編輯權限。", true); }
             } else {
                 isAdmin = false;
                 document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock mr-1"></i>解鎖編輯';
-                document.getElementById('btn-auth').className = "text-[0.7rem] bg-slate-700 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
+                document.getElementById('btn-auth').className = "text-[13px] bg-slate-700 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
                 showToast("已退出管理模式。"); applyAdminUI(false);
             }
         }
@@ -596,6 +604,75 @@
             tripWarning.title = document.getElementById('input-warn-title').value.trim();
             tripWarning.desc = document.getElementById('input-warn-desc').value.trim();
             pushTripDataToCloud(); showToast("注意事項已更新！");
+        }
+
+        // 新增：匯出成 Markdown
+        function exportToMarkdown() {
+            if(!isAdmin) return;
+            let md = `# ${dashboardInfo.title || '大灣區旅遊助手'}\n\n`;
+            md += `${dashboardInfo.desc || ''}\n\n`;
+
+            // 匯出行程
+            md += `## 📅 詳細行程\n\n`;
+            for(let i=1; i<=8; i++) {
+                if(!tripDays[i]) continue;
+                const d = tripDays[i];
+                md += `### Day ${i} - ${d.date} (${d.city})\n`;
+                if(d.hotel) md += `**住宿:** ${d.hotel}\n\n`;
+                
+                if(d.events && d.events.length > 0) {
+                    d.events.forEach(evt => {
+                        md += `- **${evt.time}** | ${evt.isTask ? '⭐ ' : ''}${evt.title}\n`;
+                        if(evt.desc) md += `  > ${evt.desc.replace(/\n/g, '\n  > ')}\n`;
+                    });
+                } else {
+                    md += `- 尚無排定細節\n`;
+                }
+                md += `\n`;
+            }
+
+            // 匯出攻略
+            md += `## 📖 實用攻略\n\n`;
+            if(guideData && guideData.length > 0) {
+                guideData.forEach((g, idx) => {
+                    const cleanTitle = g.title.replace(/^\d+\.\s*/, '');
+                    md += `### ${idx+1}. ${cleanTitle}\n`;
+                    if(g.desc) md += `${g.desc}\n\n`;
+                    if(g.s1) md += `- ${g.s1}\n`;
+                    if(g.s2) md += `- ${g.s2}\n`;
+                    md += `\n`;
+                });
+            } else {
+                md += `尚無攻略資料。\n\n`;
+            }
+
+            // 匯出帳務總結
+            md += `## 💰 記帳總覽\n\n`;
+            let totalExpense = 0;
+            let payerTotals = {};
+            budgetMembers.forEach(m => payerTotals[m] = 0);
+            
+            userExpenses.forEach(item => {
+                totalExpense += item.cost;
+                if (payerTotals[item.payer] === undefined) payerTotals[item.payer] = 0;
+                payerTotals[item.payer] += item.cost;
+            });
+
+            md += `- **整趟總花費:** NT$ ${totalExpense.toLocaleString()}\n`;
+            Object.keys(payerTotals).forEach(m => {
+                if(payerTotals[m] > 0 || budgetMembers.includes(m)) {
+                    md += `- ${m} 共支付: NT$ ${payerTotals[m].toLocaleString()}\n`;
+                }
+            });
+            md += `\n---\n*由大灣區旅遊助手自動匯出*`;
+
+            // 複製到剪貼簿
+            navigator.clipboard.writeText(md).then(() => {
+                showToast("Markdown 已複製！請前往 Notion 貼上。");
+            }).catch(err => {
+                showToast("複製失敗，請檢查瀏覽器權限。", true);
+                console.error("複製 Markdown 失敗: ", err);
+            });
         }
 
         function renderItineraryPage() {
