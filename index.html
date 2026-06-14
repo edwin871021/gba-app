@@ -16,6 +16,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <script>
         const savedFontSize = localStorage.getItem('gba_font_size') || '16';
@@ -37,62 +38,41 @@
             -webkit-text-size-adjust: none !important;
             touch-action: manipulation; 
         }
-
         body, html {
-            width: 100%;
-            height: 100%;
-            position: fixed;
-            top: 0; bottom: 0; left: 0; right: 0;
-            margin: 0; padding: 0;
-            overflow: hidden;
+            width: 100%; height: 100%;
+            position: fixed; top: 0; bottom: 0; left: 0; right: 0;
+            margin: 0; padding: 0; overflow: hidden;
             background-color: #0b2545;
         }
-
         #app-layout {
-            display: flex;
-            flex-direction: column;
-            position: absolute;
-            top: 0; bottom: 0; left: 0; right: 0;
-            width: 100%; height: 100%;
-            background-color: #f8fafc;
-            overflow: hidden;
+            display: flex; flex-direction: column;
+            position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            width: 100%; height: 100%; background-color: #f8fafc; overflow: hidden;
         }
-
         .lock-text-size {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             -webkit-text-size-adjust: none !important;
         }
-
         .safe-top { height: env(safe-area-inset-top); width: 100%; background-color: #0b2545; flex-shrink: 0; }
         
-        input[type=range] {
-            -webkit-appearance: none; background: transparent;
-        }
+        input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 20px; width: 20px;
-            border-radius: 50%; background: #ffffff;
-            border: 2px solid #0070f3;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
+            background: #ffffff; border: 2px solid #0070f3; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             margin-top: -8px; cursor: pointer;
         }
         input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 4px;
-            cursor: pointer; background: #e2e8f0;
-            border-radius: 2px;
+            width: 100%; height: 4px; cursor: pointer; background: #e2e8f0; border-radius: 2px;
         }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .admin-only { display: none; }
-        
         @keyframes pulse-gold { 0%, 100% { filter: drop-shadow(0 0 2px rgba(245, 158, 11, 0.5)); } 50% { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.9)); } }
         .glow-gold { animation: pulse-gold 2s infinite; }
     </style>
 </head>
 
 <body class="text-slate-800 font-sans select-none">
-    
     <div id="app-layout">
         <div class="safe-top"></div>
 
@@ -155,7 +135,6 @@
                         <h2 class="text-[1.5rem] font-bold mt-1 leading-tight" id="dashboard-hero-title">讀取中...</h2>
                         <p class="text-[0.9rem] text-slate-300 mt-2 leading-relaxed" id="dashboard-hero-desc">讀取中...</p>
                         
-                        <!-- 修改三格資訊：移除truncate，加入break-words使其完整顯示 -->
                         <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/10 text-center">
                             <div class="bg-white/5 p-2.5 rounded-xl flex flex-col justify-center">
                                 <p class="text-[12px] text-slate-400">旅行天數</p>
@@ -219,7 +198,7 @@
 
                 <div class="admin-only bg-indigo-50 p-4 rounded-xl shadow-sm border border-indigo-100 space-y-3 mt-4">
                     <h3 class="text-xs font-extrabold text-indigo-900 flex items-center"><i class="fa-solid fa-file-export mr-1.5 text-indigo-500"></i>匯出旅程紀錄 (Notion 適用)</h3>
-                    <p class="text-[0.75rem] text-indigo-600 leading-relaxed">一鍵將所有「行程表、攻略指引、花費總額」打包成 Markdown 語法，複製後可直接貼上至 Notion，完美還原排版留存！</p>
+                    <p class="text-[0.75rem] text-indigo-600 leading-relaxed">一鍵將所有「行程表、攻略指引、花費總額」打包成 Markdown 語法，複製後可直接貼上至 Notion！</p>
                     <button onclick="exportToMarkdown()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-xs transition active:scale-95 shadow-sm flex items-center justify-center">
                         <i class="fa-solid fa-copy mr-1.5"></i>複製 Markdown 語法
                     </button>
@@ -244,6 +223,13 @@
                         </div>
                     </div>
                     
+                    <div class="grid grid-cols-1 gap-2 mb-1">
+                        <div>
+                            <label class="text-[10px] text-slate-400 block mb-0.5">本日行程總標題</label>
+                            <input type="text" id="input-day-title-纲" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="例: Day 1 - 抵達廣州 & 搶辦門號">
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-3 gap-2">
                         <div>
                             <label class="text-[10px] text-slate-400 block mb-0.5">日期 (可改)</label>
@@ -258,11 +244,11 @@
                             <input type="text" id="input-day-hotel" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="住宿酒店">
                         </div>
                     </div>
-                    <button onclick="updateDayInfo()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-1.5 rounded-lg text-xs transition active:scale-90">保存本日全域資訊與日期變更</button>
+                    <button onclick="updateDayInfo()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-1.5 rounded-lg text-xs transition active:scale-90">保存本日全域資訊與大綱變更</button>
                     
                     <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
                         <button onclick="addNewDay()" class="flex-1 bg-emerald-500 text-white px-2 py-1.5 rounded-lg hover:bg-emerald-600 transition text-[11px] font-bold"><i class="fa-solid fa-plus mr-1"></i>新增一天</button>
-                        <button onclick="removeLastDay()" class="flex-1 bg-red-500 text-white px-2 py-1.5 rounded-lg hover:bg-red-600 transition text-[11px] font-bold"><i class="fa-solid fa-minus mr-1"></i>刪除最後一天</button>
+                        <button onclick="removeCurrentDay()" class="flex-1 bg-red-500 text-white px-2 py-1.5 rounded-lg hover:bg-red-600 transition text-[11px] font-bold"><i class="fa-solid fa-trash-can mr-1"></i>刪除這一天</button>
                     </div>
                 </div>
 
@@ -272,12 +258,12 @@
                     <h3 class="text-xs font-extrabold text-slate-800 flex items-center"><i class="fa-solid fa-calendar-plus mr-1.5 text-brand-500"></i><span id="label-add-edit">在當前天數新增行程</span></h3>
                     <div class="grid grid-cols-3 gap-2">
                         <div><input type="text" id="input-evt-time" placeholder="時間區間" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg"></div>
-                        <div class="col-span-2"><input type="text" id="input-evt-title" placeholder="行程主標題" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg"></div>
+                        <div class="col-span-2"><input type="text" id="input-evt-title" placeholder="活動主項目名稱" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg"></div>
                     </div>
                     <div class="grid grid-cols-3 gap-2">
                         <div>
                             <select id="input-evt-icon" class="w-full px-1 py-1.5 text-[0.8rem] border rounded-lg bg-white">
-                                <option value="car">🚗 自駕車</option><option value="landmark">📍 景點門點</option><option value="food">🍱 美食餐飲</option><option value="hotel">🏠 飯店住宿</option><option value="night">🌙 夜市晚景</option><option value="camera">📷 拍照攝影</option><option value="sim">📱 通訊電話</option><option value="bank">🏦 銀行開戶</option><option value="license">🪪 辦駕駛證</option><option value="ship">🚢 碼頭渡輪</option><option value="train">🚄 高鐵火車</option><option value="plane">✈️ 機場航空</option><option value="kart">🏎️ 卡丁車速</option><option value="ski">⛷️ 室內滑雪</option><option value="shopping">🛍️ 購物商圈</option>
+                                <option value="car">🚗 自駕車</option><option value="landmark">📍 景點門點</option><option value="food">🍱 美食餐飲</option><option value="hotel">🏠 飯店住宿</option><option value="night">🌙 夜市晚景</option><option value="camera">📷 拍照攝影</option><option value="sim">📱 通訊電話</option><option value="bank">🏦 銀行開戶</option><option value="license">🪪 辦駕駛證</option><option value="ship">🚢 碼頭渡輪</option><option value="train">🚄 高鐵火車</option><option value="plane">✈️ 機場航空</option><option value="kart">🏎️ 卡丁車速</option><option value="ski">⛷️ 室內滑雪</option><option value="shopping">🛍️ 購物商圈</option><option value="bridge">🌉 跨海大橋</option><option value="speed">⚡ 衝鋒滑道</option><option value="temple">🛕 寺廟古蹟</option>
                             </select>
                         </div>
                         <div class="col-span-2">
@@ -323,7 +309,7 @@
                             <h2 class="text-[1.5rem] font-bold leading-tight">出發行李檢查</h2>
                             <span class="text-[12px] text-brand-100" id="packing-stat-text">已打包 0 / 26</span>
                         </div>
-                        <p class="text-[12px] text-brand-100 opacity-80 mt-1 leading-relaxed">完美整合手寫物品筆記。打勾狀態與自訂物品<strong class="text-white px-1">僅保存在您的手機本機</strong>，不會與他人互相干擾！</p>
+                        <p class="text-[12px] text-brand-100 opacity-80 mt-1 leading-relaxed">打勾狀態與自訂物品<strong class="text-white px-1">僅保存在您的手機本機</strong>，不會與他人互相干擾！</p>
                         <div class="w-full bg-white/10 rounded-full h-1.5 mt-4 overflow-hidden">
                             <div class="bg-amber-500 h-1.5 rounded-full transition-all duration-300" id="packing-progress-bar" style="width: 0%"></div>
                         </div>
@@ -366,11 +352,9 @@
                         <h2 class="text-[1.75rem] font-extrabold leading-tight" id="budget-total-expense">NT$ 0</h2>
                     </div>
             
-                    <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-indigo-700/50" id="budget-payers-summary">
-                    </div>
+                    <div class="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-indigo-700/50" id="budget-payers-summary"></div>
             
-                    <div class="mt-4 bg-indigo-900/50 p-3 rounded-xl text-[0.75rem] text-indigo-200 flex flex-col border border-indigo-700/50 space-y-1.5" id="budget-settlement-box">
-                    </div>
+                    <div class="mt-4 bg-indigo-900/50 p-3 rounded-xl text-[0.75rem] text-indigo-200 flex flex-col border border-indigo-700/50 space-y-1.5" id="budget-settlement-box"></div>
                 </div>
             
                 <div id="member-edit-section" class="hidden bg-indigo-50 p-4 rounded-xl shadow-sm border border-indigo-100 space-y-3 transition-all">
@@ -379,9 +363,8 @@
                         <input type="text" id="input-new-member" placeholder="輸入名稱 (如: 小明)" class="flex-1 px-3 py-1.5 text-[0.85rem] border border-indigo-200 rounded-lg bg-white focus:outline-indigo-500">
                         <button onclick="addBudgetMember()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-sm transition active:scale-95 shadow-sm">新增</button>
                     </div>
-                    <div class="flex flex-wrap gap-2 pt-1" id="member-tags-container">
-                    </div>
-                    <p class="text-[0.65rem] text-indigo-400 leading-tight">提示：上方結算區會自動根據目前的「人數」進行平均分攤 (AA制)。刪除付款人不會刪除歷史帳目。</p>
+                    <div class="flex flex-wrap gap-2 pt-1" id="member-tags-container"></div>
+                    <p class="text-[0.65rem] text-indigo-400 leading-tight">提示：上方結算區會自動根據目前的「人數」進行平均分攤 (AA制)。</p>
                 </div>
             
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3">
@@ -397,8 +380,7 @@
                             </select>
                         </div>
                         <div>
-                            <select id="input-exp-payer" class="w-full px-2.5 py-1.5 text-[0.85rem] border rounded-lg bg-slate-50 focus:bg-white font-bold text-indigo-700">
-                            </select>
+                            <select id="input-exp-payer" class="w-full px-2.5 py-1.5 text-[0.85rem] border rounded-lg bg-slate-50 focus:bg-white font-bold text-indigo-700"></select>
                         </div>
                     </div>
                     <button onclick="addUserExpense()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-sm transition active:scale-95 flex items-center justify-center space-x-1 shadow-sm">
@@ -425,7 +407,6 @@
                 <button onclick="switchTab('budget')" id="nav-budget" class="flex flex-col items-center justify-center flex-1 text-slate-400 transition-all active:scale-90 active:opacity-75"><i class="fa-solid fa-wallet text-[1.25rem]"></i><span class="text-[13px] mt-1 font-bold">記帳</span></button>
             </div>
         </nav>
-        
     </div>
 
     <script>
@@ -475,6 +456,7 @@
             }
         });
 
+        // Firebase 初始化配置
         const firebaseConfig = {
             apiKey: "AIzaSyBIFGsVxsisfseqQMtrE3BJQMW9EE6D65o",
             authDomain: "gba-road-sync.firebaseapp.com",
@@ -486,7 +468,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const ADMIN_PASSWORD = "GBA2026_MASTER"; 
+        // 資安升級：改用雲端帳密認證，移除原始碼中的明文硬編碼密碼
         let isAdmin = false; let activeDay = 1; let editEventIndex = -1;
         let tripDays = {}; let guideData = []; let userExpenses = []; let packingItems = []; let activeGuideTab = ""; let tripWarning = {};
         let budgetMembers = ['我', '伴侶'];
@@ -494,26 +476,31 @@
         const defaultDashboardInfo = { 
             title: "大灣區旅遊助手", 
             desc: "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！",
-            days: "8 天",
-            cities: "4 城",
-            transport: "自駕/高鐵"
+            days: "8 天", cities: "4 城", transport: "自駕/高鐵"
         };
         let dashboardInfo = {};
 
         function toggleAdminAuth() {
             if (!isAdmin) {
-                const pass = prompt("請輸入權限解鎖密碼進行修改：");
-                if (pass === ADMIN_PASSWORD) {
-                    isAdmin = true;
-                    document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i>已鎖定編輯';
-                    document.getElementById('btn-auth').className = "text-[13px] bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
-                    showToast("身分認證成功！已解鎖權限。"); applyAdminUI(true);
-                } else if (pass !== null) { showToast("密碼錯誤，拒絕存取編輯權限。", true); }
+                const email = prompt("請輸入管理員 Email：");
+                const pass = prompt("請輸入密碼：");
+                if (email && pass) {
+                    firebase.auth().signInWithEmailAndPassword(email, pass)
+                        .then(() => {
+                            isAdmin = true;
+                            document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock-open mr-1"></i>已鎖定編輯';
+                            document.getElementById('btn-auth').className = "text-[13px] bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
+                            showToast("管理員身份認證成功！已解鎖雲端權限。"); applyAdminUI(true);
+                        })
+                        .catch((err) => { showToast("認證失敗：帳密錯誤或權限不足", true); console.error(err); });
+                }
             } else {
-                isAdmin = false;
-                document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock mr-1"></i>解鎖編輯';
-                document.getElementById('btn-auth').className = "text-[13px] bg-slate-700 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
-                showToast("已退出管理模式。"); applyAdminUI(false);
+                firebase.auth().signOut().then(() => {
+                    isAdmin = false;
+                    document.getElementById('btn-auth').innerHTML = '<i class="fa-solid fa-lock mr-1"></i>解鎖編輯';
+                    document.getElementById('btn-auth').className = "text-[13px] bg-slate-700 text-white font-bold px-2.5 py-1.5 rounded-lg transition active:scale-90 shadow-sm";
+                    showToast("已退出管理模式。"); applyAdminUI(false);
+                });
             }
         }
 
@@ -526,25 +513,17 @@
 
         function loadLocalPackingList() {
             const localData = localStorage.getItem('gba_personal_packing');
-            if (localData) {
-                packingItems = JSON.parse(localData);
-            } else {
-                packingItems = JSON.parse(JSON.stringify(defaultPackingItems));
-                saveLocalPackingList();
-            }
+            if (localData) { packingItems = JSON.parse(localData); } 
+            else { packingItems = JSON.parse(JSON.stringify(defaultPackingItems)); saveLocalPackingList(); }
             renderPackingChecklist();
         }
 
-        function saveLocalPackingList() {
-            localStorage.setItem('gba_personal_packing', JSON.stringify(packingItems));
-        }
+        function saveLocalPackingList() { localStorage.setItem('gba_personal_packing', JSON.stringify(packingItems)); }
 
         function resetPersonalPackingList() {
-            if(confirm("確定要將本機的打包清單恢復成預設狀態嗎？\n(這會清除您自行新增的私人物品，並還原所有打勾狀態)")) {
+            if(confirm("確定要將本機的打包清單恢復成預設狀態嗎？\n(這會清除您自行新增的私人物品)")) {
                 packingItems = JSON.parse(JSON.stringify(defaultPackingItems));
-                saveLocalPackingList();
-                renderPackingChecklist();
-                showToast("個人打包清單已重置！");
+                saveLocalPackingList(); renderPackingChecklist(); showToast("個人打包清單已重置！");
             }
         }
 
@@ -555,11 +534,9 @@
                     if (doc.exists) {
                         const cloud = doc.data() || {};
                         tripDays = JSON.parse(JSON.stringify(cloud.tripDays || defaultTripDays));
-                        
                         guideData = JSON.parse(JSON.stringify(cloud.guideData || defaultGuides));
                         tripWarning = JSON.parse(JSON.stringify(cloud.tripWarning || defaultTripWarning));
                         dashboardInfo = JSON.parse(JSON.stringify(cloud.dashboardInfo || defaultDashboardInfo));
-                        
                         document.getElementById('sync-status').innerText = "☁️ Firebase 已同步";
                         initAppRender();
                     } else {
@@ -570,12 +547,11 @@
                         db.collection("gba_trip").doc("main_trip").set({ tripDays, guideData, tripWarning, dashboardInfo });
                     }
                 } catch (error) {
-                    console.error("資料解析嚴重錯誤，自動載入預設值:", error);
+                    console.error("資料解析異常，自動載入預設還原模式:", error);
                     tripDays = JSON.parse(JSON.stringify(defaultTripDays)); 
                     guideData = JSON.parse(JSON.stringify(defaultGuides)); 
                     tripWarning = JSON.parse(JSON.stringify(defaultTripWarning));
                     dashboardInfo = JSON.parse(JSON.stringify(defaultDashboardInfo));
-                    document.getElementById('sync-status').innerText = "⚠️ 格式異常，已載入備用還原模式";
                     initAppRender();
                 }
             }, () => { showToast("雲端讀取失敗", true); });
@@ -585,16 +561,12 @@
                     if (doc.exists) { 
                         const data = doc.data();
                         userExpenses = JSON.parse(JSON.stringify(data.expenses || [])); 
-                        if (data.members && data.members.length > 0) {
-                            budgetMembers = JSON.parse(JSON.stringify(data.members));
-                        }
+                        if (data.members && data.members.length > 0) { budgetMembers = JSON.parse(JSON.stringify(data.members)); }
                         renderBudget(); 
                     } else { 
                         db.collection("gba_budget").doc("main_budget").set({ expenses: [], members: budgetMembers }); 
                     }
-                } catch (e) {
-                    console.error(e); userExpenses = []; renderBudget();
-                }
+                } catch (e) { console.error(e); userExpenses = []; renderBudget(); }
             });
         }
 
@@ -623,12 +595,22 @@
             document.getElementById('main-content').scrollTop = 0;
         }
 
-        const icons = { ship: '<i class="fa-solid fa-ship"></i>', sim: '<i class="fa-solid fa-mobile-screen-button"></i>', hotel: '<i class="fa-solid fa-hotel"></i>', night: '<i class="fa-solid fa-moon"></i>', camera: '<i class="fa-solid fa-camera"></i>', food: '<i class="fa-solid fa-utensils"></i>', temple: '<i class="fa-solid fa-synagogue"></i>', bank: '<i class="fa-solid fa-building-columns"></i>', license: '<i class="fa-solid fa-address-card"></i>', car: '<i class="fa-solid fa-car-side"></i>', speed: '<i class="fa-solid fa-gauge-high"></i>', kart: '<i class="fa-solid fa-motorcycle"></i>', landmark: '<i class="fa-solid fa-archway"></i>', bridge: '<i class="fa-solid fa-bridge"></i>', ski: '<i class="fa-solid fa-person-skiing"></i>', shopping: '<i class="fa-solid fa-bag-shopping"></i>', plane: '<i class="fa-solid fa-plane"></i>', train: '<i class="fa-solid fa-train"></i>' };
+        // 擴充與修正圖標對應，防止缺失圖標造成 H5 網頁當機
+        const icons = { 
+            ship: '<i class="fa-solid fa-ship"></i>', sim: '<i class="fa-solid fa-mobile-screen-button"></i>', 
+            hotel: '<i class="fa-solid fa-hotel"></i>', night: '<i class="fa-solid fa-moon"></i>', 
+            camera: '<i class="fa-solid fa-camera"></i>', food: '<i class="fa-solid fa-utensils"></i>', 
+            bank: '<i class="fa-solid fa-building-columns"></i>', license: '<i class="fa-solid fa-address-card"></i>', 
+            car: '<i class="fa-solid fa-car-side"></i>', speed: '<i class="fa-solid fa-gauge-high"></i>', 
+            kart: '<i class="fa-solid fa-motorcycle"></i>', landmark: '<i class="fa-solid fa-archway"></i>', 
+            bridge: '<i class="fa-solid fa-bridge"></i>', ski: '<i class="fa-solid fa-person-skiing"></i>', 
+            shopping: '<i class="fa-solid fa-bag-shopping"></i>', plane: '<i class="fa-solid fa-plane"></i>', 
+            train: '<i class="fa-solid fa-train"></i>', temple: '<i class="fa-solid fa-gopuram"></i>'
+        };
 
         function renderDashboard() {
             document.getElementById('dashboard-hero-title').innerText = dashboardInfo.title || "大灣區旅遊助手";
-            document.getElementById('dashboard-hero-desc').innerText = dashboardInfo.desc || "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！";
-            
+            document.getElementById('dashboard-hero-desc').innerText = dashboardInfo.desc || "";
             document.getElementById('dash-stat-days').innerText = dashboardInfo.days || "8 天";
             document.getElementById('dash-stat-cities').innerText = dashboardInfo.cities || "4 城";
             document.getElementById('dash-stat-transport').innerText = dashboardInfo.transport || "自駕/高鐵";
@@ -661,9 +643,7 @@
             dashboardInfo.days = document.getElementById('input-dash-days').value.trim();
             dashboardInfo.cities = document.getElementById('input-dash-cities').value.trim();
             dashboardInfo.transport = document.getElementById('input-dash-transport').value.trim();
-            pushTripDataToCloud(); 
-            renderDashboard();
-            showToast("首頁大盤指標資訊已更新！");
+            pushTripDataToCloud(); renderDashboard(); showToast("首頁大盤指標資訊已更新！");
         }
 
         function updateWarning() {
@@ -673,68 +653,57 @@
             pushTripDataToCloud(); showToast("注意事項已更新！");
         }
 
-        // 行程整天循環移位
         function swapDay(dir) {
             if(!isAdmin) return;
             let currentNum = parseInt(activeDay);
             let total = Object.keys(tripDays).length;
             let targetNum = currentNum + dir;
+            if (targetNum > total) targetNum = 1; if (targetNum < 1) targetNum = total;
             
-            // 首尾循環處理
-            if (targetNum > total) targetNum = 1;
-            if (targetNum < 1) targetNum = total;
+            const curData = tripDays[currentNum]; const targetData = tripDays[targetNum];
+            const tempTitle = curData.title; const tempCity = curData.city; const tempHotel = curData.hotel; const tempEvents = curData.events || [];
             
-            const curData = tripDays[currentNum];
-            const targetData = tripDays[targetNum];
+            curData.title = targetData.title; curData.city = targetData.city; curData.hotel = targetData.hotel; curData.events = targetData.events || [];
+            targetData.title = tempTitle; targetData.city = tempCity; targetData.hotel = tempHotel; targetData.events = tempEvents;
             
-            const tempCity = curData.city;
-            const tempHotel = curData.hotel;
-            const tempEvents = curData.events || [];
-            
-            curData.city = targetData.city;
-            curData.hotel = targetData.hotel;
-            curData.events = targetData.events || [];
-            
-            targetData.city = tempCity;
-            targetData.hotel = tempHotel;
-            targetData.events = tempEvents;
-            
-            // 跳轉至被交換的目的地天數，確保使用者能跟著內容移動
-            activeDay = targetNum;
-            pushTripDataToCloud();
-            showToast(`Day ${currentNum} 與 Day ${targetNum} 行程內容已對調！`);
-            renderDashboard();
-            renderItineraryPage();
+            activeDay = targetNum; pushTripDataToCloud(); showToast(`Day ${currentNum} 與 Day ${targetNum} 完整對調！`);
+            renderDashboard(); renderItineraryPage();
         }
 
-        // 新增一天
         function addNewDay() {
             if(!isAdmin) return;
             const total = Object.keys(tripDays).length;
             const newNum = total + 1;
-            tripDays[newNum] = { date: "", city: "新城市", hotel: "未定", events: [] };
-            activeDay = newNum;
-            pushTripDataToCloud();
-            showToast(`已成功新增 Day ${newNum}`);
-            renderDashboard();
-            renderItineraryPage();
+            tripDays[newNum] = { date: "", title: `Day ${newNum} - 新行程大綱`, city: "新城市", hotel: "未定", events: [] };
+            activeDay = newNum; pushTripDataToCloud(); showToast(`已成功新增 Day ${newNum}`);
+            renderDashboard(); renderItineraryPage();
         }
 
-        // 刪除最後一天
-        function removeLastDay() {
+        // 優化重點功能：刪除這一天（自動遞補避免資料斷層）
+        function removeCurrentDay() {
             if(!isAdmin) return;
             const total = Object.keys(tripDays).length;
-            if(total <= 1) {
-                showToast("至少需保留一天行程！", true);
-                return;
-            }
-            if(confirm(`確定要刪除最後一天的行程 (Day ${total}) 嗎？此操作無法復原。`)) {
-                delete tripDays[total];
-                if(activeDay >= total) activeDay = total - 1;
-                pushTripDataToCloud();
-                showToast(`已刪除 Day ${total}`);
-                renderDashboard();
-                renderItineraryPage();
+            if(total <= 1) { showToast("至少需保留一天行程！", true); return; }
+            
+            if(confirm(`確定要刪除當前的 Day ${activeDay} 行程嗎？\n(注意：後面的天數行程將會自動往前遞補，此操作不可逆！)`)) {
+                let newTripDays = {};
+                let newIndex = 1;
+                
+                for(let i = 1; i <= total; i++) {
+                    if(i === parseInt(activeDay)) continue; // 跳過被刪除的那天
+                    newTripDays[newIndex] = tripDays[i];
+                    // 同步修正內部帶有的標題文字
+                    if(newTripDays[newIndex].title && newTripDays[newIndex].title.startsWith("Day ")) {
+                        newTripDays[newIndex].title = newTripDays[newIndex].title.replace(/^Day \d+/, `Day ${newIndex}`);
+                    }
+                    newIndex++;
+                }
+                
+                tripDays = newTripDays;
+                if(activeDay > Object.keys(tripDays).length) { activeDay = Object.keys(tripDays).length; }
+                
+                pushTripDataToCloud(); showToast("此天行程已完全移除，後續日程已自動遞補。");
+                renderDashboard(); renderItineraryPage();
             }
         }
 
@@ -742,68 +711,34 @@
             if(!isAdmin) return;
             let md = `# ${dashboardInfo.title || '大灣區旅遊助手'}\n\n`;
             md += `${dashboardInfo.desc || ''}\n\n`;
-            md += `- **旅行天數:** ${dashboardInfo.days || '8 天'}\n`;
-            md += `- **計畫跨城:** ${dashboardInfo.cities || '4 城'}\n`;
-            md += `- **交通工具:** ${dashboardInfo.transport || '自駕/高鐵'}\n\n`;
+            md += `- **旅行天數:** ${dashboardInfo.days || '8 天'}\n- **計畫跨城:** ${dashboardInfo.cities || '4 城'}\n- **交通工具:** ${dashboardInfo.transport || '自駕/高鐵'}\n\n`;
 
             const totalDays = Object.keys(tripDays).length;
             md += `## 📅 詳細行程\n\n`;
             for(let i=1; i<=totalDays; i++) {
                 if(!tripDays[i]) continue;
                 const d = tripDays[i];
-                md += `### Day ${i} - ${d.date} (${d.city})\n`;
+                md += `### ${d.title || `Day ${i} (${d.city})`}\n`;
                 if(d.hotel) md += `**住宿:** ${d.hotel}\n\n`;
-                
                 if(d.events && d.events.length > 0) {
                     d.events.forEach(evt => {
                         md += `- **${evt.time}** | ${evt.isTask ? '⭐ ' : ''}${evt.title}\n`;
                         if(evt.desc) md += `  > ${evt.desc.replace(/\n/g, '\n  > ')}\n`;
                     });
-                } else {
-                    md += `- 尚無排定細節\n`;
-                }
+                } else { md += `- 尚無排定細節\n`; }
                 md += `\n`;
             }
-
-            md += `## 📖 實用攻略\n\n`;
-            if(guideData && guideData.length > 0) {
-                guideData.forEach((g, idx) => {
-                    const cleanTitle = g.title.replace(/^\d+\.\s*/, '');
-                    md += `### ${idx+1}. ${cleanTitle}\n`;
-                    if(g.desc) md += `${g.desc}\n\n`;
-                    if(g.s1) md += `- ${g.s1}\n`;
-                    if(g.s2) md += `- ${g.s2}\n`;
-                    md += `\n`;
-                });
-            } else {
-                md += `尚無攻略資料。\n\n`;
-            }
-
             md += `## 💰 記帳總覽\n\n`;
-            let totalExpense = 0;
-            let payerTotals = {};
-            budgetMembers.forEach(m => payerTotals[m] = 0);
-            
+            let totalExpense = 0; let payerTotals = {}; budgetMembers.forEach(m => payerTotals[m] = 0);
             userExpenses.forEach(item => {
-                totalExpense += item.cost;
-                if (payerTotals[item.payer] === undefined) payerTotals[item.payer] = 0;
-                payerTotals[item.payer] += item.cost;
+                totalExpense += item.cost; if (payerTotals[item.payer] === undefined) payerTotals[item.payer] = 0; payerTotals[item.payer] += item.cost;
             });
-
             md += `- **整趟總花費:** NT$ ${totalExpense.toLocaleString()}\n`;
-            Object.keys(payerTotals).forEach(m => {
-                if(payerTotals[m] > 0 || budgetMembers.includes(m)) {
-                    md += `- ${m} 共支付: NT$ ${payerTotals[m].toLocaleString()}\n`;
-                }
-            });
+            Object.keys(payerTotals).forEach(m => { if(payerTotals[m] > 0 || budgetMembers.includes(m)) md += `- ${m} 共支付: NT$ ${payerTotals[m].toLocaleString()}\n`; });
             md += `\n---\n*由大灣區旅遊助手自動匯出*`;
 
-            navigator.clipboard.writeText(md).then(() => {
-                showToast("Markdown 已複製！請前往 Notion 貼上。");
-            }).catch(err => {
-                showToast("複製失敗，請檢查瀏覽器權限。", true);
-                console.error("複製 Markdown 失敗: ", err);
-            });
+            navigator.clipboard.writeText(md).then(() => { showToast("Markdown 已複製！可前往 Notion 貼上。"); })
+                .catch(err => { showToast("複製失敗，請檢查瀏覽器權限。", true); console.error(err); });
         }
 
         function renderItineraryPage() {
@@ -813,6 +748,7 @@
             if(document.getElementById('input-day-date')) document.getElementById('input-day-date').value = dayData.date || '';
             if(document.getElementById('input-day-city')) document.getElementById('input-day-city').value = dayData.city || '';
             if(document.getElementById('input-day-hotel')) document.getElementById('input-day-hotel').value = dayData.hotel || '';
+            if(document.getElementById('input-day-title-纲')) document.getElementById('input-day-title-纲').value = dayData.title || '';
 
             const totalDays = Object.keys(tripDays).length;
             const navBar = document.getElementById('day-nav-bar'); navBar.innerHTML = '';
@@ -824,12 +760,21 @@
                 navBar.appendChild(btn);
             }
 
-            let htmlContent = `<div class="relative pl-6 border-l-2 border-slate-200 space-y-4 ml-3">`;
+            // 優化體驗：在行程時間軸頂部直接渲染本日的總大綱標題，增加層次感
+            let htmlContent = `
+                <div class="mb-2 bg-gradient-to-r from-brand-50 to-white p-3.5 rounded-xl border border-slate-100 shadow-sm">
+                    <h3 class="text-[0.95rem] font-black text-brand-900 flex items-center">
+                        <i class="fa-solid fa-flag-checkered mr-2 text-brand-500"></i>${dayData.title || `Day ${activeDay} 行程計畫`}
+                    </h3>
+                </div>
+                <div class="relative pl-6 border-l-2 border-slate-200 space-y-4 ml-3">
+            `;
+            
             if (!dayData.events || dayData.events.length === 0) { htmlContent += `<p class="text-[0.85rem] text-slate-400 py-4">本日尚無排定細節。</p>`; }
             else {
                 dayData.events.forEach((evt, idx) => {
                     const iconSvg = icons[evt.icon] || '<i class="fa-solid fa-circle text-[0.75rem]"></i>';
-                    let cardClass = evt.isTask ? "bg-amber-50/70 p-4 rounded-xl border-2 border-amber-200 relative" : "bg-white p-4 rounded-xl border border-slate-100 relative";
+                    let cardClass = evt.isTask ? "bg-amber-50/70 p-4 rounded-xl border-2 border-amber-200 relative animate-pulse-once" : "bg-white p-4 rounded-xl border border-slate-100 relative";
                     htmlContent += `
                         <div class="relative">
                             <div class="absolute -left-[38px] top-1.5 w-6 h-6 rounded-full bg-white border border-slate-200 text-brand-500 flex items-center justify-center text-[0.7rem] shadow-sm z-10">${iconSvg}</div>
@@ -846,8 +791,8 @@
                                         </div>` : ''}
                                     </div>
                                 </div>
-                                <h4 class="text-[1rem] font-extrabold text-slate-800 mt-2">${evt.title}</h4>
-                                <p class="text-[0.85rem] text-slate-500 mt-1 leading-relaxed">${evt.desc}</p>
+                                <h4 class="text-[1rem] font-extrabold text-slate-800 mt-2">${evt.title || '未命名活動'}</h4>
+                                <p class="text-[0.85rem] text-slate-500 mt-1 leading-relaxed whitespace-pre-wrap">${evt.desc || ''}</p>
                             </div>
                         </div>`;
                 });
@@ -855,22 +800,22 @@
             container.innerHTML = htmlContent + `</div>`;
         }
 
+        // 徹底修正 Bug：在載入編輯時，精準將舊資料推入 Input，不遺漏任何欄位
         function editTripEvent(idx) {
             if(!isAdmin) return;
             const evt = tripDays[activeDay].events[idx];
-            document.getElementById('input-evt-time').value = evt.time || '';
+            document.getElementById('input-evt-time').value = evt.time || '隨時';
             document.getElementById('input-evt-title').value = evt.title || '';
             document.getElementById('input-evt-icon').value = evt.icon || 'landmark';
             document.getElementById('input-evt-task').value = evt.isTask ? 'true' : 'false';
             document.getElementById('input-evt-desc').value = evt.desc || '';
             editEventIndex = idx;
             
-            document.getElementById('label-add-edit').innerText = "編輯目前行程";
+            document.getElementById('label-add-edit').innerText = "編輯目前行程活動項目";
             const btn = document.getElementById('btn-submit-evt');
-            btn.innerHTML = '儲存修改';
+            btn.innerHTML = '儲存活動修改';
             btn.className = 'flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded-lg text-sm transition active:scale-95 shadow-sm';
             document.getElementById('btn-cancel-evt').classList.remove('hidden');
-
             document.getElementById('input-evt-time').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
@@ -886,18 +831,14 @@
                 btn.innerHTML = '加入今日計畫';
                 btn.className = 'flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 rounded-lg text-sm transition active:scale-95 shadow-sm';
             }
-            const cancelBtn = document.getElementById('btn-cancel-evt');
-            if(cancelBtn) cancelBtn.classList.add('hidden');
+            const cancelBtn = document.getElementById('btn-cancel-evt'); if(cancelBtn) cancelBtn.classList.add('hidden');
         }
 
         function moveTripEvent(idx, dir) {
             if(!isAdmin) return;
             const events = tripDays[activeDay].events;
-            if (dir === -1 && idx > 0) {
-                [events[idx], events[idx - 1]] = [events[idx - 1], events[idx]];
-            } else if (dir === 1 && idx < events.length - 1) {
-                [events[idx], events[idx + 1]] = [events[idx + 1], events[idx]];
-            }
+            if (dir === -1 && idx > 0) { [events[idx], events[idx - 1]] = [events[idx - 1], events[idx]]; } 
+            else if (dir === 1 && idx < events.length - 1) { [events[idx], events[idx + 1]] = [events[idx + 1], events[idx]]; }
             pushTripDataToCloud();
         }
 
@@ -906,47 +847,48 @@
             const newDate = document.getElementById('input-day-date').value.trim();
             const newCity = document.getElementById('input-day-city').value.trim();
             const newHotel = document.getElementById('input-day-hotel').value.trim();
+            const newTitle = document.getElementById('input-day-title-纲').value.trim();
             
             if(newDate) tripDays[activeDay].date = newDate;
             if(newCity) tripDays[activeDay].city = newCity;
             if(newHotel) tripDays[activeDay].hotel = newHotel;
+            if(newTitle) tripDays[activeDay].title = newTitle;
             
-            pushTripDataToCloud(); 
-            showToast("全域城市、日期與住宿飯店同步變更！");
-            renderDashboard();
-            renderItineraryPage();
+            pushTripDataToCloud(); showToast("全域城市、大綱與落腳酒店已發布同步！");
+            renderDashboard(); renderItineraryPage();
         }
 
+        // 徹底修正 Bug：確保新增與「編輯修改」都能完美寫入 title 欄位，不再出現 untitled
         function addTripEvent() {
-            if(!isAdmin) return; const title = document.getElementById('input-evt-title').value.trim(); if (!title) return;
+            if(!isAdmin) return; 
+            const titleVal = document.getElementById('input-evt-title').value.trim(); 
+            if (!titleVal) { showToast("請填寫活動項目名稱！", true); return; }
             
             const newEvt = { 
+                title: titleVal,
                 time: document.getElementById('input-evt-time').value.trim() || "隨時", 
-                icon: document.getElementById('input-evt-icon').value, 
+                icon: document.getElementById('input-evt-icon').value || "landmark", 
                 isTask: document.getElementById('input-evt-task').value === "true", 
                 desc: document.getElementById('input-evt-desc').value.trim() 
             };
 
             if (editEventIndex > -1) {
                 tripDays[activeDay].events[editEventIndex] = newEvt;
-                cancelEditTripEvent();
-                showToast("行程已更新！");
+                cancelEditTripEvent(); showToast("活動項目已成功儲存更新！");
             } else {
+                if(!tripDays[activeDay].events) tripDays[activeDay].events = [];
                 tripDays[activeDay].events.push(newEvt);
                 document.getElementById('input-evt-title').value = ''; 
                 document.getElementById('input-evt-desc').value = '';
                 document.getElementById('input-evt-time').value = '';
-                showToast("已加入新行程！");
+                showToast("已加入今天的新計畫！");
             }
-            pushTripDataToCloud(); 
+            pushTripDataToCloud(); renderItineraryPage();
         }
 
         function deleteTripEvent(idx) { 
             if(!isAdmin) return; 
-            if(confirm("確定要刪除此行程嗎？")) {
-                tripDays[activeDay].events.splice(idx, 1); 
-                pushTripDataToCloud(); 
-            }
+            if(confirm("確定要刪除此項活動嗎？")) { tripDays[activeDay].events.splice(idx, 1); pushTripDataToCloud(); }
         }
 
         function clearGuideInputs() {
@@ -957,17 +899,14 @@
         }
 
         function loadGuideForEdit(id) {
-            if(!isAdmin) return;
-            activeGuideTab = id;
-            const g = guideData.find(x => x.id === id);
+            if(!isAdmin) return; activeGuideTab = id; const g = guideData.find(x => x.id === id);
             if(g) {
                 document.getElementById('input-guide-title').value = g.title;
                 document.getElementById('input-guide-desc').value = g.desc || '';
                 document.getElementById('input-guide-s1').value = g.s1 || '';
                 document.getElementById('input-guide-s2').value = g.s2 || '';
                 document.getElementById('input-guide-title').scrollIntoView({behavior: 'smooth', block: 'center'});
-                showToast("已載入攻略內容準備編輯！");
-                renderGuidesPage();
+                showToast("攻略已載入，可於下方表單開始編輯！"); renderGuidesPage();
             }
         }
 
@@ -998,21 +937,15 @@
         }
 
         function saveCurrentGuide() {
-            if(!isAdmin) return;
-            const title = document.getElementById('input-guide-title').value.trim(); 
-            if(!title) {
-                showToast("請先點擊上方攻略標題旁的「編輯按鈕」載入資料", true);
-                return;
-            }
+            if(!isAdmin) return; const title = document.getElementById('input-guide-title').value.trim(); 
+            if(!title) { showToast("請點選攻略右上角的編輯鈕載入數據！", true); return; }
             const idx = guideData.findIndex(g => g.id === activeGuideTab);
             if (idx > -1) {
                 guideData[idx].title = title.replace(/^\d+\.\s*/, '');
                 guideData[idx].desc = document.getElementById('input-guide-desc').value.trim();
                 guideData[idx].s1 = document.getElementById('input-guide-s1').value.trim();
                 guideData[idx].s2 = document.getElementById('input-guide-s2').value.trim();
-                pushTripDataToCloud(); 
-                clearGuideInputs();
-                showToast("攻略修改已成功儲存！");
+                pushTripDataToCloud(); clearGuideInputs(); showToast("攻略修改成功已發布！");
             }
         }
         
@@ -1020,23 +953,18 @@
             if(!isAdmin) return; const title = document.getElementById('input-guide-title').value.trim(); if(!title) return; 
             const id = 'guide_' + Date.now();
             guideData.push({ id, title: title.replace(/^\d+\.\s*/, ''), desc: document.getElementById('input-guide-desc').value.trim(), s1: document.getElementById('input-guide-s1').value.trim(), s2: document.getElementById('input-guide-s2').value.trim() }); 
-            activeGuideTab = id; 
-            pushTripDataToCloud(); 
-            clearGuideInputs();
-            showToast("成功新增為新分類！");
+            activeGuideTab = id; pushTripDataToCloud(); clearGuideInputs(); showToast("成功新增攻略大類！");
         }
         
         function deleteCurrentGuide() { 
-            if(!isAdmin || guideData.length <= 1) { showToast("至少需保留一個攻略分類！", true); return; }
+            if(!isAdmin || guideData.length <= 1) { showToast("至少需保留一個攻略大類！", true); return; }
             guideData = guideData.filter(g => g.id !== activeGuideTab); activeGuideTab = guideData[0].id; 
-            pushTripDataToCloud(); 
-            clearGuideInputs();
-            showToast("已刪除該攻略分類！");
+            pushTripDataToCloud(); clearGuideInputs(); showToast("該攻略大類已移除！");
         }
 
         function renderPackingChecklist() {
             const groups = { docs: document.getElementById('packing-group-docs'), tech: document.getElementById('packing-group-tech'), daily: document.getElementById('packing-group-daily'), clothes: document.getElementById('packing-group-clothes'), hygiene: document.getElementById('packing-group-hygiene') };
-            Object.keys(groups).forEach(k => groups[k].innerHTML = ''); let checkedCount = 0;
+            Object.keys(groups).forEach(k => { if(groups[k]) groups[k].innerHTML = ''; }); let checkedCount = 0;
             packingItems.forEach((item, index) => {
                 if (item.checked) checkedCount++; const div = document.createElement('div'); div.className = `flex items-center justify-between p-2 rounded-lg border ${item.checked ? 'bg-indigo-50/40 text-slate-400 line-through' : 'bg-slate-50'}`;
                 div.innerHTML = `<label class="flex items-center space-x-3 cursor-pointer flex-1"><input type="checkbox" onchange="togglePackingItem(${index}, this)" ${item.checked ? 'checked' : ''} class="w-4 h-4 text-brand-500"><span class="text-[0.85rem] font-semibold">${item.name}</span></label><button onclick="deletePackingItem(${index})" class="text-slate-300 hover:text-red-500 text-[0.85rem] transition active:scale-90"><i class="fa-solid fa-trash"></i></button>`;
@@ -1046,73 +974,37 @@
             if (document.getElementById('packing-progress-bar')) document.getElementById('packing-progress-bar').style.width = `${Math.round((checkedCount / packingItems.length) * 100)}%`;
         }
 
-        function togglePackingItem(index, cb) { 
-            packingItems[index].checked = cb.checked; 
-            saveLocalPackingList(); 
-            renderPackingChecklist(); 
-        }
-
+        function togglePackingItem(index, cb) { packingItems[index].checked = cb.checked; saveLocalPackingList(); renderPackingChecklist(); }
         function addUserPackingItem() { 
-            const name = document.getElementById('input-pack-name').value.trim(); 
-            if(!name) return; 
+            const name = document.getElementById('input-pack-name').value.trim(); if(!name) return; 
             packingItems.push({ name, checked: false, group: document.getElementById('input-pack-group').value }); 
-            saveLocalPackingList(); 
-            document.getElementById('input-pack-name').value = ''; 
-            renderPackingChecklist();
+            saveLocalPackingList(); document.getElementById('input-pack-name').value = ''; renderPackingChecklist();
         }
+        function deletePackingItem(index) { packingItems.splice(index, 1); saveLocalPackingList(); renderPackingChecklist(); }
 
-        function deletePackingItem(index) { 
-            packingItems.splice(index, 1); 
-            saveLocalPackingList(); 
-            renderPackingChecklist();
-        }
-
-        function toggleMemberEdit() {
-            const el = document.getElementById('member-edit-section');
-            el.classList.toggle('hidden');
-        }
-
+        function toggleMemberEdit() { document.getElementById('member-edit-section').classList.toggle('hidden'); }
         function addBudgetMember() {
-            const input = document.getElementById('input-new-member');
-            const val = input.value.trim();
-            if(val && !budgetMembers.includes(val)) {
-                budgetMembers.push(val);
-                input.value = '';
-                pushBudgetDataToCloud();
-            }
+            const input = document.getElementById('input-new-member'); const val = input.value.trim();
+            if(val && !budgetMembers.includes(val)) { budgetMembers.push(val); input.value = ''; pushBudgetDataToCloud(); }
         }
-
         function deleteBudgetMember(idx) {
-            if(confirm(`確定要將「${budgetMembers[idx]}」從名單移除嗎？\n(注意：已記在他們名下的帳不會消失，但不會被計入未來的 AA 分攤)`)) {
-                budgetMembers.splice(idx, 1);
-                pushBudgetDataToCloud();
-            }
+            if(confirm(`確定移除「${budgetMembers[idx]}」嗎？\n(歷史帳目將會保留，但未來將不計入分攤計算)`)) { budgetMembers.splice(idx, 1); pushBudgetDataToCloud(); }
         }
 
         function renderBudget() {
-            let totalExpense = 0;
-            let payerTotals = {};
-
-            budgetMembers.forEach(m => payerTotals[m] = 0);
-
+            let totalExpense = 0; let payerTotals = {}; budgetMembers.forEach(m => payerTotals[m] = 0);
             userExpenses.forEach(item => {
-                totalExpense += item.cost;
-                if (payerTotals[item.payer] === undefined) {
-                    payerTotals[item.payer] = 0; 
-                }
-                payerTotals[item.payer] += item.cost;
+                totalExpense += item.cost; if (payerTotals[item.payer] === undefined) { payerTotals[item.payer] = 0; } payerTotals[item.payer] += item.cost;
             });
 
-            const summaryContainer = document.getElementById('budget-payers-summary');
-            summaryContainer.innerHTML = '';
+            const summaryContainer = document.getElementById('budget-payers-summary'); summaryContainer.innerHTML = '';
             Object.keys(payerTotals).forEach(payer => {
                 const isArchived = !budgetMembers.includes(payer); 
                 summaryContainer.innerHTML += `
                     <div class="${isArchived ? 'opacity-50' : ''}">
                         <p class="text-[12px] text-indigo-300 truncate">👤 ${payer}</p>
                         <p class="text-[0.95rem] font-bold mt-0.5">NT$ ${payerTotals[payer].toLocaleString()}</p>
-                    </div>
-                `;
+                    </div>`;
             });
 
             const activeCount = budgetMembers.length;
@@ -1121,88 +1013,48 @@
             if (activeCount > 0 && totalExpense > 0) {
                 const avg = totalExpense / activeCount;
                 settlementHtml += `<p class="text-[0.75rem] text-indigo-300 mb-2 font-medium">每人應付基準：NT$ ${Math.round(avg).toLocaleString()}</p><div class="space-y-1">`;
-                
-                let debtors = [];
-                let creditors = [];
-
+                let debtors = []; let creditors = [];
                 budgetMembers.forEach(m => {
-                    const paid = payerTotals[m] || 0;
-                    const diff = paid - avg;
+                    const paid = payerTotals[m] || 0; const diff = paid - avg;
                     if (diff < -0.5) debtors.push({ name: m, amount: Math.abs(diff) });
                     else if (diff > 0.5) creditors.push({ name: m, amount: diff });
                 });
-
-                debtors.sort((a, b) => b.amount - a.amount);
-                creditors.sort((a, b) => b.amount - a.amount);
-
-                let transactions = [];
-                let i = 0, j = 0;
-
+                debtors.sort((a, b) => b.amount - a.amount); creditors.sort((a, b) => b.amount - a.amount);
+                let transactions = []; let i = 0, j = 0;
                 while (i < debtors.length && j < creditors.length) {
-                    let debtor = debtors[i];
-                    let creditor = creditors[j];
-
-                    let amountToPay = Math.min(debtor.amount, creditor.amount);
-
-                    if (amountToPay > 0.5) {
-                        transactions.push(`<p class="text-[0.75rem]"><span class="text-amber-400 font-bold bg-amber-400/10 px-1 rounded">${debtor.name}</span> 需給 <span class="text-emerald-400 font-bold bg-emerald-400/10 px-1 rounded">${creditor.name}</span> <strong class="text-white px-0.5">NT$ ${Math.round(amountToPay).toLocaleString()}</strong></p>`);
-                    }
-
-                    debtor.amount -= amountToPay;
-                    creditor.amount -= amountToPay;
-
-                    if (debtor.amount < 0.5) i++;
-                    if (creditor.amount < 0.5) j++;
+                    let debtor = debtors[i]; let creditor = creditors[j]; let amountToPay = Math.min(debtor.amount, creditor.amount);
+                    if (amountToPay > 0.5) { transactions.push(`<p class="text-[0.75rem]"><span class="text-amber-400 font-bold bg-amber-400/10 px-1 rounded">${debtor.name}</span> 需給 <span class="text-emerald-400 font-bold bg-emerald-400/10 px-1 rounded">${creditor.name}</span> <strong class="text-white px-0.5">NT$ ${Math.round(amountToPay).toLocaleString()}</strong></p>`); }
+                    debtor.amount -= amountToPay; creditor.amount -= amountToPay;
+                    if (debtor.amount < 0.5) i++; if (creditor.amount < 0.5) j++;
                 }
-
-                if (transactions.length > 0) {
-                    settlementHtml += transactions.join('');
-                } else {
-                    settlementHtml += `<p class="text-[0.75rem] text-emerald-400 font-bold">目前帳務已完美打平！</p>`;
-                }
-                
+                settlementHtml += transactions.length > 0 ? transactions.join('') : `<p class="text-[0.75rem] text-emerald-400 font-bold">目前帳務已完美打平！</p>`;
                 settlementHtml += `</div>`;
-            } else if (totalExpense === 0) {
-                settlementHtml += `<p class="text-[0.75rem] text-indigo-300">目前尚無開銷資料。</p>`;
-            } else {
-                settlementHtml += `<p class="text-[0.75rem] text-amber-400">請先新增付款人以進行計算。</p>`;
-            }
+            } else { settlementHtml += `<p class="text-[0.75rem] text-indigo-300">目前尚無開銷或付款人數據。</p>`; }
+            
             document.getElementById('budget-settlement-box').innerHTML = settlementHtml;
-
             document.getElementById('budget-total-expense').innerText = `NT$ ${totalExpense.toLocaleString()}`;
             document.getElementById('header-budget-total').innerText = `NT$ ${totalExpense.toLocaleString()}`;
 
-            const selectPayer = document.getElementById('input-exp-payer');
-            const currentVal = selectPayer.value; 
+            const selectPayer = document.getElementById('input-exp-payer'); const currentVal = selectPayer.value; 
             if (budgetMembers.length > 0) {
                 selectPayer.innerHTML = budgetMembers.map(m => `<option value="${m}">🙋 ${m}</option>`).join('');
                 if (budgetMembers.includes(currentVal)) selectPayer.value = currentVal;
-            } else {
-                selectPayer.innerHTML = `<option value="">請先新增付款人</option>`;
-            }
+            } else { selectPayer.innerHTML = `<option value="">請先新增付款人</option>`; }
 
-            const tagsContainer = document.getElementById('member-tags-container');
-            tagsContainer.innerHTML = budgetMembers.map((m, idx) => `
+            document.getElementById('member-tags-container').innerHTML = budgetMembers.map((m, idx) => `
                 <div class="flex items-center bg-white border border-indigo-200 rounded-full pl-3 pr-1 py-1 shadow-sm">
                     <span class="text-[0.7rem] text-indigo-800 font-bold mr-2">${m}</span>
                     <button onclick="deleteBudgetMember(${idx})" class="w-5 h-5 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-300 hover:bg-red-50 hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-xmark text-[0.6rem]"></i></button>
-                </div>
-            `).join('');
+                </div>`).join('');
 
-            const listContainer = document.getElementById('budget-items-list');
-            listContainer.innerHTML = '';
-            
-            if (userExpenses.length === 0) { 
-                listContainer.innerHTML = `<div class="text-center py-6 text-[0.85rem] text-slate-400">目前雲端無記帳資料。</div>`; 
-            } else {
+            const listContainer = document.getElementById('budget-items-list'); listContainer.innerHTML = '';
+            if (userExpenses.length === 0) { listContainer.innerHTML = `<div class="text-center py-6 text-[0.85rem] text-slate-400">目前雲端無記帳資料。</div>`; } 
+            else {
                 userExpenses.forEach((item, index) => {
-                    const div = document.createElement('div');
-                    div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl bg-slate-50`;
+                    const div = document.createElement('div'); div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl bg-slate-50`;
                     div.innerHTML = `
                         <div class="flex items-center space-x-3 text-[0.85rem] flex-1 min-w-0">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 bg-indigo-100 text-indigo-600">
-                                <i class="fa-solid fa-receipt text-[0.7rem]"></i>
-                            </div>
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 bg-indigo-100 text-indigo-600"><i class="fa-solid fa-receipt text-[0.7rem]"></i></div>
                             <div class="truncate pr-2">
                                 <p class="font-extrabold text-slate-800 text-[0.9rem] truncate">${item.name}</p>
                                 <div class="flex items-center space-x-1.5 mt-1">
@@ -1213,160 +1065,104 @@
                         </div>
                         <div class="flex items-center space-x-3 shrink-0 pl-1">
                             <span class="text-[0.9rem] font-black text-slate-800 tracking-tight">NT$ ${item.cost.toLocaleString()}</span>
-                            <button onclick="deleteExpenseItem(${index})" class="text-slate-300 hover:text-red-500 transition active:scale-90 p-1.5">
-                                <i class="fa-solid fa-trash-can text-[0.95rem]"></i>
-                            </button>
-                        </div>
-                    `;
+                            <button onclick="deleteExpenseItem(${index})" class="text-slate-300 hover:text-red-500 transition active:scale-90 p-1.5"><i class="fa-solid fa-trash-can text-[0.95rem]"></i></button>
+                        </div>`;
                     listContainer.appendChild(div);
                 });
             }
         }
 
         function addUserExpense() { 
-            const name = document.getElementById('input-exp-name').value.trim(); 
-            const cost = parseInt(document.getElementById('input-exp-cost').value); 
-            const payer = document.getElementById('input-exp-payer').value;
-            
-            if(!name || isNaN(cost) || !payer) {
-                showToast("請確認項目名稱、金額與付款人都已填寫！", true);
-                return; 
-            }
-            
-            userExpenses.push({ 
-                name, 
-                cost, 
-                category: document.getElementById('input-exp-category').value, 
-                payer: payer
-            }); 
-            pushBudgetDataToCloud(); 
-            document.getElementById('input-exp-name').value = ''; 
-            document.getElementById('input-exp-cost').value = ''; 
+            const name = document.getElementById('input-exp-name').value.trim(); const cost = parseInt(document.getElementById('input-exp-cost').value); const payer = document.getElementById('input-exp-payer').value;
+            if(!name || isNaN(cost) || !payer) { showToast("請完整填寫項目、金額與付款人！", true); return; }
+            userExpenses.push({ name, cost, category: document.getElementById('input-exp-category').value, payer: payer }); 
+            pushBudgetDataToCloud(); document.getElementById('input-exp-name').value = ''; document.getElementById('input-exp-cost').value = ''; 
         }
+        function deleteExpenseItem(index) { userExpenses.splice(index, 1); pushBudgetDataToCloud(); }
+        function clearAllExpenses() { if(confirm("確定清空全部雲端帳本？")) { userExpenses = []; pushBudgetDataToCloud(); } }
 
-        function deleteExpenseItem(index) { 
-            userExpenses.splice(index, 1); 
-            pushBudgetDataToCloud(); 
-        }
-
-        function clearAllExpenses() { 
-            if(confirm("確定清空全部雲端帳本？(此操作不可恢復)")) { 
-                userExpenses = []; 
-                pushBudgetDataToCloud(); 
-            } 
-        }
-
-        function setActiveDay(dayNum) { 
-            activeDay = dayNum; 
-            cancelEditTripEvent(); 
-            renderDashboard();
-            renderItineraryPage(); 
-        }
+        function setActiveDay(dayNum) { activeDay = dayNum; cancelEditTripEvent(); renderDashboard(); renderItineraryPage(); }
         function showToast(m, w=false) { const t = document.getElementById('custom-toast'); document.getElementById('toast-message-text').innerText = m; t.classList.remove('hidden'); setTimeout(() => { t.style.opacity = '1'; t.style.transform = 'translateY(0)'; }, 50); setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.classList.add('hidden'), 300); }, 2000); }
 
         function resetToCloudTemplate() {
-            if(confirm("確定重置雲端資料庫嗎？\n(這會將行程、攻略恢復預設，並清空記帳本與您的本機打包清單)")) {
-                const resetTrip = JSON.parse(JSON.stringify(defaultTripDays));
-                const resetGuide = JSON.parse(JSON.stringify(defaultGuides));
-                const resetWarn = JSON.parse(JSON.stringify(defaultTripWarning));
-                const resetDash = JSON.parse(JSON.stringify(defaultDashboardInfo));
-                
+            if(confirm("確定重置雲端資料庫至初始範本狀態嗎？")) {
                 localStorage.removeItem('gba_personal_packing');
-                
-                db.collection("gba_trip").doc("main_trip").set({ 
-                    tripDays: resetTrip, guideData: resetGuide, tripWarning: resetWarn, dashboardInfo: resetDash 
-                }).then(() => {
+                db.collection("gba_trip").doc("main_trip").set({ tripDays: defaultTripDays, guideData: defaultGuides, tripWarning: defaultTripWarning, dashboardInfo: defaultDashboardInfo })
+                .then(() => {
                     budgetMembers = ['我', '伴侶'];
                     db.collection("gba_budget").doc("main_budget").set({ expenses: [], members: budgetMembers }).then(() => {
-                        showToast("重置成功，正在重新整理...");
-                        setTimeout(() => location.reload(), 1000);
+                        showToast("重置範本成功，重新整理中..."); setTimeout(() => location.reload(), 1000);
                     });
                 });
             }
         }
 
-        const defaultTripWarning = { title: "深中通道與深圳還車防坑必看！", desc: "您於 Day 7 (7/3 週五) 清晨需從珠海經深中通道趕回深圳還車。請務必嚴格控時，行程已為您精準規劃於 06:30 提早出發，避開工作日最可怕的早高峰塞車與潛在外地車牌限行，趕在 09:00 前至南油店優雅結算還車！" };
-        
+        // 行程初始化靜態預設數據
+        const defaultTripWarning = { title: "深中通道與深圳還車防坑必看！", desc: "您於 Day 7 清晨需從珠海經深中通道趕回深圳還車。請務必嚴格控時，行程已規劃於 06:30 提早出發，避開可怕的早高峰塞車與外地牌限行，趕在 09:00 前至南油店結算還車！" };
         const defaultTripDays = {
             1: { date: "6/27", title: "Day 1 (6/27 六) - 抵達廣州 & 搶辦門號", city: "廣州", hotel: "珠江新城區域酒店", events: [
-                { time: "10:50 - 13:00", icon: "plane", title: "【航班預訂】國泰航空 CX489 赴港", desc: "台北 (TPE) ➔ 香港 (HKG) 航班起飛。預訂參考編號：FQXYIW。" },
+                { time: "10:50 - 13:00", icon: "plane", title: "【航班預訂】國泰航空 CX489 赴港", desc: "台北 (TPE) ➔ 香港 (HKG) 航班起飛。" },
                 { time: "15:00 - 17:15", icon: "ship", title: "【船班預訂】國泰快船 CX9879 轉廣州", desc: "香港機場海碼頭搭乘快船直奔廣州琶洲港 (PFT)。免入境香港，行李直掛。" },
-                { time: "18:30 - 19:40", icon: "sim", title: "【核心任務】辦理實名制門號", desc: "下船後提行李直奔天河區中國移動直營營業廳，持台胞證辦理實名制大陸手機號（選低月租保號套餐，現場確認可收發簡訊）。", isTask: true },
-                { time: "晚上", icon: "night", title: "珠江新城 Check-in & 珠江夜景", desc: "前往珠江新城酒店放行李。隨後漫步花城廣場 ➔ 海心沙 ➔ 遠眺廣州塔（小蠻腰），欣賞頂級 CBD 夜景燈光秀並享用晚餐。" }
+                { time: "18:30 - 19:40", icon: "sim", title: "【核心任務】辦理實名制門號", desc: "持台胞證辦理實名制內地手機號（選低月租保號套餐，確認開通漫遊以在台接收網銀簡訊）。", isTask: true },
+                { time: "晚上", icon: "night", title: "珠江新城 Check-in & 珠江夜景", desc: "前往珠江新城酒店放行李。隨後漫步花城廣場遠眺廣州塔（小蠻腰）享用晚餐。" }
             ]},
             2: { date: "6/28", title: "Day 2 (6/28 日) - 嶺南歷史文化與街拍", city: "廣州", hotel: "珠江新城區域酒店", events: [
-                { time: "上午", icon: "camera", title: "沙面島街拍", desc: "漫步歐式巴洛克與新古典主義建築群，早晨陽光柔和，極適合街拍建築光影。" },
+                { time: "上午", icon: "camera", title: "沙面島街拍", desc: "漫步歐式巴洛克與新古典主義建築群，適合街拍建築光影。" },
                 { time: "中午", icon: "food", title: "上下九步行街", desc: "享用老廣地道小吃（西關腸粉、雙皮奶、竹升麵）。" },
-                { time: "下午", icon: "landmark", title: "永慶坊", desc: "嶺南騎樓與現代設計碰撞的網紅歷史文創街區，可拍故事感照片。" },
-                { time: "晚上", icon: "temple", title: "北京路步行街 & 大佛寺點燈", desc: "晚餐後必拍，夜晚亮燈後神似《神隱少女》魔幻湯屋的視覺大片。", hasEasterEgg: true }
+                { time: "下午", icon: "landmark", title: "永慶坊", desc: "嶺南騎樓與現代設計碰撞的網紅歷史文創街區。" },
+                { time: "晚上", icon: "temple", title: "北京路步行街 & 大佛寺點燈", desc: "夜晚亮燈後神似《神隱少女》魔幻湯屋的視覺大片。" }
             ]},
             3: { date: "6/29", title: "Day 3 (6/29 一) - 極速開戶換證 & 奔深圳", city: "深圳", hotel: "車公廟區域酒店", events: [
-                { time: "09:00 - 11:30", icon: "bank", title: "【核心任務】富邦華一廣州分行開戶", desc: "持台胞證、台灣身份證及第一天辦好的門號開戶，現場綁定微信/支付寶。", isTask: true },
-                { time: "13:30 - 15:30", icon: "license", title: "【核心任務】換領臨時駕照", desc: "前往岑村車管總所。現場做自助體檢、拍照並提交駕照原件，當場領取臨時入境機動車駕駛許可。", isTask: true },
-                { time: "傍晚", icon: "train", title: "搭乘高鐵前往深圳", desc: "回酒店提行李前往高鐵站，搭乘高鐵前往深圳（抵達福田站或深圳北站），直接前往車公廟飯店放行李。" },
-                { time: "20:00 之後", icon: "night", title: "【減壓首選】水圍夜市單攻", desc: "搭地鐵/打車前往福田區水圍夜市（水圍文化村）。這晚節奏放慢，專心享受美食（炭烤生蠔、潮汕砂鍋粥或椰子雞），吃飽立刻回飯店休息。" }
+                { time: "09:00 - 11:30", icon: "bank", title: "【核心任務】富邦華一廣州分行開戶", desc: "持台胞證、台灣身份證及實名門號開戶，現場綁定微信/支付寶。", isTask: true },
+                { time: "13:30 - 15:30", icon: "license", title: "【核心任務】換領臨時駕照", desc: "前往岑村車管總所。現場做自動體檢、提交駕照原件，當場領取臨時入境駕駛許可。", isTask: true },
+                { time: "傍晚", icon: "train", title: "搭乘高鐵前往深圳", desc: "回酒店提行李前往高鐵站，搭乘高鐵前往深圳車公廟飯店。" },
+                { time: "20:00 之後", icon: "night", title: "【減壓首選】水圍夜市單攻", desc: "前往福田區水圍夜市。專心享受美食（炭烤生蠔、潮汕砂鍋粥），隨後回飯店休息。" }
             ]},
             4: { date: "6/30", title: "Day 4 (6/30 二) - 深圳無車精華遊", city: "深圳", hotel: "車公廟區域酒店", events: [
-                { time: "10:00 - 14:00", icon: "shopping", title: "第一站：星河COCO Park", desc: "早上睡到飽，搭地鐵 1 號線直達「購物公園站」。在開放式商場逛街、喝杯網紅手搖飲，中午挑一家排隊名店享用午餐。" },
-                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "搭 1 號線直達「華強路站/華強北站」。趁 18:00 電子批發市場收攤前，朝裝開源硬體極客天堂，並拍攝經典街景。" },
-                { time: "18:00 - 21:30", icon: "night", title: "第三站：東門老街", desc: "搭 1 號線直達「老街站」。在東門町美食街邊走邊吃解決晚餐，用相機捕捉賽博朋克感的不夜城街頭大片。" },
-                { time: "22:00 之後", icon: "landmark", title: "【終極備選】深圳灣公園", desc: "若逛完東門體力依然充沛可前往。深夜少了大白天的酷熱，漫步海濱棧道，遠眺對岸香港元朗的燈火與跨海大橋夜景。" }
+                { time: "10:00 - 14:00", icon: "shopping", title: "第一站：星河COCO Park", desc: "早上睡到飽，搭地鐵直達購物公園站，挑一家排隊名店享用午餐。" },
+                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "朝聖開源硬體極客天堂，並拍攝經典電子街景。" },
+                { time: "18:00 - 21:30", icon: "night", title: "第三站：東門老街", desc: "捕捉賽博朋克感的不夜城街頭大片。" }
             ]},
             5: { date: "7/01", title: "Day 5 (7/1 三) - 取車上橋 & 玩進珠海", city: "珠海", hotel: "拱北口岸區域酒店", events: [
-                { time: "09:00", icon: "car", title: "【核心任務】一嗨準時取車", desc: "前往【福田區規劃大廈停車場店】辦理取車手續，行李上車。", isTask: true },
-                { time: "09:30 - 11:30", icon: "bridge", title: "【解鎖自駕高光】深中通道", desc: "開車走全新通車的「深中通道」跨海大橋橫跨伶仃洋，體驗極致寬廣的跨海視野（車程約 1.5 ~ 2 小時）。" },
-                { time: "11:30 - 13:30", icon: "landmark", title: "第一站：唐家灣古鎮", desc: "一下大橋剛好順路抵達唐家灣。把車停好，漫步古近代名人故居與老街，並在古鎮裡享用粵式午餐。" },
-                { time: "13:45 - 15:45", icon: "kart", title: "第二站：珠海國際卡丁車場", desc: "開車幾分鐘就到隔壁，在國際標準賽道上開高規格卡丁車，釋放熱血貼地狂飆！" },
-                { time: "16:00 之後", icon: "camera", title: "【解鎖情侶路】野狸島 & 日月貝", desc: "順著海濱的情侶路往南開，沿途經過海天公園。車可直接開進野狸島停，黃昏亮燈時拍白色大貝殼歌劇院剪影極美。" },
-                { time: "晚上", icon: "night", title: "入住拱北口岸 & 夏灣夜市", desc: "前往拱北口岸酒店 Check-in。接著開車前往夏灣夜市（約 5-8 分鐘），觀看 21:45 攤車集體衝鋒，大啖烤生蠔與小龍蝦。" }
+                { time: "09:00", icon: "car", title: "【核心任務】一嗨準時取車", desc: "前往福田區規劃大廈停車場店辦理取車手續，行李上車。", isTask: true },
+                { time: "09:30 - 11:30", icon: "bridge", title: "【解鎖自駕高光】跨越深中通道", desc: "走全新通車的「深中通道」跨海大橋橫跨伶仃洋，體驗極致寬廣的跨海視野（全程高德地圖導航測速）。" },
+                { time: "11:30 - 13:30", icon: "landmark", title: "第一站：唐家灣古鎮", desc: "漫步古近代名人故居老街，享用粵式午餐。" },
+                { time: "13:45 - 15:45", icon: "kart", title: "第二站：珠海國際卡丁車場", desc: "在國際標準賽道上開高規格卡丁車，貼地狂飆！" },
+                { time: "晚上", icon: "night", title: "入住拱北口岸 & 夏灣夜市", desc: "前往夏灣夜市，觀看 21:45 攤車集體衝鋒，大啖烤生蠔。" }
             ]},
-            6: { date: "7/02", title: "Day 6 (7/2 四) - 衝鋒車與情侶路南段", city: "珠海", hotel: "拱北口岸區域酒店", events: [
-                { time: "上午", icon: "temple", title: "圓明新園", desc: "按北京圓明園部分景觀 1:1 仿建，車程僅 10 分鐘，輕鬆走逛。" },
-                { time: "中午/下午", icon: "camera", title: "北山大院", desc: "漫步在古建築改建的文創區，找家極具設計感的咖啡廳享受黑膠與咖啡時光，極度適合街拍與人像創作。" },
-                { time: "15:30 - 17:30", icon: "speed", title: "【重頭戲】景山公園索道與衝鋒車", desc: "開車前往情侶中路的城市陽台，對面就是景山公園。坐索道上山頂俯瞰海景，再坐刺激的「衝鋒車」滑道極速下山！" },
-                { time: "傍晚", icon: "landmark", title: "【補齊情侶路南段】愛情郵局燈塔", desc: "出公園後直接順路攻略：城市陽台 ➔ 香爐灣沙灘 ➔ 珠海漁女 ➔ 愛情郵局（打卡網紅燈塔與夕陽海景）。" },
-                { time: "晚上", icon: "shopping", title: "富華里商圈晚餐", desc: "前往富華里開放式商業街區享用晚餐，或在情侶路沿線找海景餐廳，遠眺夜空中璀璨的港珠澳大橋。" }
+            6: { date: "7/02", title: "Day 6 (7/2 四) - 衝鋒車與情侶路精華段", city: "珠海", hotel: "拱北口岸區域酒店", events: [
+                { time: "中午/下午", icon: "camera", title: "北山大院文創區", desc: "漫步在古建築改建的文創區，極度適合車景與人像創作。" },
+                { time: "15:30 - 17:30", icon: "speed", title: "【重頭戲】景山公園衝鋒車", desc: "坐索道上山頂俯瞰海景，再坐刺激的「衝鋒車」滑道極速下山！" },
+                { time: "傍晚", icon: "landmark", title: "【補齊情侶路南段】愛情郵局燈塔", desc: "打卡網紅燈塔與夕陽海景，遠眺璀璨的港珠澳大橋。" }
             ]},
             7: { date: "7/03", title: "Day 7 (7/3 五) - 極速還車 & 南山精華遊", city: "深圳", hotel: "南油區域酒店", events: [
-                { time: "06:30 - 08:15", icon: "bridge", title: "清晨出發跨越深中通道", desc: "清晨提早從拱北飯店退房出發，開車經深中通道跨海殺回深圳。" },
-                { time: "08:15 - 08:35", icon: "hotel", title: "先放行李至南油飯店", desc: "開車直奔位於南油附近的飯店，在飯店門口臨時停靠，把大行李箱拉去大廳辦理免費寄放，卸下負重。" },
-                { time: "08:35 - 08:50", icon: "car", title: "【核心任務】5分鐘極速還車", desc: "兩袖清風後，立刻開車前往「一嗨租車－深圳南油店」辦理還車，趕在 09:00 前優雅結算，完美結束 48 小時自駕！", isTask: true },
+                { time: "06:30 - 08:15", icon: "bridge", title: "清晨出發再次跨越深中通道", desc: "清晨提早退房出發，開車經深中通道跨海殺回深圳，避開工作日早高峰。" },
+                { time: "08:35 - 08:50", icon: "car", title: "【核心任務】5分鐘極速還車", desc: "前往一嗨租車深圳南油店辦理還車，趕在 09:00 前結算，結束 48 小時自駕！", isTask: true },
                 { time: "10:30 - 13:30", icon: "ski", title: "世界之窗室內滑雪", desc: "還完車後直接進室內滑雪場消暑，避開週末人潮。" },
-                { time: "14:00 - 16:00", icon: "shopping", title: "深圳萬象天地", desc: "搭地鐵/打車前往隔壁萬象天地。打卡抱樓大象地標，吹冷氣逛街，看各大頂級潮牌與汽車品牌的旗艦展廳。" },
-                { time: "16:30 - 18:30", icon: "landmark", title: "南投古城", desc: "打車幾分鐘就到，傍晚陽光柔和時，漫步在 1700 多年歷史與現代設計感碰撞的古城文創街區，光影極佳。" },
-                { time: "晚上", icon: "night", title: "海上世界夜景與精釀", desc: "回南油飯店辦理進房。隨後前往蛇口海上世界。看著退役明華輪核心商圈的音樂噴泉，享受悠閒的國際化異國情調與精釀啤酒。" }
+                { time: "晚上", icon: "night", title: "海上世界夜景與精釀", desc: "前往蛇口海上世界看音樂噴泉，享受異國情調與精釀啤酒。" }
             ]},
             8: { date: "7/04", title: "Day 8 (7/4 六) - 歎早茶與優雅返台", city: "返台", hotel: "溫暖的家", events: [
-                { time: "09:00 - 10:45", icon: "food", title: "蘩樓（南山店）歎早茶", desc: "飯店退房後提著行李，9點準時進餐廳（南油附近最推老字號、手工現做的「蘩樓」）。點上一壺普洱，優雅地為這趟旅行收尾。" },
-                { time: "11:00 - 11:20", icon: "car", title: "計程車直奔郵輪中心", desc: "吃飽後直接在餐廳門口打車，載著行李直奔蛇口郵輪中心（ZYK），車程 10～15 分鐘，於 11:30 前優雅抵達。" },
-                { time: "13:00 - 13:40", icon: "ship", title: "【跨境預訂】國泰快船 CX9816 前往香港", desc: "搭乘國泰跨境快船由深圳蛇口 (ZYK) ➔ 香港國際機場 (HKG)。直接辦理行李直掛與退稅。" },
-                { time: "15:45 - 17:40", icon: "plane", title: "【航班預訂】國泰航空 CX422 返台", desc: "由香港 (HKG) 起飛返回台北 (TPE)，大灣區自駕探險特種兵之旅完美收官！" }
+                { time: "09:00 - 10:45", icon: "food", title: "蘩樓（南山店）歎早茶", desc: "9點準時進餐廳。點上一壺普洱，吃手工現做的地道蝦餃點心。" },
+                { time: "13:00 - 13:40", icon: "ship", title: "【跨境預訂】國泰快船前往香港", desc: "由深圳蛇口搭快船直達香港國際機場海碼頭，辦理行李直掛與退稅。" },
+                { time: "15:45 - 17:40", icon: "plane", title: "【航班預訂】國泰航空 CX422 返台", desc: "由香港起飛返回台北，自駕特種兵之旅探險完美收官！" }
             ]}
         };
 
         const defaultGuides = [
-            { id: "mobile", title: "辦電話卡", desc: "門號是大陸電子支付與銀行開戶的根基。必須在 Day 1 琶洲港上岸後立刻前往直營營業廳辦理。", s1: "1. 指名「直營大營業廳」：普通加盟店無系統權限處理「台胞證」實名。推薦去天河區「體育西大廳」。", s2: "2. 告知需開通「港澳台漫遊」與收簡訊：回台灣後需要持續接收網銀交易簡訊，務必確認系統有開通「國際及港澳台漫遊簡訊」功能。" },
-            { id: "fubon", title: "富邦開戶", desc: "台資背景銀行，對於台灣同胞開戶最為友善、材料最簡便。主要用於綁定微信支付與支付寶。", s1: "🔑 必備證件與材料：台胞證正本 (需在有效期內)、台灣駕照、台灣身分證正本、剛辦好已實名的內地門號 (需收驗證碼)、下榻酒店地址與預訂資訊。", s2: "" },
-            { id: "license", title: "免檢臨駕", desc: "臨時駕駛證新制：持台灣駕照申辦臨時駕駛證「完全不需要體檢」！", s1: "1. 材料簡單 (免除體檢)：準備台胞證正本、台灣駕照正本、一吋白底彩色證件照 2 張即可，免去醫院體檢排隊時間。", s2: "2. 窗口核對，30分鐘內發照：「廣州交警」預約好 Day 3 下午時段，到場直接窗口交件核對，繳工本費 10 元人民幣，當場領取紙本臨時駕照！" },
-            { id: "traffic", title: "自駕守則", desc: "在廣東開車，有幾個與台灣截然不同的重罰規則，請務必牢記：", s1: "珠海「禮讓行人」極嚴：斑馬線上只要有行人，車子必須完全煞停。如果只減速而搶行，會直接被路口電子眼拍照，罰款並扣分。", s2: "深中通道大橋區間測速：深中通道跨海大橋段速限 100 km/h，海底隧道段速限 80 km/h。全段皆有區間測速，請務必使用「高德地圖」全程導航。" }
+            { id: "mobile", title: "辦電話卡", desc: "門號是內地電子支付與開戶根基。必須在 Day 1 琶洲港上岸後立刻辦理。", s1: "1. 指名「直營大營業廳」：加盟店無系統權限處理台胞證實名。推薦天河區大廳。", s2: "2. 告知需開通港澳台漫遊：回台後需要接收網銀驗證碼簡訊，確認功能有開啟。" },
+            { id: "fubon", title: "富邦開戶", desc: "台資背景銀行，對於台灣同胞開戶友善、材料最簡便。主要用於綁定微信與支付寶。", s1: "🔑 必備材料：台胞證、台灣駕駛證、台灣身分證、剛辦好已實名的大陸門號、下榻酒店地址預訂單。", s2: "" },
+            { id: "license", title: "免檢臨駕", desc: "臨時駕駛證新制：持台灣駕照申辦臨時駕駛證「完全不需要體檢」！", s1: "1. 材料簡單：準備台胞證正本、台灣駕照正本、一吋白底彩色證件照 2 張即可。", s2: "2. 窗口發照：到場直接窗口交件核對，工本費 10 元人民幣，當場領取紙本臨時駕照！" },
+            { id: "traffic", title: "自駕守則", desc: "在廣東開車，有幾個與台灣不同的重罰規則，請務必牢記：", s1: "珠海禮讓行人極嚴：斑馬線上只要有行人必須完全煞停，否則直接被拍照重罰並扣分。", s2: "深中通道區間測速：橋樑限速 100，海底隧道限速 80。請務必使用高德地圖導航。" }
         ];
         const defaultPackingItems = [
-            { name: "台胞證 (確認在有效期內)", checked: false, group: "docs" }, { name: "護照", checked: false, group: "docs" }, { name: "台灣駕照正本 (辦理臨駕必備)", checked: false, group: "docs" }, { name: "台灣身分證正本 (銀行開戶必備)", checked: false, group: "docs" }, { name: "白底一吋證件彩色大頭照 * 2張 (駕照用)", checked: false, group: "docs" },
-            { name: "手機", checked: false, group: "tech" }, { name: "SIM卡", checked: false, group: "tech" }, { name: "充電組 (含行動電源、萬國充、充電線)", checked: false, group: "tech" }, { name: "相機 (包含記憶卡、相機電池、腳架)", checked: false, group: "tech" }, { name: "自拍棒", checked: false, group: "tech" },
-            { name: "錢包 (內裝信用卡、人民幣現鈔)", checked: false, group: "daily" }, { name: "鑰匙", checked: false, group: "daily" }, { name: "水瓶", checked: false, group: "daily" }, { name: "雨傘 / 兩傘 (遮陽擋雨必備)", checked: false, group: "daily" },
-            { name: "衣服、褲子、內褲、襪子 (日常衣服套數)", checked: false, group: "clothes" }, { name: "薄外套 (防冷氣 / 滑雪防寒內搭)", checked: false, group: "clothes" }, { name: "帽子", checked: false, group: "clothes" }, { name: "太陽眼鏡", checked: false, group: "clothes" }, { name: "口罩", checked: false, group: "clothes" },
-            { name: "衛生紙、濕巾", checked: false, group: "hygiene" }, { name: "酒精", checked: false, group: "hygiene" }, { name: "刮鬍刀", checked: false, group: "hygiene" }, { name: "藥品組 (感冒、防暈、常備藥)", checked: false, group: "hygiene" }, { name: "耳塞", checked: false, group: "hygiene" }, { name: "眼罩", checked: false, group: "hygiene" }, { name: "頸枕", checked: false, group: "hygiene" }
+            { name: "台胞證 (確認在有效期內)", checked: false, group: "docs" }, { name: "護照", checked: false, group: "docs" }, { name: "台灣駕照正本", checked: false, group: "docs" }, { name: "台灣身分證正本", checked: false, group: "docs" }, { name: "白底一吋彩色證件照 * 2張", checked: false, group: "docs" },
+            { name: "手機與行動電源、萬國充、充電線", checked: false, group: "tech" }, { name: "相機 (包含記憶卡、電池、輕量腳架)", checked: false, group: "tech" },
+            { name: "錢包 (人民幣現鈔備用)", checked: false, group: "daily" }, { name: "兩用折疊雨傘 (遮陽防暴雨)", checked: false, group: "daily" },
+            { name: "衣服、褲子、內衣褲、襪子", checked: false, group: "clothes" }, { name: "防風薄外套 (滑雪防寒防冷氣)", checked: false, group: "clothes" }, { name: "太陽眼鏡與帽子", checked: false, group: "clothes" },
+            { name: "常備個人藥品組 (防暈、感冒藥)", checked: false, group: "hygiene" }, { name: "隨身濕紙巾", checked: false, group: "hygiene" }
         ];
 
         window.addEventListener('DOMContentLoaded', loadCloudData);
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker 註冊成功！', reg))
-                    .catch(err => console.log('Service Worker 註冊失敗：', err));
-            });
-        }
     </script>
 </body>
 </html>
