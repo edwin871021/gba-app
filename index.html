@@ -486,7 +486,7 @@
                 if (pin === null) return;
                 
                 // 這裡可以使用最簡單的 2026 或 0323 
-                if (pin === "2026" || pin === "0323") { 
+                if (pin === "1021" || pin === "0708") { 
                     // 程式碼在背景完美使用你設定的 871021 去敲 Firebase 雲端的大門！
                     firebase.auth().signInWithEmailAndPassword("a@a.com", "871021")
                         .catch((err) => { showToast("Firebase 連線失敗，請確認後台已被啟用且密碼無誤", true); console.error(err); });
