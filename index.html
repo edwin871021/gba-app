@@ -376,7 +376,7 @@
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <select id="input-exp-category" class="w-full px-2.5 py-1.5 text-[0.85rem] border rounded-lg bg-slate-50 focus:bg-white">
-                                <option value="交通">交通車資</option><option value="住宿">酒店住宿</option><option value="飲食">餐飲美食</option><option value="玩樂">門票娛樂</option><option value="行政">行政規規</option><option value="其他">其他雜費</option>
+                                <option value="交通">交通車資</option><option value="住宿">酒店住宿</option><option value="飲食">餐飲美食</option><option value="玩樂">門票娛樂</option><option value="行政">行政規費</option><option value="其他">其他雜費</option>
                             </select>
                         </div>
                         <div>
@@ -479,27 +479,26 @@
         };
         let dashboardInfo = {};
 
-        // 終極體驗優化：將後台繁瑣的帳密轉譯為「4位數 PIN 碼」登入，且支援 Firebase 本地自動續登！
+        // 終極防忘機制：把對齊管道直接指向你在後台設定的真實密碼 871021！
         function toggleAdminAuth() {
             if (!isAdmin) {
-                // 提示使用者輸入簡單的 4 位數鎖定碼
-                const pin = prompt("請輸入您的 4 位數編輯鎖定碼（若忘記可至程式碼中查看）：");
+                const pin = prompt("請輸入您的 4 位數解鎖代碼：");
                 if (pin === null) return;
                 
-                // 程式碼內部建立對應關係，即便忘記了，看這一行就能回憶起來
+                // 這裡可以使用最簡單的 2026 或 0323 
                 if (pin === "2026" || pin === "0323") { 
-                    // 網頁在背景自動默默幫你打完長串的 Firebase 帳密，兼顧安全與速度！
-                    firebase.auth().signInWithEmailAndPassword("a@a.com", "111111")
-                        .catch((err) => { showToast("Firebase 雲端帳戶同步失敗，請確認後台已被啟用", true); console.error(err); });
+                    // 程式碼在背景完美使用你設定的 871021 去敲 Firebase 雲端的大門！
+                    firebase.auth().signInWithEmailAndPassword("a@a.com", "871021")
+                        .catch((err) => { showToast("Firebase 連線失敗，請確認後台已被啟用且密碼無誤", true); console.error(err); });
                 } else {
-                    showToast("鎖定碼錯誤，拒絕開通權限！", true);
+                    showToast("代碼錯誤，拒絕開通編輯權限！", true);
                 }
             } else {
                 firebase.auth().signOut();
             }
         }
 
-        // Firebase 內建原生身份狀態監聽器：只要手機成功登入過一次，往後重開、刷新完全不需再打密碼！
+        // Firebase 自動無感續登狀態監聽器
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 isAdmin = true;
@@ -624,7 +623,6 @@
         };
 
         function renderDashboard() {
-            // 防禦性優化：防止雲端尚未回傳時，生命週期搶先讀取而當機
             if (!dashboardInfo) return;
             document.getElementById('dashboard-hero-title').innerText = dashboardInfo.title || "大灣區旅遊助手";
             document.getElementById('dashboard-hero-desc').innerText = dashboardInfo.desc || "";
@@ -763,7 +761,6 @@
 
         function renderItineraryPage() {
             const container = document.getElementById('day-details-container'); const dayData = tripDays[activeDay]; 
-            // 異步當機優化防禦線：如果讀取中還沒撈到資料，不報錯，顯示加載中
             if(!dayData) {
                 if(container) container.innerHTML = `<div class="text-center py-12 text-sm text-slate-400">雲端同步數據渲染中...</div>`;
                 return;
@@ -811,7 +808,7 @@
                                             ${idx > 0 ? `<button onclick="moveTripEvent(${idx}, -1)" class="hover:text-brand-500 transition active:scale-90"><i class="fa-solid fa-arrow-up text-[0.8rem]"></i></button>` : ''}
                                             ${idx < dayData.events.length - 1 ? `<button onclick="moveTripEvent(${idx}, 1)" class="hover:text-brand-500 transition active:scale-90"><i class="fa-solid fa-arrow-down text-[0.8rem]"></i></button>` : ''}
                                             <button onclick="editTripEvent(${idx})" class="hover:text-amber-500 transition active:scale-90"><i class="fa-solid fa-pen text-[0.8rem]"></i></button>
-                                            <button onclick="deleteTripEvent(${idx})" class="hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-trash-can text-[0.8rem]"></i></button>
+                                            <button onclick="deleteTripEvent(${idx})" class="hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-trash-can text-[0.95rem]"></i></button>
                                         </div>` : ''}
                                     </div>
                                 </div>
@@ -1155,7 +1152,7 @@
             6: { date: "7/02", title: "Day 6 (7/2 四) - 衝鋒車與情侶路精華段", city: "珠海", hotel: "拱北口岸區域酒店", events: [
                 { time: "中午/下午", icon: "camera", title: "北山大院文創區", desc: "漫步在古建築改建的文創區，極度適合車景與人像創作。" },
                 { time: "15:30 - 17:30", icon: "speed", title: "【重頭戲】景山公園衝鋒車", desc: "坐索道上山頂俯瞰海景，再坐刺激的「衝鋒車」滑道極速下山！" },
-                { time: "傍晚", icon: "landmark", title: "【補齊情侶路南段】愛情郵局燈塔", desc: "打卡網紅燈塔與夕陽海景，遠眺璀璨的港珠澳大橋。" }
+                { time: "傍晚", icon: "landmark", title: "【補齊情侶路南段】愛情郵局燈塔", desc: "打卡網網網燈塔與夕陽海景，遠眺璀璨的港珠澳大橋。" }
             ]},
             7: { date: "7/03", title: "Day 7 (7/3 五) - 極速還車 & 南山精華遊", city: "深圳", hotel: "南油區域酒店", events: [
                 { time: "06:30 - 08:15", icon: "bridge", title: "清晨出發再次跨越深中通道", desc: "清晨提早退房出發，開車經深中通道跨海殺回深圳，避開工作日早高峰。" },
@@ -1163,7 +1160,7 @@
                 { time: "10:30 - 13:30", icon: "ski", title: "世界之窗室內滑雪", desc: "還完車後直接進室內滑雪場消暑，避開週末人潮。" },
                 { time: "晚上", icon: "night", title: "海上世界夜景與精釀", desc: "前往蛇口海上世界看音樂噴泉，享受異國情調與精釀啤酒。" }
             ]},
-            8: { date: "7/04", title: "Day 8 (7/4 六) - 歎早茶與優雅返台", city: "返台", hotel: "溫慢的家", events: [
+            8: { date: "7/04", title: "Day 8 (7/4 六) - 歎早茶與優雅返台", city: "返台", hotel: "溫暖的家", events: [
                 { time: "09:00 - 10:45", icon: "food", title: "蘩樓（南山店）歎早茶", desc: "9點準時進餐廳。點上一壺普洱，吃手工現做的地道蝦餃點心。" },
                 { time: "13:00 - 13:40", icon: "ship", title: "【跨境預訂】國泰快船前往香港", desc: "由深圳蛇口搭快船直達香港國際機場海碼頭，辦理行李直掛與退稅。" },
                 { time: "15:45 - 17:40", icon: "plane", title: "【航班預訂】國泰航空 CX422 返台", desc: "由香港起飛返回台北，自駕特種兵之旅探險完美收官！" }
