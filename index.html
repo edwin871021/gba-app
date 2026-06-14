@@ -19,14 +19,41 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <script>
+        // 本機字型大小初始化
         const savedFontSize = localStorage.getItem('gba_font_size') || '16';
         document.documentElement.style.fontSize = savedFontSize + 'px';
+        
+        // 全域主題色票庫資料 (支援本機換膚)
+        const themePalettes = {
+            blue:   { 50: '#f0f7ff', 100: '#e0effe', 500: '#0070f3', 600: '#0061d5', 800: '#00449e', 900: '#0b2545', name: '經典藍' },
+            red:    { 50: '#fff5f5', 100: '#ffe3e3', 500: '#fa5252', 600: '#e03131', 800: '#c92a2a', 900: '#491111', name: '熱血紅' },
+            orange: { 50: '#fff9db', 100: '#ffe0b2', 500: '#ff922b', 600: '#f76707', 800: '#d9480f', 900: '#5c1d00', name: '活力橙' },
+            yellow: { 50: '#fef9e7', 100: '#fde9b9', 500: '#f1c40f', 600: '#d4ac0d', 800: '#9a7d0a', 900: '#423505', name: '璀璨黃' },
+            green:  { 50: '#f4fbf7', 100: '#d3f9d8', 500: '#2ec4b6', 600: '#12b886', 800: '#0b946e', 900: '#053c2e', name: '探索綠' },
+            indigo: { 50: '#f5f3ff', 100: '#e0e0fe', 500: '#6366f1', 600: '#4f46e5', 800: '#3730a3', 900: '#1e1b4b', name: '極光靛' },
+            purple: { 50: '#faf5ff', 100: '#f3e8ff', 500: '#a855f7', 600: '#9333ea', 800: '#6b21a8', 900: '#3b0764', name: '幻境紫' },
+            black:  { 50: '#f8fafc', 100: '#e2e8f0', 500: '#64748b', 600: '#475569', 800: '#1e293b', 900: '#0f172a', name: '極致黑' }
+        };
+
+        // 搶在最前端讀取並注入本機主題色，避免轉色閃爍
+        const savedTheme = localStorage.getItem('gba_theme_color') || 'blue';
+        const currentPalette = themePalettes[savedTheme] || themePalettes.blue;
+        Object.keys(currentPalette).forEach(key => {
+            if(key !== 'name') document.documentElement.style.setProperty(`--theme-${key}`, currentPalette[key]);
+        });
         
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50: '#f0f7ff', 100: '#e0effe', 500: '#0070f3', 600: '#0061d5', 800: '#00449e', 900: '#0b2545' },
+                        brand: { 
+                            50: 'var(--theme-50)', 
+                            100: 'var(--theme-100)', 
+                            500: 'var(--theme-500)', 
+                            600: 'var(--theme-600)', 
+                            800: 'var(--theme-800)', 
+                            900: 'var(--theme-900)' 
+                        },
                         amber: { 500: '#f59e0b', 600: '#d97706' }
                     }
                 }
@@ -42,7 +69,8 @@
             width: 100%; height: 100%;
             position: fixed; top: 0; bottom: 0; left: 0; right: 0;
             margin: 0; padding: 0; overflow: hidden;
-            background-color: #0b2545;
+            background-color: var(--theme-900) !important;
+            transition: background 0.3s ease;
         }
         #app-layout {
             display: flex; flex-direction: column;
@@ -53,12 +81,13 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             -webkit-text-size-adjust: none !important;
         }
-        .safe-top { height: env(safe-area-inset-top); width: 100%; background-color: #0b2545; flex-shrink: 0; }
+        .safe-top { height: env(safe-area-inset-top); width: 100%; background-color: var(--theme-900) !important; flex-shrink: 0; transition: background 0.3s ease; }
+        header { background-color: var(--theme-900) !important; transition: background 0.3s ease; }
         
         input[type=range] { -webkit-appearance: none; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
-            background: #ffffff; border: 2px solid #0070f3; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            background: #ffffff; border: 2px solid var(--theme-500); box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             margin-top: -8px; cursor: pointer;
         }
         input[type=range]::-webkit-slider-runnable-track {
@@ -76,7 +105,7 @@
     <div id="app-layout">
         <div class="safe-top"></div>
 
-        <header class="lock-text-size bg-brand-900 text-white shrink-0 shadow-md relative z-50">
+        <header class="lock-text-size text-white shrink-0 shadow-md relative z-50">
             <div class="px-4 py-3 flex items-center justify-between">
                 <div class="flex items-center space-x-2">
                     <div class="bg-brand-500 text-white p-1.5 rounded-lg flex items-center justify-center">
@@ -165,6 +194,14 @@
                         <h4 class="text-[0.8rem] font-bold text-amber-800" id="dashboard-warning-title">讀取中...</h4>
                         <p class="text-[0.8rem] text-amber-700 mt-1 leading-relaxed" id="dashboard-warning-desc">讀取中...</p>
                     </div>
+                </div>
+
+                <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 mt-4">
+                    <h3 class="text-xs font-extrabold text-slate-800 flex items-center">
+                        <i class="fa-solid fa-palette mr-1.5 text-brand-500"></i>自訂此裝置的主題風格
+                    </h3>
+                    <p class="text-[0.7rem] text-slate-500 leading-tight">提示：色彩風格僅儲存於目前的本機手機，不會影響其他人的裝置畫面。</p>
+                    <div class="grid grid-cols-4 gap-2 pt-1" id="theme-picker-container"></div>
                 </div>
 
                 <div class="admin-only bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 mt-4">
@@ -471,6 +508,7 @@
         let isAdmin = false; let activeDay = 1; let editEventIndex = -1;
         let tripDays = {}; let guideData = []; let userExpenses = []; let packingItems = []; let activeGuideTab = ""; let tripWarning = {};
         let budgetMembers = ['我', '伴侶'];
+        let deviceTheme = localStorage.getItem('gba_theme_color') || 'blue'; // 初始化本機主題變數
         
         const defaultDashboardInfo = { 
             title: "大灣區旅遊助手", 
@@ -479,15 +517,11 @@
         };
         let dashboardInfo = {};
 
-        // 終極防忘機制：把對齊管道直接指向你在後台設定的真實密碼 871021！
         function toggleAdminAuth() {
             if (!isAdmin) {
                 const pin = prompt("請輸入您的 4 位數解鎖代碼：");
                 if (pin === null) return;
-                
-                // 這裡可以使用最簡單的 2026 或 0323 
                 if (pin === "1021" || pin === "0708") { 
-                    // 程式碼在背景完美使用你設定的 871021 去敲 Firebase 雲端的大門！
                     firebase.auth().signInWithEmailAndPassword("a@a.com", "871021")
                         .catch((err) => { showToast("Firebase 連線失敗，請確認後台已被啟用且密碼無誤", true); console.error(err); });
                 } else {
@@ -498,7 +532,6 @@
             }
         }
 
-        // Firebase 自動無感續登狀態監聽器
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 isAdmin = true;
@@ -519,11 +552,47 @@
             }
         });
 
+        // 獨立本機換膚：渲染編輯模式下的色彩按鈕
+        function renderThemePicker() {
+            const container = document.getElementById('theme-picker-container');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            Object.keys(themePalettes).forEach(key => {
+                const p = themePalettes[key];
+                const btn = document.createElement('button');
+                btn.onclick = () => changeDeviceTheme(key);
+                const isCurrent = (deviceTheme === key);
+                btn.className = `flex flex-col items-center justify-center p-2 rounded-xl border text-center transition active:scale-95 ${isCurrent ? 'border-slate-800 bg-slate-100 font-bold shadow-sm' : 'border-slate-200 bg-slate-50'}`;
+                btn.innerHTML = `
+                    <span class="w-5 h-5 rounded-full block shadow-sm mb-1" style="background-color: ${p['500']}"></span>
+                    <span class="text-[11px] text-slate-700">${p.name}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        // 獨立本機換膚：執行本地裝置色彩切換
+        function changeDeviceTheme(themeKey) {
+            deviceTheme = themeKey;
+            localStorage.setItem('gba_theme_color', themeKey);
+            
+            const palette = themePalettes[themeKey];
+            const root = document.documentElement;
+            Object.keys(palette).forEach(key => {
+                if(key !== 'name') root.style.setProperty(`--theme-${key}`, palette[key]);
+            });
+            
+            renderThemePicker();
+            showToast(`本地裝置色彩已切換為：${themePalettes[themeKey].name}`);
+        }
+
         function applyAdminUI(show) {
             document.querySelectorAll('.admin-only').forEach(el => { el.style.display = show ? 'block' : 'none'; });
             cancelEditTripEvent();
             clearGuideInputs();
             renderItineraryPage(); renderGuidesPage();
+            if (show) renderThemePicker(); // 解鎖後載入色盤選單
         }
 
         function loadLocalPackingList() {
@@ -554,6 +623,7 @@
                         dashboardInfo = JSON.parse(JSON.stringify(cloud.dashboardInfo || defaultDashboardInfo));
                         document.getElementById('sync-status').innerText = "☁️ Firebase 已同步";
                         initAppRender();
+                        if (isAdmin) renderThemePicker();
                     } else {
                         tripDays = JSON.parse(JSON.stringify(defaultTripDays)); 
                         guideData = JSON.parse(JSON.stringify(defaultGuides)); 
@@ -741,7 +811,7 @@
                 if(d.events && d.events.length > 0) {
                     d.events.forEach(evt => {
                         md += `- **${evt.time}** | ${evt.isTask ? '⭐ ' : ''}${evt.title}\n`;
-                        if(evt.desc) md += `  > ${evt.desc.replace(/\n/g, '\n  > ')}\n`;
+                        if(evt.desc) md += `   > ${evt.desc.replace(/\n/g, '\n   > ')}\n`;
                     });
                 } else { md += `- 尚無排定細節\n`; }
                 md += `\n`;
@@ -1139,7 +1209,7 @@
             ]},
             4: { date: "6/30", title: "Day 4 (6/30 二) - 深圳無車精華遊", city: "深圳", hotel: "車公廟區域酒店", events: [
                 { time: "10:00 - 14:00", icon: "shopping", title: "第一站：星河COCO Park", desc: "早上睡到飽，搭地鐵直達購物公園站，挑一家排隊名店享用午餐。" },
-                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "朝聖開源硬體極客天堂，並拍攝經典電子街景。" },
+                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "朝盛開源硬體極客天堂，並拍攝經典電子街景。" },
                 { time: "18:00 - 21:30", icon: "night", title: "第三站：東門老街", desc: "捕捉賽博朋克感的不夜城街頭大片。" }
             ]},
             5: { date: "7/01", title: "Day 5 (7/1 三) - 取車上橋 & 玩進珠海", city: "珠海", hotel: "拱北口岸區域酒店", events: [
