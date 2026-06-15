@@ -447,6 +447,115 @@
     </div>
 
     <script>
+        // ==========================================
+        // 1. Firebase 初始化配置
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIFGsVxsisfseqQMtrE3BJQMW9EE6D65o",
+            authDomain: "gba-road-sync.firebaseapp.com",
+            projectId: "gba-road-sync",
+            storageBucket: "gba-road-sync.firebasestorage.app",
+            messagingSenderId: "505744854359",
+            appId: "1:505744854359:web:d084429073a06693268212"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let isAdmin = false; let activeDay = 1; let editEventIndex = -1;
+        let tripDays = {}; let guideData = []; let userExpenses = []; let packingItems = []; let activeGuideTab = ""; let tripWarning = {};
+        let budgetMembers = ['我', '伴侶'];
+        let deviceTheme = localStorage.getItem('gba_theme_color') || 'blue';
+        let dashboardInfo = {};
+
+        // ==========================================
+        // 2. 預設資料宣告 (解決 Hoisting 問題，確保於載入前備妥)
+        // ==========================================
+        const defaultDashboardInfo = { 
+            title: "大灣區旅遊助手", 
+            desc: "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！",
+            days: "8 天", cities: "4 城", transport: "自駕/高鐵"
+        };
+
+        const defaultTripWarning = { 
+            title: "深中通道與深圳還車防坑必看！", 
+            desc: "您於 Day 7 (7/3 週五) 清晨需從珠海經深中通道趕回深圳還車。請務必嚴格控時，行程已為您精準規劃於 06:30 提早出發，避開工作日最可怕的早高峰塞車與潛在外地車牌限行，趕在 09:00 前至南油店優雅結算還車！" 
+        };
+
+        const defaultTripDays = {
+            1: { date: "6/27", title: "Day 1 (6/27 六) - 抵達廣州 & 搶辦門號", city: "廣州", hotel: "珠江新城區域酒店", events: [
+                { time: "10:50 - 13:00", icon: "plane", title: "【航班預訂】國泰航空 CX489 赴港", desc: "台北 (TPE) ➔ 香港 (HKG) 航班起飛。預訂參考編號：FQXYIW。" },
+                { time: "15:00 - 17:15", icon: "ship", title: "【船班預訂】國泰快船 CX9879 轉廣州", desc: "香港機場海碼頭搭乘快船直奔廣州琶洲港 (PFT)。免入境香港，行李直掛。" },
+                { time: "18:30 - 19:40", icon: "sim", title: "【核心任務】辦理實名制門號", desc: "下船後提行李直奔天河區中國移動直營營業廳，持台胞證辦理實名制內地手機號（選低月租保號套餐，確認開通漫遊以在台接收網銀交易與簡訊簡報）。", isTask: true },
+                { time: "晚上", icon: "night", title: "珠江新城 Check-in & 珠江夜景", desc: "前往珠江新城酒店放行李。隨後漫步花城廣場 ➔ 海心沙 ➔ 遠眺廣州塔（小蠻腰），欣賞頂級 CBD 夜景燈光秀並享用晚餐。" }
+            ]},
+            2: { date: "6/28", title: "Day 2 (6/28 日) - 嶺南歷史文化與街拍", city: "廣州", hotel: "珠江新城區域酒店", events: [
+                { time: "上午", icon: "camera", title: "沙面島街拍", desc: "漫步歐式巴洛克與新古典主義建築群，早晨陽光柔和，極適合街拍建築光影與人像寫真。" },
+                { time: "中午", icon: "food", title: "上下九步行街", desc: "享用老廣地道小吃（西關腸粉、雙皮奶、竹升麵）。" },
+                { time: "下午", icon: "landmark", title: "永慶坊", desc: "嶺南騎樓與現代設計碰撞的網紅歷史文創街區，可拍攝極具故事感的人文照片。" },
+                { time: "晚上", icon: "temple", title: "北京路步行街 & 大佛寺點燈", desc: "晚餐後必拍！夜晚亮燈後神似《神隱少女》魔幻湯屋的視覺大片，璀璨迷人。" }
+            ]},
+            3: { date: "6/29", title: "Day 3 (6/29 一) - 極速開戶換證 & 奔深圳", city: "深圳", hotel: "車公廟區域酒店", events: [
+                { time: "09:00 - 11:30", icon: "bank", title: "【核心任務】富邦華一廣州分行開戶", desc: "持台胞證、台灣身份證及第一天辦好的實名門號開戶，現場綁定微信/支付寶。", isTask: true },
+                { time: "13:30 - 15:30", icon: "license", title: "【核心任務】換領臨時駕照", desc: "前往岑村車管總所。免體檢新制！提交台胞證正本、台灣駕照正本與 2 張一吋白底照片，窗口收件現場核對，繳費 10 元人民幣當場換取紙本臨時入境駕駛許可。", isTask: true },
+                { time: "傍晚", icon: "train", title: "搭乘高鐵前往深圳", desc: "回酒店提行李前往高鐵站，搭乘高鐵前往深圳（抵達福田站或深圳北站），直接前往車公廟飯店放行李。" },
+                { time: "20:00 之後", icon: "night", title: "【減壓首選】水圍夜市單攻", desc: "搭地鐵/打車前往福田區水圍夜市（水圍文化村）。這晚節奏放慢，專心享受美食（炭烤生蠔、潮汕砂鍋粥或椰子雞），吃飽立刻回飯店休息。" }
+            ]},
+            4: { date: "6/30", title: "Day 4 (6/30 二) - 深圳無車精華遊", city: "深圳", hotel: "車公廟區域酒店", events: [
+                { time: "10:00 - 14:00", icon: "shopping", title: "第一站：星河COCO Park", desc: "早上睡到飽，搭地鐵 1 號線直達「購物公園站」。在開放式商場逛街、喝杯網紅手搖飲，中午挑一家排隊名店享用午餐。" },
+                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "搭 1 號線直達「華強路站/華強北站」。趁 18:00 電子批發市場收攤前，朝聖開源硬體極客天堂，並拍攝經典街景。" },
+                { time: "18:00 - 21:30", icon: "night", title: "第三站：東門老街", desc: "搭 1 號線直達「老街站」。在東門町美食街邊走邊吃解決晚餐，用相機捕捉賽博朋克感的不夜城街頭大片。" },
+                { time: "22:00 之後", icon: "landmark", title: "【終極備選】深圳灣公園", desc: "若逛完東門體力依然充沛可前往。深夜少了大白天的酷熱，漫步海濱棧道，遠眺對岸香港元朗的燈火與跨海大橋夜景。" }
+            ]},
+            5: { date: "7/01", title: "Day 5 (7/1 三) - 取車上橋 & 玩進珠海", city: "珠海", hotel: "拱北口岸區域酒店", events: [
+                { time: "09:00", icon: "car", title: "【核心任務】一嗨準時取車", desc: "前往【福田區規劃大廈停車場店】辦理取車手續，行李上車。", isTask: true },
+                { time: "09:30 - 11:30", icon: "bridge", title: "【解鎖自駕高光】跨越深中通道", desc: "開車走全新通車的「深中通道」跨海大橋橫跨伶仃洋，體驗極致寬廣的跨海視野（全程高德地圖導航測速與路況提醒）。" },
+                { time: "11:30 - 13:30", icon: "landmark", title: "第一站：唐家灣古鎮", desc: "一下大橋剛好順路抵達唐家灣。把車停好，漫步古近代名人故居老街，並在古鎮裡享用粵式午餐。" },
+                { time: "13:45 - 15:45", icon: "kart", title: "第二站：珠海國際卡丁車場", desc: "開車幾分鐘就到隔壁，在國際標準賽道上開高規格卡丁車，貼地狂飆！" },
+                { time: "16:00 之後", icon: "camera", title: "【解鎖情侶路】野狸島 & 日月貝", desc: "順著海濱的情侶路往南開，沿途經過海天公園。車可直接開進野狸島停，黃昏亮燈時拍白色大貝殼歌劇院剪影極美。" },
+                { time: "晚上", icon: "night", title: "入住拱北口岸 & 夏灣夜市", desc: "前往拱北口岸酒店 Check-in。接著開車前往夏灣夜市（約 5-8 分鐘），觀看 21:45 攤車集體衝鋒，大啖烤生蠔與大排檔美食。" }
+            ]},
+            6: { date: "7/02", title: "Day 6 (7/2 四) - 衝鋒車與情侶路精華段", city: "珠海", hotel: "拱北口岸區域酒店", events: [
+                { time: "上午", icon: "temple", title: "圓明新園", desc: "按北京圓明園部分景觀 1:1 仿建，車程僅 10 分鐘，輕鬆走逛皇家園林景致。" },
+                { time: "中午/下午", icon: "camera", title: "北山大院文創區", desc: "漫步在古建築改建的文創區，找家設計感咖啡廳享受午後黑膠時光，極度適合車景與人像創作。" },
+                { time: "15:30 - 17:30", icon: "speed", title: "【重頭戲】景山公園索道與衝鋒車", desc: "開車前往情侶中路的城市陽台，對面就是景山公園。坐索道上山頂俯瞰無敵海景，再坐刺激的「衝鋒車」滑道極速下山！" },
+                { time: "傍晚", icon: "landmark", title: "【補齊情侶路南段】愛情郵局燈塔", desc: "出公園後直接順路攻略：城市陽台 ➔ 香爐灣沙灘 ➔ 珠海漁女 ➔ 愛情郵局（打卡網網紅燈塔與夕陽海景），遠眺港珠澳大橋。" },
+                { time: "晚上", icon: "shopping", title: "富華里商圈晚餐", desc: "前往富華里開放式商業街區享用晚餐，體驗珠海時尚街區夜生活。" }
+            ]},
+            7: { date: "7/03", title: "Day 7 (7/3 五) - 極速還車 & 南山精華遊", city: "深圳", hotel: "南油區域酒店", events: [
+                { time: "06:30 - 08:15", icon: "bridge", title: "清晨出發再次跨越深中通道", desc: "清晨提早從拱北飯店退房出發，開車經深中通道跨海殺回深圳，避開工作日恐怖的早高峰。" },
+                { time: "08:15 - 08:35", icon: "hotel", title: "先放行李至南油飯店", desc: "開車直奔南油飯店門口臨時停靠，先把兩人的大行李箱拉去大廳辦理免費寄放，迅速卸下負重。" },
+                { time: "08:35 - 08:50", icon: "car", title: "【核心任務】5分鐘極速還車", desc: "一身輕鬆後，立刻開車前往「一嗨租車－深圳南油店」辦理還車，趕在 09:00 前結算，完美結束 48 小時自駕！", isTask: true },
+                { time: "10:30 - 13:30", icon: "ski", title: "世界之窗室內滑雪", desc: "還完車後直接進室內滑雪場消暑，避開週末大批人潮。" },
+                { time: "14:00 - 16:00", icon: "shopping", title: "深圳萬象天地", desc: "搭地鐵/打車前往隔壁萬象天地。打卡抱樓大象地標，吹冷氣逛街，看各大頂級潮牌與汽車品牌的旗艦展廳。" },
+                { time: "16:30 - 18:30", icon: "landmark", title: "南頭古城", desc: "打車幾分鐘就到，黃昏陽光柔和時，漫步在 1700 多年歷史與現代設計感碰撞的古城文創街區，光影極佳。" },
+                { time: "晚上", icon: "night", title: "海上世界夜景與精釀", desc: "回南油飯店辦理進房。隨後前往蛇口海上世界。看著退役明華輪核心商圈的音樂噴泉，享受悠閒的國際化異國情調與精釀啤酒。" }
+            ]},
+            8: { date: "7/04", title: "Day 8 (7/4 六) - 歎早茶與優雅返台", city: "返台", hotel: "溫暖的家", events: [
+                { time: "09:00 - 10:45", icon: "food", title: "蘩樓（南山店）歎早茶", desc: "飯店退房後提著行李，9點準時進餐廳（南油附近老字號、手工現做的「蘩樓」）。點上一壺普洱，吃上手工現做的地道蝦餃點心，優雅收尾。" },
+                { time: "11:00 - 11:20", icon: "car", title: "計程車直奔郵輪中心", desc: "吃飽後直接在餐廳門口打車，載著行李直奔蛇口郵輪中心（ZYK），車程 10～15 分鐘，於 11:30 前優雅抵達。" },
+                { time: "13:00 - 13:40", icon: "ship", title: "【跨境預訂】國泰快船 前往香港", desc: "由深圳蛇口搭快船直達香港國際機場海碼頭，辦理行李直掛與退稅，免入境香港快捷省時。" },
+                { time: "15:45 - 17:40", icon: "plane", title: "【航班預訂】國泰航空 CX422 返台", desc: "由香港國際機場起飛返回台北，大灣區特種兵自駕之旅探險探險完美收官！" }
+            ]}
+        };
+
+        const defaultGuides = [
+            { id: "mobile", title: "辦電話卡", desc: "門號是內地電子支付與開戶根基。必須在 Day 1 琶洲港上岸後立刻辦理。", s1: "1. 指名「直營大營業廳」：加盟店無系統權限處理台胞證實名。推薦去天河區「體育西大廳」。", s2: "2. 告知需開通港澳台漫遊：回台後需要接收網銀驗證碼簡訊，確認功能有開啟。" },
+            { id: "fubon", title: "富邦開戶", desc: "台資背景銀行，對於台灣同胞開戶友善、材料最簡便。主要用於綁定微信與支付寶。", s1: "🔑 必備材料：台胞證、台灣駕駛證、台灣身分證、剛辦好已實名的大陸門號、下榻酒店地址預訂單。", s2: "" },
+            { id: "license", title: "免檢臨駕", desc: "臨時駕駛證新制：持台灣駕照申辦臨時駕駛證「完全不需要體檢」！", s1: "1. 材料簡單：準備台胞證正本、台灣駕照正本、一吋白底彩色證件照 2 張即可。", s2: "2. 窗口發照：到場直接窗口交件核對，工本費 10 元人民幣，當場領取紙本臨時駕照！" },
+            { id: "traffic", title: "自駕守則", desc: "在廣東開車，有幾個與台灣不同的重罰規則，請務必牢記：", s1: "珠海禮讓行人極嚴：斑馬線上只要有行人必須完全煞停，否則直接被拍照重罰並扣分。", s2: "深中通道區間測速：橋樑限速 100，海底隧道限速 80。請務必使用高德地圖導航。" }
+        ];
+
+        const defaultPackingItems = [
+            { name: "台胞證 (確認在有效期內)", checked: false, group: "docs" }, { name: "護照", checked: false, group: "docs" }, { name: "台灣駕照正本 (辦理臨駕必備)", checked: false, group: "docs" }, { name: "台灣身分證正本 (銀行開戶必備)", checked: false, group: "docs" }, { name: "白底一吋證件彩色大頭照 * 2張 (駕照用)", checked: false, group: "docs" },
+            { name: "手機", checked: false, group: "tech" }, { name: "SIM卡", checked: false, group: "tech" }, { name: "充電組 (含行動電源、萬國充、充電線)", checked: false, group: "tech" }, { name: "相機 (包含記憶卡、相機電池、腳架)", checked: false, group: "tech" }, { name: "自拍棒", checked: false, group: "tech" },
+            { name: "錢包 (內裝信用卡、人民幣現鈔)", checked: false, group: "daily" }, { name: "鑰匙", checked: false, group: "daily" }, { name: "水瓶", checked: false, group: "daily" }, { name: "雨傘 / 兩傘 (遮陽擋雨必備)", checked: false, group: "daily" },
+            { name: "衣服、褲子、內庫、襪子 (日常衣服套數)", checked: false, group: "clothes" }, { name: "薄外套 (防冷氣 / 滑雪防寒內搭)", checked: false, group: "clothes" }, { name: "帽子", checked: false, group: "clothes" }, { name: "太陽眼鏡", checked: false, group: "clothes" }, { name: "口罩", checked: false, group: "clothes" },
+            { name: "衛生紙、濕巾", checked: false, group: "hygiene" }, { name: "酒精", checked: false, group: "hygiene" }, { name: "刮鬍刀", checked: false, group: "hygiene" }, { name: "藥品組 (感冒、防暈、常備藥)", checked: false, group: "hygiene" }, { name: "耳塞", checked: false, group: "hygiene" }, { name: "眼罩", checked: false, group: "hygiene" }, { name: "頸枕", checked: false, group: "hygiene" }
+        ];
+
+        // ==========================================
+        // 3. 安全與輔助函數
+        // ==========================================
         // 安全防護：將使用者輸入的文字進行 HTML 轉義，防止腳本攻擊 (XSS)
         function escapeHTML(str) {
             if (!str) return '';
@@ -467,14 +576,9 @@
             popup.classList.toggle('hidden');
         }
 
-        document.addEventListener('click', function(e) {
-            const popup = document.getElementById('font-slider-popup');
-            const btn = document.getElementById('btn-font-toggle');
-            if (popup && !popup.classList.contains('hidden') && !popup.contains(e.target) && !btn.contains(e.target)) {
-                popup.classList.add('hidden');
-            }
-        });
-
+        // ==========================================
+        // 4. 事件監聽與行動端適配
+        // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
             const slider = document.getElementById('font-size-slider');
             if (slider) {
@@ -484,6 +588,7 @@
                     localStorage.setItem('gba_font_size', this.value);
                 });
             }
+            loadCloudData(); // 確保常數宣告完畢後才執行
         });
 
         document.addEventListener('touchstart', function (event) { if (event.touches.length > 1) event.preventDefault(); }, { passive: false });
@@ -495,6 +600,7 @@
         }, { passive: false });
         document.addEventListener('gesturestart', function (event) { event.preventDefault(); });
 
+        // 優化版：自動隱藏底部導航列 (避免輸入法推擠版面)
         document.addEventListener('focusin', function(e) {
             if(['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
                 document.getElementById('bottom-nav').style.display = 'none';
@@ -508,31 +614,9 @@
             }
         });
 
-        // Firebase 初始化配置
-        const firebaseConfig = {
-            apiKey: "AIzaSyBIFGsVxsisfseqQMtrE3BJQMW9EE6D65o",
-            authDomain: "gba-road-sync.firebaseapp.com",
-            projectId: "gba-road-sync",
-            storageBucket: "gba-road-sync.firebasestorage.app",
-            messagingSenderId: "505744854359",
-            appId: "1:505744854359:web:d084429073a06693268212"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        let isAdmin = false; let activeDay = 1; let editEventIndex = -1;
-        let tripDays = {}; let guideData = []; let userExpenses = []; let packingItems = []; let activeGuideTab = ""; let tripWarning = {};
-        let budgetMembers = ['我', '伴侶'];
-        let deviceTheme = localStorage.getItem('gba_theme_color') || 'blue';
-        
-        const defaultDashboardInfo = { 
-            title: "大灣區旅遊助手", 
-            desc: "免體檢快速申辦臨時駕照、直奔珠海唐家灣與拱北口岸、自駕跨越深中通道、最後於深圳南山區還車入住！",
-            days: "8 天", cities: "4 城", transport: "自駕/高鐵"
-        };
-        let dashboardInfo = {};
-
-        // 核心修改：動態拼接帳密防護法
+        // ==========================================
+        // 5. 核心邏輯與 UI 渲染函數
+        // ==========================================
         function toggleAdminAuth() {
             if (!isAdmin) {
                 const pin = prompt("請輸入您的 4 位數解鎖代碼：");
@@ -1102,7 +1186,7 @@
             Object.keys(groups).forEach(k => { if(groups[k]) groups[k].innerHTML = ''; }); let checkedCount = 0;
             packingItems.forEach((item, index) => {
                 if (item.checked) checkedCount++; const div = document.createElement('div'); div.className = `flex items-center justify-between p-2 rounded-lg border ${item.checked ? 'bg-indigo-50/40 text-slate-400 line-through' : 'bg-slate-50'}`;
-                // XSS 防護：在渲染使用者自訂的行李名稱時，使用 escapeHTML
+                // XSS 防護
                 div.innerHTML = `<label class="flex items-center space-x-3 cursor-pointer flex-1"><input type="checkbox" onchange="togglePackingItem(${index}, this)" ${item.checked ? 'checked' : ''} class="w-4 h-4 text-brand-500"><span class="text-[0.85rem] font-semibold">${escapeHTML(item.name)}</span></label><button onclick="deletePackingItem(${index})" class="text-slate-300 hover:text-red-500 text-[0.85rem] transition active:scale-90"><i class="fa-solid fa-trash"></i></button>`;
                 if(groups[item.group]) groups[item.group].appendChild(div);
             });
@@ -1200,7 +1284,7 @@
                 else {
                     userExpenses.forEach((item, index) => {
                         const div = document.createElement('div'); div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl bg-slate-50`;
-                        // XSS 防護：將所有使用者輸入的字串用 escapeHTML 處理
+                        // XSS 防護
                         div.innerHTML = `
                             <div class="flex items-center space-x-3 text-[0.85rem] flex-1 min-w-0">
                                 <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 bg-indigo-100 text-indigo-600"><i class="fa-solid fa-receipt text-[0.7rem]"></i></div>
@@ -1246,80 +1330,6 @@
                 });
             }
         }
-
-        const defaultTripWarning = { title: "深中通道與深圳還車防坑必看！", desc: "您於 Day 7 (7/3 週五) 清晨需從珠海經深中通道趕回深圳還車。請務必嚴格控時，行程已為您精準規劃於 06:30 提早出發，避開工作日最可怕的早高峰塞車與潛在外地車牌限行，趕在 09:00 前至南油店優雅結算還車！" };
-        const defaultTripDays = {
-            1: { date: "6/27", title: "Day 1 (6/27 六) - 抵達廣州 & 搶辦門號", city: "廣州", hotel: "珠江新城區域酒店", events: [
-                { time: "10:50 - 13:00", icon: "plane", title: "【航班預訂】國泰航空 CX489 赴港", desc: "台北 (TPE) ➔ 香港 (HKG) 航班起飛。預訂參考編號：FQXYIW。" },
-                { time: "15:00 - 17:15", icon: "ship", title: "【船班預訂】國泰快船 CX9879 轉廣州", desc: "香港機場海碼頭搭乘快船直奔廣州琶洲港 (PFT)。免入境香港，行李直掛。" },
-                { time: "18:30 - 19:40", icon: "sim", title: "【核心任務】辦理實名制門號", desc: "下船後提行李直奔天河區中國移動直營營業廳，持台胞證辦理實名制內地手機號（選低月租保號套餐，確認開通漫遊以在台接收網銀交易與簡訊簡報）。", isTask: true },
-                { time: "晚上", icon: "night", title: "珠江新城 Check-in & 珠江夜景", desc: "前往珠江新城酒店放行李。隨後漫步花城廣場 ➔ 海心沙 ➔ 遠眺廣州塔（小蠻腰），欣賞頂級 CBD 夜景燈光秀並享用晚餐。" }
-            ]},
-            2: { date: "6/28", title: "Day 2 (6/28 日) - 嶺南歷史文化與街拍", city: "廣州", hotel: "珠江新城區域酒店", events: [
-                { time: "上午", icon: "camera", title: "沙面島街拍", desc: "漫步歐式巴洛克與新古典主義建築群，早晨陽光柔和，極適合街拍建築光影與人像寫真。" },
-                { time: "中午", icon: "food", title: "上下九步行街", desc: "享用老廣地道小吃（西關腸粉、雙皮奶、竹升麵）。" },
-                { time: "下午", icon: "landmark", title: "永慶坊", desc: "嶺南騎樓與現代設計碰撞的網紅歷史文創街區，可拍攝極具故事感的人文照片。" },
-                { time: "晚上", icon: "temple", title: "北京路步行街 & 大佛寺點燈", desc: "晚餐後必拍！夜晚亮燈後神似《神隱少女》魔幻湯屋的視覺大片，璀璨迷人。" }
-            ]},
-            3: { date: "6/29", title: "Day 3 (6/29 一) - 極速開戶換證 & 奔深圳", city: "深圳", hotel: "車公廟區域酒店", events: [
-                { time: "09:00 - 11:30", icon: "bank", title: "【核心任務】富邦華一廣州分行開戶", desc: "持台胞證、台灣身份證及第一天辦好的實名門號開戶，現場綁定微信/支付寶。", isTask: true },
-                { time: "13:30 - 15:30", icon: "license", title: "【核心任務】換領臨時駕照", desc: "前往岑村車管總所。免體檢新制！提交台胞證正本、台灣駕照正本與 2 張一吋白底照片，窗口收件現場核對，繳費 10 元人民幣當場換取紙本臨時入境駕駛許可。", isTask: true },
-                { time: "傍晚", icon: "train", title: "搭乘高鐵前往深圳", desc: "回酒店提行李前往高鐵站，搭乘高鐵前往深圳（抵達福田站或深圳北站），直接前往車公廟飯店放行李。" },
-                { time: "20:00 之後", icon: "night", title: "【減壓首選】水圍夜市單攻", desc: "搭地鐵/打車前往福田區水圍夜市（水圍文化村）。這晚節奏放慢，專心享受美食（炭烤生蠔、潮汕砂鍋粥或椰子雞），吃飽立刻回飯店休息。" }
-            ]},
-            4: { date: "6/30", title: "Day 4 (6/30 二) - 深圳無車精華遊", city: "深圳", hotel: "車公廟區域酒店", events: [
-                { time: "10:00 - 14:00", icon: "shopping", title: "第一站：星河COCO Park", desc: "早上睡到飽，搭地鐵 1 號線直達「購物公園站」。在開放式商場逛街、喝杯網紅手搖飲，中午挑一家排隊名店享用午餐。" },
-                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "搭 1 號線直達「華強路站/華強北站」。趁 18:00 電子批發市場收攤前，朝盛開源硬體極客天堂，並拍攝經典街景。" },
-                { time: "18:00 - 21:30", icon: "night", title: "第三站：東門老街", desc: "搭 1 號線直達「老街站」。在東門町美食街邊走邊吃解決晚餐，用相機捕捉賽博朋克感的不夜城街頭大片。" },
-                { time: "22:00 之後", icon: "landmark", title: "【終極備選】深圳灣公園", desc: "若逛完東門體力依然充沛可前往。深夜少了大白天的酷熱，漫步海濱棧道，遠眺對岸香港元朗的燈火與跨海大橋夜景。" }
-            ]},
-            5: { date: "7/01", title: "Day 5 (7/1 三) - 取車上橋 & 玩進珠海", city: "珠海", hotel: "拱北口岸區域酒店", events: [
-                { time: "09:00", icon: "car", title: "【核心任務】一嗨準時取車", desc: "前往【福田區規劃大廈停車場店】辦理取車手續，行李上車。", isTask: true },
-                { time: "09:30 - 11:30", icon: "bridge", title: "【解鎖自駕高光】跨越深中通道", desc: "開車走全新通車的「深中通道」跨海大橋橫跨伶仃洋，體驗極致寬廣的跨海視野（全程高德地圖導航測速與路況提醒）。" },
-                { time: "11:30 - 13:30", icon: "landmark", title: "第一站：唐家灣古鎮", desc: "一下大橋剛好順路抵達唐家灣。把車停好，漫步古近代名人故居老街，並在古鎮裡享用粵式午餐。" },
-                { time: "13:45 - 15:45", icon: "kart", title: "第二站：珠海國際卡丁車場", desc: "開車幾分鐘就到隔壁，在國際標準賽道上開高規格卡丁車，貼地狂飆！" },
-                { time: "16:00 之後", icon: "camera", title: "【解鎖情侶路】野狸島 & 日月貝", desc: "順著海濱的情侶路往南開，沿途經過海天公園。車可直接開進野狸島停，黃昏亮燈時拍白色大貝殼歌劇院剪影極美。" },
-                { time: "晚上", icon: "night", title: "入住拱北口岸 & 夏灣夜市", desc: "前往拱北口岸酒店 Check-in。接著開車前往夏灣夜市（約 5-8 分鐘），觀看 21:45 攤車集體衝鋒，大啖烤生蠔與大排檔美食。" }
-            ]},
-            6: { date: "7/02", title: "Day 6 (7/2 四) - 衝鋒車與情侶路精華段", city: "珠海", hotel: "拱北口岸區域酒店", events: [
-                { time: "上午", icon: "temple", title: "圓明新園", desc: "按北京圓明園部分景觀 1:1 仿建，車程僅 10 分鐘，輕鬆走逛皇家園林景致。" },
-                { time: "中午/下午", icon: "camera", title: "北山大院文創區", desc: "漫步在古建築改建的文創區，找家設計感咖啡廳享受午後黑膠時光，極度適合車景與人像創作。" },
-                { time: "15:30 - 17:30", icon: "speed", title: "【重頭戲】景山公園索道與衝鋒車", desc: "開車前往情侶中路的城市陽台，對面就是景山公園。坐索道上山頂俯瞰無敵海景，再坐刺激的「衝鋒車」滑道極速下山！" },
-                { time: "傍晚", icon: "landmark", title: "【補齊情侶路南段】愛情郵局燈塔", desc: "出公園後直接順路攻略：城市陽台 ➔ 香爐灣沙灘 ➔ 珠海漁女 ➔ 愛情郵局（打卡網網紅燈塔與夕陽海景），遠眺港珠澳大橋。" },
-                { time: "晚上", icon: "shopping", title: "富華里商圈晚餐", desc: "前往富華里開放式商業街區享用晚餐，體驗珠海時尚街區夜生活。" }
-            ]},
-            7: { date: "7/03", title: "Day 7 (7/3 五) - 極速還車 & 南山精華遊", city: "深圳", hotel: "南油區域酒店", events: [
-                { time: "06:30 - 08:15", icon: "bridge", title: "清晨出發再次跨越深中通道", desc: "清晨提早從拱北飯店退房出發，開車經深中通道跨海殺回深圳，避開工作日恐怖的早高峰。" },
-                { time: "08:15 - 08:35", icon: "hotel", title: "先放行李至南油飯店", desc: "開車直奔南油飯店門口臨時停靠，先把兩人的大行李箱拉去大廳辦理免費寄放，迅速卸下負重。" },
-                { time: "08:35 - 08:50", icon: "car", title: "【核心任務】5分鐘極速還車", desc: "一身輕鬆後，立刻開車前往「一嗨租車－深圳南油店」辦理還車，趕在 09:00 前結算，完美結束 48 小時自駕！", isTask: true },
-                { time: "10:30 - 13:30", icon: "ski", title: "世界之窗室內滑雪", desc: "還完車後直接進室內滑雪場消暑，避開週末大批人潮。" },
-                { time: "14:00 - 16:00", icon: "shopping", title: "深圳萬象天地", desc: "搭地鐵/打車前往隔壁萬象天地。打卡抱樓大象地標，吹冷氣逛街，看各大頂級潮牌與汽車品牌的旗艦展廳。" },
-                { time: "16:30 - 18:30", icon: "landmark", title: "南頭古城", desc: "打車幾分鐘就到，黃昏陽光柔和時，漫步在 1700 多年歷史與現代設計感碰撞的古城文創街區，光影極佳。" },
-                { time: "晚上", icon: "night", title: "海上世界夜景與精釀", desc: "回南油飯店辦理進房。隨後前往蛇口海上世界。看著退役明華輪核心商圈的音樂噴泉，享受悠閒的國際化異國情調與精釀啤酒。" }
-            ]},
-            8: { date: "7/04", title: "Day 8 (7/4 六) - 歎早茶與優雅返台", city: "返台", hotel: "溫暖的家", events: [
-                { time: "09:00 - 10:45", icon: "food", title: "蘩樓（南山店）歎早茶", desc: "飯店退房後提著行李，9點準時進餐廳（南油附近老字號、手工現做的「蘩樓」）。點上一壺普洱，吃上手工現做的地道蝦餃點心，優雅收尾。" },
-                { time: "11:00 - 11:20", icon: "car", title: "計程車直奔郵輪中心", desc: "吃飽後直接在餐廳門口打車，載著行李直奔蛇口郵輪中心（ZYK），車程 10～15 分鐘，於 11:30 前優雅抵達。" },
-                { time: "13:00 - 13:40", icon: "ship", title: "【跨境預訂】國泰快船 前往香港", desc: "由深圳蛇口搭快船直達香港國際機場海碼頭，辦理行李直掛與退稅，免入境香港快捷省時。" },
-                { time: "15:45 - 17:40", icon: "plane", title: "【航班預訂】國泰航空 CX422 返台", desc: "由香港國際機場起飛返回台北，大灣區特種兵自駕之旅探險探險完美收官！" }
-            ]}
-        };
-
-        const defaultGuides = [
-            { id: "mobile", title: "辦電話卡", desc: "門號是內地電子支付與開戶根基。必須在 Day 1 琶洲港上岸後立刻辦理。", s1: "1. 指名「直營大營業廳」：加盟店無系統權限處理台胞證實名。推薦去天河區「體育西大廳」。", s2: "2. 告知需開通港澳台漫遊：回台後需要接收網銀驗證碼簡訊，確認功能有開啟。" },
-            { id: "fubon", title: "富邦開戶", desc: "台資背景銀行，對於台灣同胞開戶友善、材料最簡便。主要用於綁定微信與支付寶。", s1: "🔑 必備材料：台胞證、台灣駕駛證、台灣身分證、剛辦好已實名的大陸門號、下榻酒店地址預訂單。", s2: "" },
-            { id: "license", title: "免檢臨駕", desc: "臨時駕駛證新制：持台灣駕照申辦臨時駕駛證「完全不需要體檢」！", s1: "1. 材料簡單：準備台胞證正本、台灣駕照正本、一吋白底彩色證件照 2 張即可。", s2: "2. 窗口發照：到場直接窗口交件核對，工本費 10 元人民幣，當場領取紙本臨時駕照！" },
-            { id: "traffic", title: "自駕守則", desc: "在廣東開車，有幾個與台灣不同的重罰規則，請務必牢記：", s1: "珠海禮讓行人極嚴：斑馬線上只要有行人必須完全煞停，否則直接被拍照重罰並扣分。", s2: "深中通道區間測速：橋樑限速 100，海底隧道限速 80。請務必使用高德地圖導航。" }
-        ];
-        const defaultPackingItems = [
-            { name: "台胞證 (確認在有效期內)", checked: false, group: "docs" }, { name: "護照", checked: false, group: "docs" }, { name: "台灣駕照正本 (辦理臨駕必備)", checked: false, group: "docs" }, { name: "台灣身分證正本 (銀行開戶必備)", checked: false, group: "docs" }, { name: "白底一吋證件彩色大頭照 * 2張 (駕照用)", checked: false, group: "docs" },
-            { name: "手機", checked: false, group: "tech" }, { name: "SIM卡", checked: false, group: "tech" }, { name: "充電組 (含行動電源、萬國充、充電線)", checked: false, group: "tech" }, { name: "相機 (包含記憶卡、相機電池、腳架)", checked: false, group: "tech" }, { name: "自拍棒", checked: false, group: "tech" },
-            { name: "錢包 (內裝信用卡、人民幣現鈔)", checked: false, group: "daily" }, { name: "鑰匙", checked: false, group: "daily" }, { name: "水瓶", checked: false, group: "daily" }, { name: "雨傘 / 兩傘 (遮陽擋雨必備)", checked: false, group: "daily" },
-            { name: "衣服、褲子、內庫、襪子 (日常衣服套數)", checked: false, group: "clothes" }, { name: "薄外套 (防冷氣 / 滑雪防寒內搭)", checked: false, group: "clothes" }, { name: "帽子", checked: false, group: "clothes" }, { name: "太陽眼鏡", checked: false, group: "clothes" }, { name: "口罩", checked: false, group: "clothes" },
-            { name: "衛生紙、濕巾", checked: false, group: "hygiene" }, { name: "酒精", checked: false, group: "hygiene" }, { name: "刮鬍刀", checked: false, group: "hygiene" }, { name: "藥品組 (感冒、防暈、常備藥)", checked: false, group: "hygiene" }, { name: "耳塞", checked: false, group: "hygiene" }, { name: "眼罩", checked: false, group: "hygiene" }, { name: "頸枕", checked: false, group: "hygiene" }
-        ];
-
-        window.addEventListener('DOMContentLoaded', loadCloudData);
     </script>
 </body>
 </html>
