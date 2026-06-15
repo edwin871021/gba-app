@@ -255,7 +255,7 @@
                                 <i class="fa-solid fa-arrow-left mr-1"></i>前移
                             </button>
                             <button onclick="swapDay(1)" class="bg-amber-500 text-white px-2 py-1 rounded hover:bg-amber-600 transition text-[11px]">
-                                後移<i class="fa-solid fa-arrow-right ml-1"></i>
+                                後移<i class="fa-solid fa-arrow-right mr-1"></i>
                             </button>
                         </div>
                     </div>
@@ -263,7 +263,7 @@
                     <div class="grid grid-cols-1 gap-2 mb-1">
                         <div>
                             <label class="text-[10px] text-slate-400 block mb-0.5">本日行程總標題</label>
-                            <input type="text" id="input-day-title-纲" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="例: Day 1 - 抵達廣州 & 搶辦門號">
+                            <input type="text" id="input-day-main-title" class="w-full px-2 py-1.5 text-[0.8rem] border rounded-lg bg-slate-50 focus:bg-white" placeholder="例: Day 1 - 抵達廣州 & 搶辦門號">
                         </div>
                     </div>
 
@@ -508,7 +508,7 @@
         let isAdmin = false; let activeDay = 1; let editEventIndex = -1;
         let tripDays = {}; let guideData = []; let userExpenses = []; let packingItems = []; let activeGuideTab = ""; let tripWarning = {};
         let budgetMembers = ['我', '伴侶'];
-        let deviceTheme = localStorage.getItem('gba_theme_color') || 'blue'; // 初始化本機主題變數
+        let deviceTheme = localStorage.getItem('gba_theme_color') || 'blue';
         
         const defaultDashboardInfo = { 
             title: "大灣區旅遊助手", 
@@ -552,7 +552,6 @@
             }
         });
 
-        // 獨立本機換膚：渲染編輯模式下的色彩按鈕
         function renderThemePicker() {
             const container = document.getElementById('theme-picker-container');
             if (!container) return;
@@ -572,7 +571,6 @@
             });
         }
 
-        // 獨立本機換膚：執行本地裝置色彩切換
         function changeDeviceTheme(themeKey) {
             deviceTheme = themeKey;
             localStorage.setItem('gba_theme_color', themeKey);
@@ -592,7 +590,7 @@
             cancelEditTripEvent();
             clearGuideInputs();
             renderItineraryPage(); renderGuidesPage();
-            if (show) renderThemePicker(); // 解鎖後載入色盤選單
+            if (show) renderThemePicker();
         }
 
         function loadLocalPackingList() {
@@ -743,7 +741,6 @@
             pushTripDataToCloud(); showToast("注意事項已更新！");
         }
 
-        // 行程整天移位
         function swapDay(dir) {
             if(!isAdmin) return;
             let currentNum = parseInt(activeDay);
@@ -770,7 +767,6 @@
             renderDashboard(); renderItineraryPage();
         }
 
-        // 完美遞補型天數刪除邏輯
         function removeCurrentDay() {
             if(!isAdmin) return;
             const total = Object.keys(tripDays).length;
@@ -782,9 +778,9 @@
                 
                 for(let i = 1; i <= total; i++) {
                     if(i === parseInt(activeDay)) continue;
-                    newTripDays[newIndex] = tripDays[i];
-                    if(newTripDays[newIndex].title && newTripDays[newIndex].title.startsWith("Day ")) {
-                        newTripDays[newIndex].title = newTripDays[newIndex].title.replace(/^Day \d+/, `Day ${newIndex}`);
+                    newTripDays[String(newIndex)] = tripDays[String(i)] || tripDays[i];
+                    if(newTripDays[String(newIndex)].title && newTripDays[String(newIndex)].title.startsWith("Day ")) {
+                        newTripDays[String(newIndex)].title = newTripDays[String(newIndex)].title.replace(/^Day \d+/, `Day ${newIndex}`);
                     }
                     newIndex++;
                 }
@@ -813,7 +809,7 @@
                 if(d.events && d.events.length > 0) {
                     d.events.forEach(evt => {
                         md += `- **${evt.time}** | ${evt.isTask ? '⭐ ' : ''}${evt.title}\n`;
-                        if(evt.desc) md += `   > ${evt.desc.replace(/\n/g, '\n   > ')}\n`;
+                        if(evt.desc) md += `    > ${evt.desc.replace(/\n/g, '\n    > ')}\n`;
                     });
                 } else { md += `- 尚無排定細節\n`; }
                 md += `\n`;
@@ -827,8 +823,29 @@
             Object.keys(payerTotals).forEach(m => { if(payerTotals[m] > 0 || budgetMembers.includes(m)) md += `- ${m} 共支付: NT$ ${payerTotals[m].toLocaleString()}\n`; });
             md += `\n---\n*由大灣區旅遊助手自動匯出*`;
 
-            navigator.clipboard.writeText(md).then(() => { showToast("Markdown 已複製！可前往 Notion 貼上。"); })
-                .catch(err => { showToast("複製失敗，請檢查權限。", true); console.error(err); });
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(md).then(() => { showToast("Markdown 已複製！可前往 Notion 貼上。"); })
+                    .catch(err => { fallbackCopyText(md); });
+            } else {
+                fallbackCopyText(md);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Markdown 已複製！(相容模式)");
+            } catch (err) {
+                showToast("複製失敗，請檢查權限。", true);
+                console.error(err);
+            }
+            document.body.removeChild(textArea);
         }
 
         function renderItineraryPage() {
@@ -842,7 +859,7 @@
             if(document.getElementById('input-day-date')) document.getElementById('input-day-date').value = dayData.date || '';
             if(document.getElementById('input-day-city')) document.getElementById('input-day-city').value = dayData.city || '';
             if(document.getElementById('input-day-hotel')) document.getElementById('input-day-hotel').value = dayData.hotel || '';
-            if(document.getElementById('input-day-title-纲')) document.getElementById('input-day-title-纲').value = dayData.title || '';
+            if(document.getElementById('input-day-main-title')) document.getElementById('input-day-main-title').value = dayData.title || '';
 
             const totalDays = Object.keys(tripDays).length;
             const navBar = document.getElementById('day-nav-bar'); navBar.innerHTML = '';
@@ -932,6 +949,7 @@
             if (dir === -1 && idx > 0) { [events[idx], events[idx - 1]] = [events[idx - 1], events[idx]]; } 
             else if (dir === 1 && idx < events.length - 1) { [events[idx], events[idx + 1]] = [events[idx + 1], events[idx]]; }
             pushTripDataToCloud();
+            renderItineraryPage();
         }
 
         function updateDayInfo() {
@@ -939,7 +957,7 @@
             const newDate = document.getElementById('input-day-date').value.trim();
             const newCity = document.getElementById('input-day-city').value.trim();
             const newHotel = document.getElementById('input-day-hotel').value.trim();
-            const newTitle = document.getElementById('input-day-title-纲').value.trim();
+            const newTitle = document.getElementById('input-day-main-title').value.trim();
             
             if(newDate) tripDays[activeDay].date = newDate;
             if(newCity) tripDays[activeDay].city = newCity;
@@ -979,7 +997,7 @@
 
         function deleteTripEvent(idx) { 
             if(!isAdmin) return; 
-            if(confirm("確定要刪除此項活動嗎？")) { tripDays[activeDay].events.splice(idx, 1); pushTripDataToCloud(); }
+            if(confirm("確定要刪除此項活動嗎？")) { tripDays[activeDay].events.splice(idx, 1); pushTripDataToCloud(); renderItineraryPage(); }
         }
 
         function clearGuideInputs() {
@@ -1088,15 +1106,18 @@
                 totalExpense += item.cost; if (payerTotals[item.payer] === undefined) { payerTotals[item.payer] = 0; } payerTotals[item.payer] += item.cost;
             });
 
-            const summaryContainer = document.getElementById('budget-payers-summary'); summaryContainer.innerHTML = '';
-            Object.keys(payerTotals).forEach(payer => {
-                const isArchived = !budgetMembers.includes(payer); 
-                summaryContainer.innerHTML += `
-                    <div class="${isArchived ? 'opacity-50' : ''}">
-                        <p class="text-[12px] text-indigo-300 truncate">👤 ${payer}</p>
-                        <p class="text-[0.95rem] font-bold mt-0.5">NT$ ${payerTotals[payer].toLocaleString()}</p>
-                    </div>`;
-            });
+            const summaryContainer = document.getElementById('budget-payers-summary'); 
+            if (summaryContainer) {
+                summaryContainer.innerHTML = '';
+                Object.keys(payerTotals).forEach(payer => {
+                    const isArchived = !budgetMembers.includes(payer); 
+                    summaryContainer.innerHTML += `
+                        <div class="${isArchived ? 'opacity-50' : ''}">
+                            <p class="text-[12px] text-indigo-300 truncate">👤 ${payer}</p>
+                            <p class="text-[0.95rem] font-bold mt-0.5">NT$ ${payerTotals[payer].toLocaleString()}</p>
+                        </div>`;
+                });
+            }
 
             const activeCount = budgetMembers.length;
             let settlementHtml = `<div class="flex items-center mb-1.5"><i class="fa-solid fa-scale-balanced mr-2"></i><span class="font-bold text-[0.9rem] text-white">自動 AA 結算 (依目前 ${activeCount} 人均攤)</span></div>`;
@@ -1122,44 +1143,52 @@
                 settlementHtml += `</div>`;
             } else { settlementHtml += `<p class="text-[0.75rem] text-indigo-300">目前尚無開銷或付款人數據。</p>`; }
             
-            document.getElementById('budget-settlement-box').innerHTML = settlementHtml;
-            document.getElementById('budget-total-expense').innerText = `NT$ ${totalExpense.toLocaleString()}`;
-            document.getElementById('header-budget-total').innerText = `NT$ ${totalExpense.toLocaleString()}`;
+            if (document.getElementById('budget-settlement-box')) document.getElementById('budget-settlement-box').innerHTML = settlementHtml;
+            if (document.getElementById('budget-total-expense')) document.getElementById('budget-total-expense').innerText = `NT$ ${totalExpense.toLocaleString()}`;
+            if (document.getElementById('header-budget-total')) document.getElementById('header-budget-total').innerText = `NT$ ${totalExpense.toLocaleString()}`;
 
-            const selectPayer = document.getElementById('input-exp-payer'); const currentVal = selectPayer.value; 
-            if (budgetMembers.length > 0) {
-                selectPayer.innerHTML = budgetMembers.map(m => `<option value="${m}">🙋 ${m}</option>`).join('');
-                if (budgetMembers.includes(currentVal)) selectPayer.value = currentVal;
-            } else { selectPayer.innerHTML = `<option value="">請先新增付款人</option>`; }
+            const selectPayer = document.getElementById('input-exp-payer'); 
+            if (selectPayer) {
+                const currentVal = selectPayer.value; 
+                if (budgetMembers.length > 0) {
+                    selectPayer.innerHTML = budgetMembers.map(m => `<option value="${m}">🙋 ${m}</option>`).join('');
+                    selectPayer.value = budgetMembers.includes(currentVal) ? currentVal : budgetMembers[0];
+                } else { selectPayer.innerHTML = `<option value="">請先新增付款人</option>`; }
+            }
 
-            document.getElementById('member-tags-container').innerHTML = budgetMembers.map((m, idx) => `
-                <div class="flex items-center bg-white border border-indigo-200 rounded-full pl-3 pr-1 py-1 shadow-sm">
-                    <span class="text-[0.7rem] text-indigo-800 font-bold mr-2">${m}</span>
-                    <button onclick="deleteBudgetMember(${idx})" class="w-5 h-5 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-300 hover:bg-red-50 hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-xmark text-[0.6rem]"></i></button>
-                </div>`).join('');
+            if (document.getElementById('member-tags-container')) {
+                document.getElementById('member-tags-container').innerHTML = budgetMembers.map((m, idx) => `
+                    <div class="flex items-center bg-white border border-indigo-200 rounded-full pl-3 pr-1 py-1 shadow-sm">
+                        <span class="text-[0.7rem] text-indigo-800 font-bold mr-2">${m}</span>
+                        <button onclick="deleteBudgetMember(${idx})" class="w-5 h-5 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-300 hover:bg-red-50 hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-xmark text-[0.6rem]"></i></button>
+                    </div>`).join('');
+            }
 
-            const listContainer = document.getElementById('budget-items-list'); listContainer.innerHTML = '';
-            if (userExpenses.length === 0) { listContainer.innerHTML = `<div class="text-center py-6 text-[0.85rem] text-slate-400">目前雲端無記帳資料。</div>`; } 
-            else {
-                userExpenses.forEach((item, index) => {
-                    const div = document.createElement('div'); div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl bg-slate-50`;
-                    div.innerHTML = `
-                        <div class="flex items-center space-x-3 text-[0.85rem] flex-1 min-w-0">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 bg-indigo-100 text-indigo-600"><i class="fa-solid fa-receipt text-[0.7rem]"></i></div>
-                            <div class="truncate pr-2">
-                                <p class="font-extrabold text-slate-800 text-[0.9rem] truncate">${item.name}</p>
-                                <div class="flex items-center space-x-1.5 mt-1">
-                                    <span class="text-[0.6rem] px-1.5 py-0.5 border border-slate-200 bg-white text-slate-500 rounded font-medium">${item.category}</span>
-                                    <span class="text-[0.6rem] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-bold truncate max-w-[80px]">${item.payer}</span>
+            const listContainer = document.getElementById('budget-items-list'); 
+            if (listContainer) {
+                listContainer.innerHTML = '';
+                if (userExpenses.length === 0) { listContainer.innerHTML = `<div class="text-center py-6 text-[0.85rem] text-slate-400">目前雲端無記帳資料。</div>`; } 
+                else {
+                    userExpenses.forEach((item, index) => {
+                        const div = document.createElement('div'); div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl bg-slate-50`;
+                        div.innerHTML = `
+                            <div class="flex items-center space-x-3 text-[0.85rem] flex-1 min-w-0">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 bg-indigo-100 text-indigo-600"><i class="fa-solid fa-receipt text-[0.7rem]"></i></div>
+                                <div class="truncate pr-2">
+                                    <p class="font-extrabold text-slate-800 text-[0.9rem] truncate">${item.name}</p>
+                                    <div class="flex items-center space-x-1.5 mt-1">
+                                        <span class="text-[0.6rem] px-1.5 py-0.5 border border-slate-200 bg-white text-slate-500 rounded font-medium">${item.category}</span>
+                                        <span class="text-[0.6rem] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-bold truncate max-w-[80px]">${item.payer}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="flex items-center space-x-3 shrink-0 pl-1">
-                            <span class="text-[0.9rem] font-black text-slate-800 tracking-tight">NT$ ${item.cost.toLocaleString()}</span>
-                            <button onclick="deleteExpenseItem(${index})" class="text-slate-300 hover:text-red-500 transition active:scale-90 p-1.5"><i class="fa-solid fa-trash-can text-[0.95rem]"></i></button>
-                        </div>`;
-                    listContainer.appendChild(div);
-                });
+                            <div class="flex items-center space-x-3 shrink-0 pl-1">
+                                <span class="text-[0.9rem] font-black text-slate-800 tracking-tight">NT$ ${item.cost.toLocaleString()}</span>
+                                <button onclick="deleteExpenseItem(${index})" class="text-slate-300 hover:text-red-500 transition active:scale-90 p-1.5"><i class="fa-solid fa-trash-can text-[0.95rem]"></i></button>
+                            </div>`;
+                        listContainer.appendChild(div);
+                    });
+                }
             }
         }
 
@@ -1188,7 +1217,6 @@
             }
         }
 
-        // 行程靜態備份數據 (已完整補回包含「預訂參考編號：FQXYIW」與「深圳灣公園」在內的所有特種兵詳細細節與防坑文字)
         const defaultTripWarning = { title: "深中通道與深圳還車防坑必看！", desc: "您於 Day 7 (7/3 週五) 清晨需從珠海經深中通道趕回深圳還車。請務必嚴格控時，行程已為您精準規劃於 06:30 提早出發，避開工作日最可怕的早高峰塞車與潛在外地車牌限行，趕在 09:00 前至南油店優雅結算還車！" };
         const defaultTripDays = {
             1: { date: "6/27", title: "Day 1 (6/27 六) - 抵達廣州 & 搶辦門號", city: "廣州", hotel: "珠江新城區域酒店", events: [
@@ -1211,7 +1239,7 @@
             ]},
             4: { date: "6/30", title: "Day 4 (6/30 二) - 深圳無車精華遊", city: "深圳", hotel: "車公廟區域酒店", events: [
                 { time: "10:00 - 14:00", icon: "shopping", title: "第一站：星河COCO Park", desc: "早上睡到飽，搭地鐵 1 號線直達「購物公園站」。在開放式商場逛街、喝杯網紅手搖飲，中午挑一家排隊名店享用午餐。" },
-                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "搭 1 號線直達「華強路站/華強北站」。趁 18:00 電子批發市場收攤前，朝聖開源硬體極客天堂，並拍攝經典街景。" },
+                { time: "14:30 - 17:30", icon: "camera", title: "第二站：華強北步行街", desc: "搭 1 號線直達「華強路站/華強北站」。趁 18:00 電子批發市場收攤前，朝盛開源硬體極客天堂，並拍攝經典街景。" },
                 { time: "18:00 - 21:30", icon: "night", title: "第三站：東門老街", desc: "搭 1 號線直達「老街站」。在東門町美食街邊走邊吃解決晚餐，用相機捕捉賽博朋克感的不夜城街頭大片。" },
                 { time: "22:00 之後", icon: "landmark", title: "【終極備選】深圳灣公園", desc: "若逛完東門體力依然充沛可前往。深夜少了大白天的酷熱，漫步海濱棧道，遠眺對岸香港元朗的燈火與跨海大橋夜景。" }
             ]},
@@ -1227,7 +1255,7 @@
                 { time: "上午", icon: "temple", title: "圓明新園", desc: "按北京圓明園部分景觀 1:1 仿建，車程僅 10 分鐘，輕鬆走逛皇家園林景致。" },
                 { time: "中午/下午", icon: "camera", title: "北山大院文創區", desc: "漫步在古建築改建的文創區，找家設計感咖啡廳享受午後黑膠時光，極度適合車景與人像創作。" },
                 { time: "15:30 - 17:30", icon: "speed", title: "【重頭戲】景山公園索道與衝鋒車", desc: "開車前往情侶中路的城市陽台，對面就是景山公園。坐索道上山頂俯瞰無敵海景，再坐刺激的「衝鋒車」滑道極速下山！" },
-                { time: "傍晚", icon: "landmark", title: "【補齊情侶路南段】愛情郵局燈塔", desc: "出公園後直接順路攻略：城市陽台 ➔ 香爐灣沙灘 ➔ 珠海漁女 ➔ 愛情郵局（打卡網紅燈塔與夕陽海景），遠眺港珠澳大橋。" },
+                { time: "傍晚", icon: "landmark", title: "【補齊情侶路南段】愛情郵局燈塔", desc: "出公園後直接順路攻略：城市陽台 ➔ 香爐灣沙灘 ➔ 珠海漁女 ➔ 愛情郵局（打卡網網紅燈塔與夕陽海景），遠眺港珠澳大橋。" },
                 { time: "晚上", icon: "shopping", title: "富華里商圈晚餐", desc: "前往富華里開放式商業街區享用晚餐，體驗珠海時尚街區夜生活。" }
             ]},
             7: { date: "7/03", title: "Day 7 (7/3 五) - 極速還車 & 南山精華遊", city: "深圳", hotel: "南油區域酒店", events: [
