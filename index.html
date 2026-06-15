@@ -447,6 +447,21 @@
     </div>
 
     <script>
+        // 安全防護：將使用者輸入的文字進行 HTML 轉義，防止腳本攻擊 (XSS)
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>"']/g, function(match) {
+                const escapeMap = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#x27;'
+                };
+                return escapeMap[match];
+            });
+        }
+
         function toggleFontSlider() {
             const popup = document.getElementById('font-slider-popup');
             popup.classList.toggle('hidden');
@@ -517,18 +532,29 @@
         };
         let dashboardInfo = {};
 
+        // 核心修改：動態拼接帳密防護法
         function toggleAdminAuth() {
             if (!isAdmin) {
                 const pin = prompt("請輸入您的 4 位數解鎖代碼：");
-                if (pin === null) return;
-                if (pin === "1021" || pin === "0708") { 
-                    firebase.auth().signInWithEmailAndPassword("a@a.com", "871021")
-                        .catch((err) => { showToast("Firebase 連線失敗，請確認後台已被啟用且密碼無誤", true); console.error(err); });
-                } else {
-                    showToast("代碼錯誤，拒絕開通編輯權限！", true);
-                }
+                if (!pin) return; // 按取消或沒輸入就跳出
+
+                // 把輸入的 4 個數字，動態組合成信箱與密碼！
+                const loginEmail = `admin${pin}@gba.com`;
+                const loginPassword = `trip${pin}`; 
+
+                firebase.auth().signInWithEmailAndPassword(loginEmail, loginPassword)
+                    .then(() => {
+                        showToast("解鎖成功！已開啟編輯權限。");
+                    })
+                    .catch((err) => {
+                        showToast("代碼錯誤，拒絕開通編輯權限！", true);
+                        console.error("登入失敗", err);
+                    });
             } else {
-                firebase.auth().signOut();
+                if(confirm("確定要鎖定並關閉編輯模式嗎？")) {
+                    firebase.auth().signOut();
+                    showToast("已鎖定編輯介面。");
+                }
             }
         }
 
@@ -1076,7 +1102,8 @@
             Object.keys(groups).forEach(k => { if(groups[k]) groups[k].innerHTML = ''; }); let checkedCount = 0;
             packingItems.forEach((item, index) => {
                 if (item.checked) checkedCount++; const div = document.createElement('div'); div.className = `flex items-center justify-between p-2 rounded-lg border ${item.checked ? 'bg-indigo-50/40 text-slate-400 line-through' : 'bg-slate-50'}`;
-                div.innerHTML = `<label class="flex items-center space-x-3 cursor-pointer flex-1"><input type="checkbox" onchange="togglePackingItem(${index}, this)" ${item.checked ? 'checked' : ''} class="w-4 h-4 text-brand-500"><span class="text-[0.85rem] font-semibold">${item.name}</span></label><button onclick="deletePackingItem(${index})" class="text-slate-300 hover:text-red-500 text-[0.85rem] transition active:scale-90"><i class="fa-solid fa-trash"></i></button>`;
+                // XSS 防護：在渲染使用者自訂的行李名稱時，使用 escapeHTML
+                div.innerHTML = `<label class="flex items-center space-x-3 cursor-pointer flex-1"><input type="checkbox" onchange="togglePackingItem(${index}, this)" ${item.checked ? 'checked' : ''} class="w-4 h-4 text-brand-500"><span class="text-[0.85rem] font-semibold">${escapeHTML(item.name)}</span></label><button onclick="deletePackingItem(${index})" class="text-slate-300 hover:text-red-500 text-[0.85rem] transition active:scale-90"><i class="fa-solid fa-trash"></i></button>`;
                 if(groups[item.group]) groups[item.group].appendChild(div);
             });
             document.getElementById('header-packing-count').innerText = `${checkedCount}/${packingItems.length}`; document.getElementById('packing-stat-text').innerText = `已打包 ${checkedCount} / ${packingItems.length}`;
@@ -1111,9 +1138,10 @@
                 summaryContainer.innerHTML = '';
                 Object.keys(payerTotals).forEach(payer => {
                     const isArchived = !budgetMembers.includes(payer); 
+                    // XSS 防護
                     summaryContainer.innerHTML += `
                         <div class="${isArchived ? 'opacity-50' : ''}">
-                            <p class="text-[12px] text-indigo-300 truncate">👤 ${payer}</p>
+                            <p class="text-[12px] text-indigo-300 truncate">👤 ${escapeHTML(payer)}</p>
                             <p class="text-[0.95rem] font-bold mt-0.5">NT$ ${payerTotals[payer].toLocaleString()}</p>
                         </div>`;
                 });
@@ -1135,7 +1163,7 @@
                 let transactions = []; let i = 0, j = 0;
                 while (i < debtors.length && j < creditors.length) {
                     let debtor = debtors[i]; let creditor = creditors[j]; let amountToPay = Math.min(debtor.amount, creditor.amount);
-                    if (amountToPay > 0.5) { transactions.push(`<p class="text-[0.75rem]"><span class="text-amber-400 font-bold bg-amber-400/10 px-1 rounded">${debtor.name}</span> 需給 <span class="text-emerald-400 font-bold bg-emerald-400/10 px-1 rounded">${creditor.name}</span> <strong class="text-white px-0.5">NT$ ${Math.round(amountToPay).toLocaleString()}</strong></p>`); }
+                    if (amountToPay > 0.5) { transactions.push(`<p class="text-[0.75rem]"><span class="text-amber-400 font-bold bg-amber-400/10 px-1 rounded">${escapeHTML(debtor.name)}</span> 需給 <span class="text-emerald-400 font-bold bg-emerald-400/10 px-1 rounded">${escapeHTML(creditor.name)}</span> <strong class="text-white px-0.5">NT$ ${Math.round(amountToPay).toLocaleString()}</strong></p>`); }
                     debtor.amount -= amountToPay; creditor.amount -= amountToPay;
                     if (debtor.amount < 0.5) i++; if (creditor.amount < 0.5) j++;
                 }
@@ -1151,7 +1179,8 @@
             if (selectPayer) {
                 const currentVal = selectPayer.value; 
                 if (budgetMembers.length > 0) {
-                    selectPayer.innerHTML = budgetMembers.map(m => `<option value="${m}">🙋 ${m}</option>`).join('');
+                    // XSS 防護
+                    selectPayer.innerHTML = budgetMembers.map(m => `<option value="${escapeHTML(m)}">🙋 ${escapeHTML(m)}</option>`).join('');
                     selectPayer.value = budgetMembers.includes(currentVal) ? currentVal : budgetMembers[0];
                 } else { selectPayer.innerHTML = `<option value="">請先新增付款人</option>`; }
             }
@@ -1159,7 +1188,7 @@
             if (document.getElementById('member-tags-container')) {
                 document.getElementById('member-tags-container').innerHTML = budgetMembers.map((m, idx) => `
                     <div class="flex items-center bg-white border border-indigo-200 rounded-full pl-3 pr-1 py-1 shadow-sm">
-                        <span class="text-[0.7rem] text-indigo-800 font-bold mr-2">${m}</span>
+                        <span class="text-[0.7rem] text-indigo-800 font-bold mr-2">${escapeHTML(m)}</span>
                         <button onclick="deleteBudgetMember(${idx})" class="w-5 h-5 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-300 hover:bg-red-50 hover:text-red-500 transition active:scale-90"><i class="fa-solid fa-xmark text-[0.6rem]"></i></button>
                     </div>`).join('');
             }
@@ -1171,14 +1200,15 @@
                 else {
                     userExpenses.forEach((item, index) => {
                         const div = document.createElement('div'); div.className = `flex justify-between items-center p-2.5 border border-slate-100 rounded-xl bg-slate-50`;
+                        // XSS 防護：將所有使用者輸入的字串用 escapeHTML 處理
                         div.innerHTML = `
                             <div class="flex items-center space-x-3 text-[0.85rem] flex-1 min-w-0">
                                 <div class="w-8 h-8 rounded-full flex items-center justify-center shadow-sm shrink-0 bg-indigo-100 text-indigo-600"><i class="fa-solid fa-receipt text-[0.7rem]"></i></div>
                                 <div class="truncate pr-2">
-                                    <p class="font-extrabold text-slate-800 text-[0.9rem] truncate">${item.name}</p>
+                                    <p class="font-extrabold text-slate-800 text-[0.9rem] truncate">${escapeHTML(item.name)}</p>
                                     <div class="flex items-center space-x-1.5 mt-1">
-                                        <span class="text-[0.6rem] px-1.5 py-0.5 border border-slate-200 bg-white text-slate-500 rounded font-medium">${item.category}</span>
-                                        <span class="text-[0.6rem] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-bold truncate max-w-[80px]">${item.payer}</span>
+                                        <span class="text-[0.6rem] px-1.5 py-0.5 border border-slate-200 bg-white text-slate-500 rounded font-medium">${escapeHTML(item.category)}</span>
+                                        <span class="text-[0.6rem] px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded font-bold truncate max-w-[80px]">${escapeHTML(item.payer)}</span>
                                     </div>
                                 </div>
                             </div>
